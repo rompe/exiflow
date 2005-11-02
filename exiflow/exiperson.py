@@ -12,41 +12,10 @@ import os
 import optparse
 import subprocess
 import ConfigParser
+import exiflow.exif
 
 configfiles = ["/etc/exiflow/exif.cfg",
                os.path.expanduser('~/.exiflow/exif.cfg')]
-
-class NotAnImageError(Exception):
-   def __init__(self, value):
-      self.value = value
-   def __str__(self):
-      return repr(self.value)
-
-def read_exif(filename):
-   """
-   Read EXIF information from filename
-   and return a dictionary containing the collected values.
-   """
-   myexif = {}
-   exiftool = subprocess.Popen("exiftool -S " + filename, shell=True,
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-   for line in exiftool.stdout:
-      if ": " in line:
-         key, value = line.split(": ", 1)
-         myexif[key] = value.strip()
-   if exiftool.wait():
-      raise NotAnImageError, "".join(exiftool.stderr)
-   else:
-# We have to read the ImageDescription binary because it may contain
-# things like line breaks.
-      myexif["ImageDescription"] = \
-         "".join(subprocess.Popen("exiftool -b -ImageDescription " + filename,
-                             shell=True, stdout=subprocess.PIPE).stdout)
-# Be shure to have proper UTF8 strings
-   for key in myexif:
-      myexif[key] = unicode(myexif[key], "utf-8")
-   return myexif
-
 
 parser = optparse.OptionParser(usage="usage: %prog [options] [-- -TAGNAME=" \
                                      "VALUE [...]] <files or dirs>")
@@ -96,24 +65,24 @@ if myoptions.section:
 
 for imagefile in imagefiles:
 
+   exif_file = exiflow.exif.Exif(imagefile)
    try:
-      exif = read_exif(imagefile)
-   except NotAnImageError, message:
+      exif_file.read_exif()
+   except IOError, msg:
       if myoptions.verbose:
-         print "Skipping %s: %s" % (imagefile, message)
+         print "Skipping %s: %s" % (imagefile, msg)
       continue
 
    personals = defaultpersonals[:]
-   if exif.has_key("Model") and config.has_section(exif["Model"]):
-      personals += config.items(exif["Model"])
+   if exif_file.fields.has_key("Model") and config.has_section(exif_file.fields["Model"]):
+      personals += config.items(exif_file.fields["Model"])
 
-   exiftool_config_args = ""
-   for pair in personals:
-      exiftool_config_args += " -%s=\"%s\"" % pair
+   exif_file.fields = {}
+   for key, value in personals:
+      exif_file.fields[key] = value
 
-   exiftool = "exiftool -P -overwrite_original" + exiftool_config_args + \
-              exiftool_args + " " + imagefile
+   try:
+      exif_file.write_exif()
+   except IOError, msg:
+      print "Error writing EXIF data:\n", imagefile, "\n", msg
 
-   if myoptions.verbose:
-      print "Running: " + exiftool
-   subprocess.call(exiftool, shell=True)

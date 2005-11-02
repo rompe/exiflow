@@ -67,4 +67,31 @@ class Exif:
       return exiftool.wait()
 
 
+   def update_exif(self, sourcefile):
+      """
+      Copy Exif Information from sourcefile into destfile and merge in values
+      from myexif. The fields used for merging have to be defined in exiffields.
+      Raises IOError on errors.
+      """
+# Fields we want to keep
+      exiffields = ["Artist", "Credit", "Copyright", "CopyrightNotice", 
+                    "ImageDescription", "Keywords", "Location", "UserComment",
+                    "XPTitle"]
+      command = "exiftool -overwrite_original -P -TagsFromFile " + sourcefile
+      for field in exiffields:
+         if field in self.fields:
+            if field == "Keywords":
+               for keyword in self.fields[field].split(","):
+                  command += " -%s=\"%s\"" % (field, keyword)
+            else:
+               command += " -%s=\"%s\"" % (field, self.fields[field])
+      command += " " + self.filename
+      ret = True
+      exiftool = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE)
+# exiftool doesn't reflect errors in it's return code, so we have to
+# assume an error if something is written to stderr.
+      for line in exiftool.stderr:
+         raise IOError, "".join(exiftool.stderr)
+      return exiftool.wait()
+
 

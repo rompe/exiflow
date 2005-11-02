@@ -20,68 +20,7 @@ import sys
 import glob
 import optparse
 import subprocess
-
-
-class NotAnImageError(Exception):
-   def __init__(self, value):
-      self.value = value
-   def __str__(self):
-      return repr(self.value)
-
-def read_exif(filename):
-   """
-   Read EXIF information from filename
-   and return a dictionary containing the collected values.
-   """
-   myexif = {}
-   exiftool = subprocess.Popen("exiftool -S " + filename, shell=True,
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-   for line in exiftool.stdout:
-      if ": " in line:
-         key, value = line.split(": ", 1)
-         myexif[key] = value.strip()
-   if exiftool.wait():
-      raise NotAnImageError, "".join(exiftool.stderr)
-   else:
-# We have to read the ImageDescription binary because it may contain
-# things like line breaks.
-      myexif["ImageDescription"] = \
-         "".join(subprocess.Popen("exiftool -b -ImageDescription " + filename,
-                             shell=True, stdout=subprocess.PIPE).stdout)
-# Be shure to have proper UTF8 strings
-   for key in myexif:
-      myexif[key] = unicode(myexif[key], "utf-8")
-   return myexif
-
-
-def update_exif(destfile, sourcefile, myexif):
-   """
-   Copy Exif Information from sourcefile into destfile and merge in values
-   from myexif. The fields used for merging have to be defined in exiffields.
-   Returns True on success.
-   """
-# Fields we want to keep
-   exiffields = ["Artist", "Credit", "Copyright", "CopyrightNotice", 
-                 "ImageDescription", "Keywords", "Location", "UserComment",
-                 "XPTitle"]
-   command = "exiftool -overwrite_original -P -TagsFromFile " + sourcefile
-   for field in exiffields:
-      if field in myexif:
-         if field == "Keywords":
-            for keyword in myexif[field].split(","):
-               command += " -%s=\"%s\"" % (field, keyword)
-         else:
-            command += " -%s=\"%s\"" % (field, myexif[field])
-   command += " " + destfile
-   ret = True
-   exiftool = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE)
-# exiftool doesn't reflect errors in it's return code, so we have to
-# assume an error if something is written to stderr.
-   for line in exiftool.stderr:
-      print >>sys.stderr, line
-      ret = False
-   exiftool.wait()
-   return ret
+import exiflow.exif
 
 
 parser = optparse.OptionParser(usage="usage: %prog [options] <files or dirs>")
@@ -115,12 +54,13 @@ for imagefile in imagefiles:
    mymatch = filename_re.match(os.path.basename(imagefile))
    if mymatch:
       leader, revision = mymatch.groups()
+      exif_file = exiflow.exif.Exif(imagefile)
       try:
-         imageexif = read_exif(imagefile)
-      except NotAnImageError, msg:
+         exif_file.read_exif()
+      except IOError, msg:
          print msg
          continue
-      if not myoptions.force and imageexif.has_key("DateTimeOriginal"):
+      if not myoptions.force and exif_file.fields.has_key("DateTimeOriginal"):
          if myoptions.verbose:
             print "Skipping %s, it seems to contain EXIF data." % imagefile
          continue
@@ -134,14 +74,15 @@ for imagefile in imagefiles:
       if len(mtimes) == 0 and myoptions.verbose:
          print "No sibling found for %s." % imagefile
       for otherfile in sorted(mtimes, None, None, True):
+         other_exif_file = exiflow.exif.Exif(mtimes[otherfile])
          try:
-            otherexif = read_exif(mtimes[otherfile])
-         except NotAnImageError:
+            other_exif_file.read_exif()
+         except IOError:
             continue
-         otherexif.update(imageexif)
-         if otherexif != imageexif:
+         other_exif_file.fields.update(exif_file.fields)
+         if other_exif_file.fields != exif_file.fields:
             if myoptions.verbose:
                print "Updating %s from %s." % (imagefile, mtimes[otherfile])
-            update_exif(imagefile, mtimes[otherfile], imageexif)
+            exif_file.update_exif(mtimes[otherfile])
             break
 
