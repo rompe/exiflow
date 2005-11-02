@@ -125,11 +125,14 @@ for imagefile in imagefiles:
             print "Skipping %s, it seems to contain EXIF data." % imagefile
          continue
       mtimes = {}
-      for otherfile in glob.glob(leader + "*"):
+      for otherfile in glob.glob(os.path.join(os.path.dirname(imagefile),
+                                              leader + "*")):
          if otherfile == imagefile:
             continue
          else:
             mtimes[str(os.stat(otherfile).st_mtime) + otherfile] = otherfile
+      if len(mtimes) == 0 and myoptions.verbose:
+         print "No sibling found for %s." % imagefile
       for otherfile in sorted(mtimes, None, None, True):
          try:
             otherexif = read_exif(mtimes[otherfile])

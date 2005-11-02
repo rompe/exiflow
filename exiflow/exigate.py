@@ -7,66 +7,7 @@ import sys
 import gzip
 import xml.dom.minidom
 import re
-
-class NotAnImageError(Exception):
-   def __init__(self, value):
-      self.value = value
-   def __str__(self):
-      return repr(self.value)
-
-
-def read_exif(filename):
-   """
-   Read EXIF information from filename
-   and return a dictionary containing the collected values.
-   """
-   myexif = {}
-   exiftool = subprocess.Popen("exiftool -d %s -S " + filename, shell=True,
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-   for line in exiftool.stdout:
-      if ": " in line:
-         key, value = line.split(": ", 1)
-         myexif[key] = value.strip()
-   if exiftool.wait():
-      raise NotAnImageError, "".join(exiftool.stderr)
-   else:
-# We have to read the ImageDescription binary because it may contain
-# things like line breaks.
-      myexif["ImageDescription"] = \
-         "".join(subprocess.Popen("exiftool -b -ImageDescription " + filename,
-                             shell=True, stdout=subprocess.PIPE).stdout)
-# Be shure to have proper UTF8 strings
-   for key in myexif:
-      myexif[key] = unicode(myexif[key], "utf-8")
-   return myexif
-
-
-def write_exif(filename, myexif):
-   """
-   Write Exif Information from myexif into filename.
-   Returns True on success.
-   """
-   command = "exiftool -overwrite_original -P"
-   for field in myexif.keys():
-      if field == "Keywords":
-         for keyword in myexif[field].split(","):
-            command += " -%s=\"%s\"" % (field, keyword)
-      elif field == "DateTimeOriginal":
-# TODO: Writing back DateTimeOriginal seems to be a bad idea since gthumb
-# drops seconds and there is some confusion with time strings and epoch.
-         continue
-      else:
-         command += " -%s=\"%s\"" % (field, myexif[field])
-   command += " " + filename
-   ret = True
-   exiftool = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE)
-# exiftool doesn't reflect errors in it's return code, so we have to
-# assume an error if something is written to stderr.
-   for line in exiftool.stderr:
-      print >>sys.stderr, line
-      ret = False
-   exiftool.wait()
-   return ret
+import exiflow.exif
 
 
 def read_gthumb(filename):
@@ -194,23 +135,32 @@ def autogate_gthumb(filename, myoptions):
       except IOError, msg:
          print "Error reading gthumb comment:\n", myxmlfile, "\n", msg
          return False
-      write_exif(filename, gthumb)
-      write_gthumb(filename, gthumb, myoptions.addfields,
-                   myoptions.template)
+      exif_file = exiflow.exif.Exif(filename)
+      exif_file.fields = gthumb
+      try:
+         exif_file.write_exif()
+      except IOError, msg:
+         print "Error writing EXIF data:\n", filename, "\n", msg
+         return False
+# TODO: Find out why we intruduced this line. Seems odd...
+      #write_gthumb(filename, gthumb, myoptions.addfields,
+      #             myoptions.template)
       os.utime(myxmlfile, (filetimestamp, filetimestamp))
       os.utime(filename, (filetimestamp, filetimestamp))
    elif filetimestamp > xmltimestamp or myoptions.template:
       if myoptions.verbose:
          print "Updating comment file from", filename
+      exif_file = exiflow.exif.Exif(filename)
       try:
-         exif = read_exif(filename)
-      except NotAnImageError, message:
+         exif_file.read_exif()
+      except IOError, message:
          if myoptions.verbose:
             print "Skipping %s: %s" % (filename, message)
          return 1
-      write_gthumb(filename, exif, myoptions.addfields, myoptions.template)
+      write_gthumb(filename, exif_file.fields, myoptions.addfields, myoptions.template)
       os.utime(myxmlfile, (filetimestamp, filetimestamp))
    else:
+# TODO: Templates should be created here (and everywhere else) if ordered by the user.
       if myoptions.verbose:
          print filename, "is in sync with comment file"
    return True
