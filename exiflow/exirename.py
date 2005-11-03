@@ -16,40 +16,10 @@ import time
 import optparse
 import subprocess
 import ConfigParser
+import exiflow.exif
 
 configfiles = ["/etc/exiflow/cameras.cfg",
                os.path.expanduser('~/.exiflow/cameras.cfg')]
-
-class NotAnImageError(Exception):
-   def __init__(self, value):
-      self.value = value
-   def __str__(self):
-      return repr(self.value)
-
-def read_exif(filename):
-   """
-   Read EXIF information from filename
-   and return a dictionary containing the collected values.
-   """
-   myexif = {}
-   exiftool = subprocess.Popen("exiftool -S " + filename, shell=True,
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-   for line in exiftool.stdout:
-      if ": " in line:
-         key, value = line.split(": ", 1)
-         myexif[key] = value.strip()
-   if exiftool.wait():
-      raise NotAnImageError, "".join(exiftool.stderr)
-   else:
-# We have to read the ImageDescription binary because it may contain
-# things like line breaks.
-      myexif["ImageDescription"] = \
-         "".join(subprocess.Popen("exiftool -b -ImageDescription " + filename,
-                             shell=True, stdout=subprocess.PIPE).stdout)
-# Be shure to have proper UTF8 strings
-   for key in myexif:
-      myexif[key] = unicode(myexif[key], "utf-8")
-   return myexif
 
 
 parser = optparse.OptionParser(usage="usage: %prog [options] <files or dirs>")
@@ -95,14 +65,15 @@ for imagefile in imagefiles:
       continue
    extension = imagefile[tmpindex + 1 : len(imagefile)].lower()
    leader = imagefile[0 : tmpindex]
+   exif_file = exiflow.exif.Exif(imagefile)
    try:
-      exif = read_exif(imagefile)
-   except NotAnImageError, message:
+      exif_file.read_exif()
+   except IOError, message:
       if myoptions.verbose:
          print "Skipping %s: %s" % (imagefile, message)
       continue
-   model = exif.get("Model", "all")
-   date = exif.get("DateTimeOriginal", "0")
+   model = exif_file.fields.get("Model", "all")
+   date = exif_file.fields.get("DateTimeOriginal", "0")
    if ":" in date:
       date = date[0:4] + date[5:7] + date[8:10]
    else:
