@@ -160,7 +160,6 @@ def autogate_gthumb(filename, myoptions):
       write_gthumb(filename, exif_file.fields, myoptions.addfields, myoptions.template)
       os.utime(myxmlfile, (filetimestamp, filetimestamp))
    else:
-# TODO: Templates should be created here (and everywhere else) if ordered by the user.
       if myoptions.verbose:
          print filename, "is in sync with comment file"
    return True
