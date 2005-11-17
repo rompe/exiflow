@@ -1,7 +1,7 @@
 #!/usr/bin/env python2.4
 # -*- coding: utf-8 -*-
 """
-A class that hosts information about files given in it's contructor.
+An (iterable!) class that hosts information about files given in it's contructor.
 """
 
 import os
