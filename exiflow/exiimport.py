@@ -34,7 +34,7 @@ if len(args) > 0 or not options.mount or not options.target:
 # Build file list whithout skipping unknown files
 filelist = exiflow.filelist.Filelist()
 if options.verbose:
-   print "Read config files:", " ".join(filelist.get_read_config_files()
+   print "Read config files:", " ".join(filelist.get_read_config_files())
 filelist.process_unknown_types()
 filelist.add_files(options.mount)
 

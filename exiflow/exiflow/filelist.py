@@ -42,7 +42,6 @@ class Filelist:
       found_unknown = False
       filelist = []
       for path in pathes:
-         print "path:", path
          if os.path.isfile(path):
             filelist.append(path)
          elif os.path.isdir(path):
