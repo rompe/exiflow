@@ -25,12 +25,16 @@ parser.add_option("-d", "--device", dest="device",
                   help="Mounted device file. If given, this device will be " \
                        "unmounted using pumount after the import. Corresponds" \
                        " to %d in the gnome-volume-manager config dialog.")
+parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
+                  help="Be verbose.")
 options, args = parser.parse_args()
 if len(args) > 0 or not options.mount or not options.target:
     sys.exit("Wrong syntax, call with --help for info.")
 
 # Build file list whithout skipping unknown files
 filelist = exiflow.filelist.Filelist()
+if options.verbose:
+   print "Read config files:", " ".join(filelist.get_read_config_files()
 filelist.process_unknown_types()
 filelist.add_files(options.mount)
 

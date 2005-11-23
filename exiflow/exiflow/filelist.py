@@ -22,7 +22,7 @@ class Filelist:
       self._filestats = {}
       self._fullsize = 0
       self._process_unknown_types = False
-      settings, read_files = exiflow.configfile.settings()
+      settings, self._read_config_files = exiflow.configfile.settings()
       self._image_extensions = settings.get("all", "image_extensions").split()
       self._unwanted_files = settings.get("all", "unwantend_files").split()
       self._unwanted_dirs = settings.get("all", "unwantend_dirs").split()
@@ -124,4 +124,11 @@ class Filelist:
       Get number of files.
       """
       return len(self._files)
+
+   
+   def get_read_config_files(self):
+      """
+      Get names of read config files.
+      """
+      return self._read_config_files
 
