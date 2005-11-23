@@ -25,6 +25,7 @@ class Filelist:
       settings, read_files = exiflow.configfile.settings()
       self._image_extensions = settings.get("all", "image_extensions").split()
       self._unwanted_files = settings.get("all", "unwantend_files").split()
+      self._unwanted_dirs = settings.get("all", "unwantend_dirs").split()
       for path in pathes:
          self.add_files(path)
 
@@ -45,7 +46,10 @@ class Filelist:
          if os.path.isfile(path):
             filelist.append(path)
          elif os.path.isdir(path):
-            for root, dirs, files in os.walk(path):
+            for root, dirs, files in os.walk(path, True):
+               for unwanted_dir in self._unwanted_dirs:
+                  if unwanted_dir in dirs:
+                     dirs.remove(unwanted_dir)
                for basefile in files:
                   filelist.append(os.path.join(root, basefile))
          else:

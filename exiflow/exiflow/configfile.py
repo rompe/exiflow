@@ -24,7 +24,8 @@ def settings():
 # Create some defaults
    config.add_section("all")
    config.set("all", "image_extensions", ".jpg .nef .raw .crw .tif")
-   config.set("all", "unwantend_files", "nikon100.dsc")
+   config.set("all", "unwantend_files", "nikon001.dsc")
+   config.set("all", "unwantend_dirs", ".comments")
 # Eventually read config files
    read_files = config.read([global_config, local_config])
 # Write private config file
