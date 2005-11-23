@@ -51,9 +51,10 @@ class Filelist:
          else:
             raise IOError, path + " is not a regular file or directory."
       for filename in filelist:
+         basefilename = os.path.basename(filename).lower()
          if (self._process_unknown_types == True or \
-             os.path.splitext(filename)[1] in self._image_extensions) and \
-            not os.path.basename(filename) in self._unwanted_files:
+             os.path.splitext(basefilename)[1] in self._image_extensions) and \
+            not basefilename in self._unwanted_files:
             found_known = True
             self._files.append(filename)
             filestat = os.stat(filename)
