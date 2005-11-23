@@ -7,7 +7,7 @@ it doesn't exist. Afterwards a configparser object of this file and
 /etc/exiflow/<classname>.cfg is returned.
 """
 
-import os.path
+import os
 import ConfigParser
 
 global_config_dir = "/etc/exiflow"
@@ -28,7 +28,9 @@ def settings():
    config.set("all", "unwantend_dirs", ".comments")
 # Eventually read config files
    read_files = config.read([global_config, local_config])
-# Write private config file
+# Write private config file (unconditionally, in case we have new options)
+   if not os.path.isdir(local_config_dir):
+      os.makedirs(local_config_dir)
    config.write(open(local_config, "w"))
    return config, read_files
 
