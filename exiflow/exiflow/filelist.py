@@ -6,15 +6,14 @@ An (iterable!) class that hosts information about files given in it's contructor
 
 import os
 import time
+import exiflow.configfile
 
 class Filelist:
 
-   knownextensions = (".jpg", ".nef", ".raw", ".crw", ".tif")
-
-   def __init__(self, process_unknown_types=False, *pathes):
+   def __init__(self, *pathes):
       """
-      Create FileList object and set _process_unknown_types to given value.
-      Call add_files() with all remaining arguments.
+      Create FileList object.
+      Call add_files() with all arguments.
       If process_unknown_types is given, then no files will be skipped.
       """
       self._files = []
@@ -22,11 +21,15 @@ class Filelist:
       self._filedates = {}
       self._filestats = {}
       self._fullsize = 0
-      self._process_unknown_types = process_unknown_types
-      self.add_files(pathes)
+      self._process_unknown_types = False
+      settings, read_files = exiflow.configfile.settings()
+      self._image_extensions = settings.get("all", "image_extensions").split()
+      self._unwanted_files = settings.get("all", "unwantend_files").split()
+      for path in pathes:
+         self.add_files(path)
 
 
-   def add_files(self, pathes):
+   def add_files(self, *pathes):
       """
       Add filenames found in pathes either to _files or _skippedfiles,
       depending on their extension and the value of _process_unknown_types.
@@ -48,8 +51,9 @@ class Filelist:
          else:
             raise IOError, path + " is not a regular file or directory."
       for filename in filelist:
-         if self._process_unknown_types == True or \
-            os.path.splitext(filename)[1] in self.knownextensions:
+         if (self._process_unknown_types == True or \
+             os.path.splitext(filename)[1] in self._image_extensions) and \
+            not os.path.basename(filename) in self._unwanted_files:
             found_known = True
             self._files.append(filename)
             filestat = os.stat(filename)
@@ -61,6 +65,16 @@ class Filelist:
             found_unknown = True
             self._skippedfiles.append(filename)
       return found_known and not found_unknown
+
+
+   def process_unknown_types(self):
+      """
+      Set _process_unknown_types to True, meaning that following method calls
+      should work on every file except those listed in "unwanted_files" in
+      the config file. Typical usage will be to call the constructor without
+      arguments, then call this method, and then call add_files().
+      """
+      self._process_unknown_types = True
 
 
    def __iter__(self):

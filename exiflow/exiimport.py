@@ -30,7 +30,9 @@ if len(args) > 0 or not options.mount or not options.target:
     sys.exit("Wrong syntax, call with --help for info.")
 
 # Build file list whithout skipping unknown files
-filelist = exiflow.filelist.Filelist(True, options.mount)
+filelist = exiflow.filelist.Filelist()
+filelist.process_unknown_types()
+filelist.add_files(options.mount)
 
 # Cry if we found no images
 if filelist.get_filecount() == 0:
