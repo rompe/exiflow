@@ -1,0 +1,17 @@
+#!/usr/bin/env python2.4
+# -*- coding: utf-8 -*-
+"""
+Install the exiflow collection on your computer.
+"""
+
+import distutils.core
+
+distutils.core.setup(name='exiflow',
+                     version='0.1',
+                     scripts=['exiassign.py',
+                              'exigate.py',
+                              'exiimport.py',
+                              'exiperson.py',
+                              'exirename.py'],
+                     packages=['exiflow'])
+
