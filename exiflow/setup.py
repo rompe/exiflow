@@ -8,10 +8,10 @@ import distutils.core
 
 distutils.core.setup(name='exiflow',
                      version='0.1',
-                     scripts=['exiassign.py',
-                              'exigate.py',
-                              'exiimport.py',
-                              'exiperson.py',
-                              'exirename.py'],
+                     scripts=['exiassign',
+                              'exigate',
+                              'exiimport',
+                              'exiperson',
+                              'exirename'],
                      packages=['exiflow'])
 

@@ -1,0 +1,4 @@
+#!/usr/bin/env python2.4
+import sys
+import exiflow.exiperson
+sys.exit(exiflow.exiperson.run(sys.argv[1:]))
