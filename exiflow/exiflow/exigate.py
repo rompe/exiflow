@@ -167,17 +167,18 @@ def autogate_gthumb(filename, myoptions):
 
 
 
-parser = optparse.OptionParser(usage="usage: %prog [options] <files or dirs>")
-parser.add_option("--gthumb", action="store_true", dest="gthumb",
-                  help="Gateway to/from gthumb comment files." \
-                       "This is the default.")
-parser.add_option("--additional-fields", "-a", action="store_true",
-                  dest="addfields",
-                  help="When gating from Exif to gthumb, combine additional" \
-                       "Exif fields into the comment.")
-parser.add_option("--template", "-t", action="store_true", dest="template",
-                  help="Like --additional-fields, but also combine empty" \
-                       "fields as templates into the comment.")
+def run(argv):
+   parser = optparse.OptionParser(usage="usage: %prog [options] <files or dirs>")
+   parser.add_option("--gthumb", action="store_true", dest="gthumb",
+                     help="Gateway to/from gthumb comment files." \
+                          "This is the default.")
+   parser.add_option("--additional-fields", "-a", action="store_true",
+                     dest="addfields",
+                     help="When gating from Exif to gthumb, combine additional" \
+                          "Exif fields into the comment.")
+   parser.add_option("--template", "-t", action="store_true", dest="template",
+                     help="Like --additional-fields, but also combine empty" \
+                          "fields as templates into the comment.")
 # TODO: 
 #parser.add_option("--merge", action="store_true", dest="merge",
 #                  help="Merge data instead of just using the newest version "\
@@ -185,21 +186,27 @@ parser.add_option("--template", "-t", action="store_true", dest="template",
 #parser.add_option("--cleanup", action="store_true", dest="cleanup",
 #                  help="The opposite of --additional-fields, that is, remove" \
 #                       "additional fields from gthumb comments.")
-parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
-                  help="Be verbose.")
-myoptions, args = parser.parse_args()
+   parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
+                     help="Be verbose.")
+   myoptions, args = parser.parse_args(argv)
 
-imagefiles = []
-for arg in args:
-   if os.path.isfile(arg):
-      imagefiles.append(arg)
-   elif os.path.isdir(arg):
-      for root, dirs, files in os.walk(arg):
-         for myfile in files:
-            imagefiles.append(os.path.join(root, myfile))
-   else:
-      print arg + " is not a regular file or directory."
-      sys.exit(1)
+   imagefiles = []
+   for arg in args:
+      if os.path.isfile(arg):
+         imagefiles.append(arg)
+      elif os.path.isdir(arg):
+         for root, dirs, files in os.walk(arg):
+            for myfile in files:
+               imagefiles.append(os.path.join(root, myfile))
+      else:
+         print arg + " is not a regular file or directory."
+         sys.exit(1)
 
-for imagefile in imagefiles:
-   autogate_gthumb(imagefile, myoptions)
+   for imagefile in imagefiles:
+      autogate_gthumb(imagefile, myoptions)
+
+
+if __name__ == "__main__":
+   run(sys.argv[1:])
+
+

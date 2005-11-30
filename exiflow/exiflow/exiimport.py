@@ -13,52 +13,57 @@ import optparse
 import subprocess
 import exiflow.filelist
 
+def run(argv):
 # Parse command line.
-parser = optparse.OptionParser()
-parser.add_option("-m", "--mount", dest="mount",
-                  help="Mountpoint of directory to import. Corresponds" \
-                       " to %m in the gnome-volume-manager config dialog.")
-parser.add_option("-t", "--target", dest="target",
-                  help="Target directory. A subdirectory will be created" \
-                       " in this directory.")
-parser.add_option("-d", "--device", dest="device",
-                  help="Mounted device file. If given, this device will be " \
-                       "unmounted using pumount after the import. Corresponds" \
-                       " to %d in the gnome-volume-manager config dialog.")
-parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
-                  help="Be verbose.")
-options, args = parser.parse_args()
-if len(args) > 0 or not options.mount or not options.target:
-    sys.exit("Wrong syntax, call with --help for info.")
+   parser = optparse.OptionParser()
+   parser.add_option("-m", "--mount", dest="mount",
+                     help="Mountpoint of directory to import. Corresponds" \
+                          " to %m in the gnome-volume-manager config dialog.")
+   parser.add_option("-t", "--target", dest="target",
+                     help="Target directory. A subdirectory will be created" \
+                          " in this directory.")
+   parser.add_option("-d", "--device", dest="device",
+                     help="Mounted device file. If given, this device will be " \
+                          "unmounted using pumount after the import. Corresponds" \
+                          " to %d in the gnome-volume-manager config dialog.")
+   parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
+                     help="Be verbose.")
+   options, args = parser.parse_args(argv)
+   if len(args) > 0 or not options.mount or not options.target:
+       sys.exit("Wrong syntax, call with --help for info.")
 
 # Build file list whithout skipping unknown files
-filelist = exiflow.filelist.Filelist()
-if options.verbose:
-   print "Read config files:", " ".join(filelist.get_read_config_files())
-filelist.process_unknown_types()
-filelist.add_files(options.mount)
+   filelist = exiflow.filelist.Filelist()
+   if options.verbose:
+      print "Read config files:", " ".join(filelist.get_read_config_files())
+   filelist.process_unknown_types()
+   filelist.add_files(options.mount)
 
 # Cry if we found no images
-if filelist.get_filecount() == 0:
-    sys.exit("No files to import, sorry.")
+   if filelist.get_filecount() == 0:
+       sys.exit("No files to import, sorry.")
 
 # Create targetdir
-targetdir = os.path.join(options.target, filelist.get_daterange())
+   targetdir = os.path.join(options.target, filelist.get_daterange())
 # TODO: find a better solution than just appendings "+" chars.
-while os.path.exists(targetdir):
-    targetdir += "+"
-os.makedirs(targetdir)
-print "Importing", filelist.get_fullsize() / 1024 / 1024 , "MB in", \
-      filelist.get_filecount(), "files to", targetdir
+   while os.path.exists(targetdir):
+       targetdir += "+"
+   os.makedirs(targetdir)
+   print "Importing", filelist.get_fullsize() / 1024 / 1024 , "MB in", \
+         filelist.get_filecount(), "files to", targetdir
 
 # Copy files
-progress_size = 0
-for filename, percentage in filelist:
-   print "%3s%% %s" % (percentage, filename)
-   shutil.copy2(filename, targetdir)
-   os.chmod(os.path.join(targetdir, os.path.basename(filename)), stat.S_IMODE(0644))
+   progress_size = 0
+   for filename, percentage in filelist:
+      print "%3s%% %s" % (percentage, filename)
+      shutil.copy2(filename, targetdir)
+      os.chmod(os.path.join(targetdir, os.path.basename(filename)), stat.S_IMODE(0644))
 
 # Unmount card
-if options.device:
-   subprocess.call("pumount " + options.device, shell=True)
+   if options.device:
+      subprocess.call("pumount " + options.device, shell=True)
+
+
+if __name__ == "__main__":
+   run(sys.argv[1:])
 
