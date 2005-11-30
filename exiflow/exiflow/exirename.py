@@ -18,6 +18,7 @@ import optparse
 import subprocess
 import ConfigParser
 import exiflow.exif
+import exiflow.filelist
 
 def run(argv):
    configfiles = ["/etc/exiflow/cameras.cfg",
@@ -33,46 +34,38 @@ def run(argv):
                           " long.")
    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
                      help="Be verbose.")
-   myoptions, args = parser.parse_args()
+   options, args = parser.parse_args()
 
    config = ConfigParser.ConfigParser()
    config.read(configfiles)
 
-   imagefiles = []
-   for arg in args:
-      if os.path.isfile(arg):
-         imagefiles.append(arg)
-      elif os.path.isdir(arg):
-         for root, dirs, files in os.walk(arg):
-            for myfile in files:
-               imagefiles.append(os.path.join(root, myfile))
-      else:
-         print arg + " is not a regular file or directory."
-         sys.exit(1)
+   filelist = exiflow.filelist.Filelist(*args)
+   if options.verbose:
+      print "Read config files:", " ".join(filelist.get_read_config_files())
 
    filename_re = re.compile("^\d{8}-.{3}\d{4}-.{5}\.[^.]*$")
 
-   for imagefile in imagefiles:
-      if filename_re.match(os.path.basename(imagefile)):
-         if myoptions.verbose:
-            print imagefile, "already seems to be formatted, skipping."
+   for filename, percentage in filelist:
+      if filename_re.match(os.path.basename(filename)):
+         if options.verbose:
+            print filename, "already seems to be formatted, skipping."
          continue
-      tmpindex = imagefile.rfind(".")
-      number = imagefile[tmpindex - 4 : tmpindex].ljust(4, "0")
+      tmpindex = filename.rfind(".")
+      number = filename[tmpindex - 4 : tmpindex].ljust(4, "0")
       try:
          int(number)
       except ValueError:
-         if myoptions.verbose:
-            print "Can't find a number in", imagefile, ", skipping."
+         if options.verbose:
+            print "Can't find a number in", filename, ", skipping."
          continue
-      extension = imagefile[tmpindex + 1 : len(imagefile)].lower()
-      leader = imagefile[0 : tmpindex]
-      exif_file = exiflow.exif.Exif(imagefile)
+      extension = filename[tmpindex + 1 : len(filename)].lower()
+      leader = filename[0 : tmpindex]
+      exif_file = exiflow.exif.Exif(filename)
       try:
          exif_file.read_exif()
       except IOError, message:
-         if myoptions.verbose:
-            print "Skipping %s: %s" % (imagefile, message)
+         if options.verbose:
+            print "Skipping %s: %s" % (filename, message)
          continue
       model = exif_file.fields.get("Model", "all")
       date = exif_file.fields.get("DateTimeOriginal", "0")
@@ -80,11 +73,11 @@ def run(argv):
          date = date[0:4] + date[5:7] + date[8:10]
       else:
          if date == "0":
-            date = os.stat(imagefile).st_mtime
+            date = os.stat(filename).st_mtime
          date = time.strftime("%Y%m%d", time.localtime(float(date)))
 
-      if myoptions.cam_id:
-         cam_id = myoptions.cam_id
+      if options.cam_id:
+         cam_id = options.cam_id
       elif config.has_section(model) and config.has_option(model, "cam_id"):
          cam_id = config.get(model, "cam_id")
       elif config.has_section("all") and config.has_option("all", "cam_id"):
@@ -92,8 +85,8 @@ def run(argv):
       else:
          cam_id = "000"
 
-      if myoptions.artist_initials:
-         artist_initials = myoptions.artist_initials
+      if options.artist_initials:
+         artist_initials = options.artist_initials
       elif config.has_section(model) and config.has_option(model,
                                                            "artist_initials"):
          artist_initials = config.get(model, "artist_initials")
@@ -108,16 +101,16 @@ def run(argv):
       if extension == "jpg":
 # TODO: find a simpler version of this loop, maybe fnmatch.filter()?
          count = 0
-         for tmpfile in imagefiles:
+         for tmpfile, tmppercentage in filelist:
             if tmpfile.startswith(leader):
                count += 1
          if count > 1:
             revision = "00l"
       newname = date + "-" + cam_id + number + "-" + artist_initials + revision + \
                 "." + extension
-      if myoptions.verbose:
-          print imagefile, "->", newname
-      os.rename(imagefile, os.path.join(os.path.dirname(imagefile), newname))
+      if options.verbose:
+          print "%3s%% %s -> %s" % (percentage, filename, newname)
+      os.rename(filename, os.path.join(os.path.dirname(filename), newname))
 
 
 if __name__ == "__main__":
