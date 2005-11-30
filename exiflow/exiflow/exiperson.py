@@ -14,6 +14,7 @@ import optparse
 import subprocess
 import ConfigParser
 import exiflow.exif
+import exiflow.filelist
 
 def run(argv):
    configfiles = ["/etc/exiflow/exif.cfg",
@@ -29,7 +30,7 @@ def run(argv):
                           " the default.")
    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
                      help="Be verbose.")
-   myoptions, args = parser.parse_args(argv)
+   options, args = parser.parse_args(argv)
 
    config = ConfigParser.ConfigParser()
    config.read(configfiles)
@@ -43,38 +44,32 @@ def run(argv):
       else:
          remaining_args.append(arg)
 
-   imagefiles = []
-   for arg in remaining_args:
-      if os.path.isfile(arg):
-         imagefiles.append(arg)
-      elif os.path.isdir(arg):
-         for root, dirs, files in os.walk(arg):
-            for myfile in files:
-               imagefiles.append(os.path.join(root, myfile))
-      else:
-         print arg + " is not a regular file or directory."
-         sys.exit(1)
-
    defaultpersonals = []
    if config.has_section("all"):
       defaultpersonals += config.items("all")
-   if myoptions.section:
-      if config.has_section(myoptions.section):
-         defaultpersonals += config.items(myoptions.section)
+   if options.section:
+      if config.has_section(options.section):
+         defaultpersonals += config.items(options.section)
       else:
-         sys.exit("ERROR: Section %s not found in config files" % myoptions.section)
+         sys.exit("ERROR: Section %s not found in config files" % options.section)
 
+   filelist = exiflow.filelist.Filelist(*args)
+   if options.verbose:
+      print "Read config files:", " ".join(filelist.get_read_config_files())
 
-   for imagefile in imagefiles:
+   for filename, percentage in filelist:
+      if options.verbose:
+         print "%3s%% %s" % (percentage, filename)
 
-      exif_file = exiflow.exif.Exif(imagefile)
+      exif_file = exiflow.exif.Exif(filename)
       try:
          exif_file.read_exif()
       except IOError, msg:
-         if myoptions.verbose:
-            print "Skipping %s: %s" % (imagefile, msg)
+         if options.verbose:
+            print "Skipping %s: %s" % (filename, msg)
          continue
 
+# TODO: Do we really need the colon?
       personals = defaultpersonals[:]
       if exif_file.fields.has_key("Model") and config.has_section(exif_file.fields["Model"]):
          personals += config.items(exif_file.fields["Model"])
@@ -86,7 +81,7 @@ def run(argv):
       try:
          exif_file.write_exif()
       except IOError, msg:
-         print "Error writing EXIF data:\n", imagefile, "\n", msg
+         print "Error writing EXIF data:\n", filename, "\n", msg
 
 
 if __name__ == "__main__":

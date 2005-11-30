@@ -8,6 +8,7 @@ import gzip
 import xml.dom.minidom
 import re
 import exiflow.exif
+import exiflow.filelist
 
 
 def read_gthumb(filename):
@@ -188,22 +189,16 @@ def run(argv):
 #                       "additional fields from gthumb comments.")
    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
                      help="Be verbose.")
-   myoptions, args = parser.parse_args(argv)
+   options, args = parser.parse_args(argv)
 
-   imagefiles = []
-   for arg in args:
-      if os.path.isfile(arg):
-         imagefiles.append(arg)
-      elif os.path.isdir(arg):
-         for root, dirs, files in os.walk(arg):
-            for myfile in files:
-               imagefiles.append(os.path.join(root, myfile))
-      else:
-         print arg + " is not a regular file or directory."
-         sys.exit(1)
+   filelist = exiflow.filelist.Filelist(*args)
+   if options.verbose:
+      print "Read config files:", " ".join(filelist.get_read_config_files())
 
-   for imagefile in imagefiles:
-      autogate_gthumb(imagefile, myoptions)
+   for filename, percentage in filelist:
+      if options.verbose:
+         print "%3s%% " % percentage,
+      autogate_gthumb(filename, options)
 
 
 if __name__ == "__main__":
