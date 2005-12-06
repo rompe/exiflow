@@ -69,7 +69,7 @@ def run(argv):
             print "Skipping %s: %s" % (filename, msg)
          continue
 
-# TODO: Do we really need the colon?
+# Note to programmer: The [:] is needed to get a slice copy instead of a reference.
       personals = defaultpersonals[:]
       if exif_file.fields.has_key("Model") and config.has_section(exif_file.fields["Model"]):
          personals += config.items(exif_file.fields["Model"])
