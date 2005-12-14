@@ -41,7 +41,7 @@ def autogate_gthumb(filename, myoptions):
       #             myoptions.template)
       gthumbfile.set_mtime(filetimestamp)
       os.utime(filename, (filetimestamp, filetimestamp))
-   elif filetimestamp > gthumbtimestamp or myoptions.template:
+   elif filetimestamp > gthumbtimestamp or myoptions.addfields or myoptions.template:
       if myoptions.verbose:
          print "Updating comment file from", filename
       exif_file = exiflow.exif.Exif(filename)
@@ -60,27 +60,25 @@ def autogate_gthumb(filename, myoptions):
    return True
 
 
-
-
 def run(argv):
    parser = optparse.OptionParser(usage="usage: %prog [options] <files or dirs>")
    parser.add_option("--gthumb", action="store_true", dest="gthumb",
-                     help="Gateway to/from gthumb comment files." \
+                     help="Gateway to/from gthumb comment files."
                           "This is the default.")
    parser.add_option("--additional-fields", "-a", action="store_true",
                      dest="addfields",
-                     help="When gating from Exif to gthumb, combine additional" \
-                          "Exif fields into the comment.")
+                     help="When gating from Exif to gthumb, combine "
+                          "additional Exif fields into the comment.")
    parser.add_option("--template", "-t", action="store_true", dest="template",
-                     help="Like --additional-fields, but also combine empty" \
+                     help="Like --additional-fields, but also combine empty "
                           "fields as templates into the comment.")
 # TODO: 
 #parser.add_option("--merge", action="store_true", dest="merge",
 #                  help="Merge data instead of just using the newest version "\
 #                       "to overwrite the older one.")
-#parser.add_option("--cleanup", action="store_true", dest="cleanup",
-#                  help="The opposite of --additional-fields, that is, remove" \
-#                       "additional fields from gthumb comments.")
+   parser.add_option("--cleanup", "-c", action="store_true", dest="cleanup",
+                     help="The opposite of --additional-fields, that is, "
+                          "remove additional fields from gthumb comments.")
    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
                      help="Be verbose.")
    options, args = parser.parse_args(argv)
@@ -93,6 +91,12 @@ def run(argv):
       if options.verbose:
          print "%3s%% " % percentage,
       autogate_gthumb(filename, options)
+      if options.cleanup:
+         log_prefix = "Leaving"
+         if exiflow.gthumb.Gthumb(filename).cleanup():
+            log_prefix = "Cleaning"
+         if options.verbose:
+            print log_prefix, "comment file of", filename
 
 
 if __name__ == "__main__":

@@ -64,7 +64,7 @@ class Gthumb:
             self.fields["Keywords"] = mydata["Keywords"]
          if "Note" in mydata:
             note = []
-            myregex = re.compile("(\w+)::(.+)$")
+            myregex = re.compile("(\w+)::(.*)$")
             for line in mydata["Note"].split("\n"):
                mymatch = myregex.match(line)
                if mymatch:
@@ -145,3 +145,18 @@ class Gthumb:
       else:
          return False
 
+   def cleanup(self):
+      """
+      Remove additional fields from gthumb comments.
+      (other fields than Note, Keywords, Place, Time)
+      Return True if a file is cleaned, False otherwise.
+      """
+      if self.read():
+         for field in self.fields:
+            if field not in ("ImageDescription", "Location",
+                             "DateTimeOriginal", "Keywords", "XPTitle"):
+               mtime = self.get_mtime()
+               self.write()
+               self.set_mtime(mtime)
+               return True
+      return False
