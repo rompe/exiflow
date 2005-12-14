@@ -12,14 +12,11 @@ import os
 import sys
 import optparse
 import subprocess
-import ConfigParser
 import exiflow.exif
 import exiflow.filelist
+import exiflow.configfile
 
 def run(argv):
-   configfiles = ["/etc/exiflow/exif.cfg",
-                  os.path.expanduser('~/.exiflow/exif.cfg')]
-
    parser = optparse.OptionParser(usage="usage: %prog [options] [-- -TAGNAME=" \
                                         "VALUE [...]] <files or dirs>")
    parser.add_option("--section", "-s", dest="section",
@@ -32,8 +29,7 @@ def run(argv):
                      help="Be verbose.")
    options, args = parser.parse_args(argv)
 
-   config = ConfigParser.ConfigParser()
-   config.read(configfiles)
+   exifconfig, read_config_files = exiflow.configfile.exif()
 
 # collect args for Exiftool
    exiftool_args = ""
@@ -44,18 +40,17 @@ def run(argv):
       else:
          remaining_args.append(arg)
 
-   defaultpersonals = []
-   if config.has_section("all"):
-      defaultpersonals += config.items("all")
+   defaultpersonals = exifconfig.items("all")
    if options.section:
-      if config.has_section(options.section):
-         defaultpersonals += config.items(options.section)
+      if exifconfig.has_section(options.section):
+         defaultpersonals += exifconfig.items(options.section)
       else:
          sys.exit("ERROR: Section %s not found in config files" % options.section)
 
    filelist = exiflow.filelist.Filelist(*args)
    if options.verbose:
-      print "Read config files:", " ".join(filelist.get_read_config_files())
+      print "Read settings config files:", " ".join(filelist.get_read_config_files())
+      print "Read exif config files:", " ".join(read_config_files)
 
    for filename, percentage in filelist:
       if options.verbose:
@@ -71,8 +66,8 @@ def run(argv):
 
 # Note to programmer: The [:] is needed to get a slice copy instead of a reference.
       personals = defaultpersonals[:]
-      if exif_file.fields.has_key("Model") and config.has_section(exif_file.fields["Model"]):
-         personals += config.items(exif_file.fields["Model"])
+      if exif_file.fields.has_key("Model") and exifconfig.has_section(exif_file.fields["Model"]):
+         personals += exifconfig.items(exif_file.fields["Model"])
 
       exif_file.fields = {}
       for key, value in personals:

@@ -16,15 +16,11 @@ import sys
 import time
 import optparse
 import subprocess
-import ConfigParser
 import exiflow.exif
 import exiflow.filelist
+import exiflow.configfile
 
 def run(argv):
-   configfiles = ["/etc/exiflow/cameras.cfg",
-                  os.path.expanduser('~/.exiflow/cameras.cfg')]
-
-
    parser = optparse.OptionParser(usage="usage: %prog [options] <files or dirs>")
    parser.add_option("--cam_id", "-c", dest="cam_id",
                      help="ID string for the camera model. Should normally be" \
@@ -36,12 +32,12 @@ def run(argv):
                      help="Be verbose.")
    options, args = parser.parse_args()
 
-   config = ConfigParser.ConfigParser()
-   config.read(configfiles)
+   cameraconfig, read_config_files = exiflow.configfile.cameras()
 
    filelist = exiflow.filelist.Filelist(*args)
    if options.verbose:
-      print "Read config files:", " ".join(filelist.get_read_config_files())
+      print "Read settings config files:", " ".join(filelist.get_read_config_files())
+      print "Read camera config files:", " ".join(read_config_files)
 
    filename_re = re.compile("^\d{8}-.{3}\d{4}-.{5}\.[^.]*$")
 
@@ -78,21 +74,21 @@ def run(argv):
 
       if options.cam_id:
          cam_id = options.cam_id
-      elif config.has_section(model) and config.has_option(model, "cam_id"):
-         cam_id = config.get(model, "cam_id")
-      elif config.has_section("all") and config.has_option("all", "cam_id"):
-         cam_id = config.get("all", "cam_id")
+      elif cameraconfig.has_section(model) and cameraconfig.has_option(model, "cam_id"):
+         cam_id = cameraconfig.get(model, "cam_id")
+      elif cameraconfig.has_section("all") and cameraconfig.has_option("all", "cam_id"):
+         cam_id = cameraconfig.get("all", "cam_id")
       else:
          cam_id = "000"
 
       if options.artist_initials:
          artist_initials = options.artist_initials
-      elif config.has_section(model) and config.has_option(model,
+      elif cameraconfig.has_section(model) and cameraconfig.has_option(model,
                                                            "artist_initials"):
-         artist_initials = config.get(model, "artist_initials")
-      elif config.has_section("all") and config.has_option("all",
+         artist_initials = cameraconfig.get(model, "artist_initials")
+      elif cameraconfig.has_section("all") and cameraconfig.has_option("all",
                                                            "artist_initials"):
-         artist_initials = config.get("all", "artist_initials")
+         artist_initials = cameraconfig.get("all", "artist_initials")
       else:
          artist_initials = "xy"
 
