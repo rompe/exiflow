@@ -127,4 +127,13 @@ class Gthumb:
       gzip.open(myxmlfile, "wb").write(mydom.toxml(encoding="utf-8"))
 
 
+   def get_mtime(self):
+      """
+      Get modification time of comment file or 0 if it doesn't exist.
+      """
+      if os.path.isfile(self.commentsfile):
+         return os.path.getmtime(self.commentsfile)
+      else:
+         return 0
+
 
