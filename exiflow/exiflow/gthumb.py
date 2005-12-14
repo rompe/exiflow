@@ -20,7 +20,7 @@ class Gthumb:
       self.filename = os.path.abspath(filename)
       self.commentsdir = os.path.join(os.path.dirname(self.filename),
                                       ".comments")
-      self.commentsfile = os.path.join(commentsdir,
+      self.commentsfile = os.path.join(self.commentsdir,
                                        os.path.basename(self.filename) + ".xml")
 
 
@@ -48,7 +48,7 @@ class Gthumb:
       """
       if os.path.isfile(self.commentsfile):
          mydata = {}
-         mydom = xml.dom.minidom.parse(gzip.open(myxmlfile))
+         mydom = xml.dom.minidom.parse(gzip.open(self.commentsfile))
          for field in ("Note", "Keywords", "Place", "Time"):
             mynodes = mydom.getElementsByTagName(field)
             if len(mynodes) > 0:
@@ -88,9 +88,6 @@ class Gthumb:
       mytemplate: Write empty fields as well.
       """
       exiffields = ["Artist", "Credit", "Copyright", "CopyrightNotice", "UserComment"]
-      filename = os.path.abspath(filename)
-      commentsdir = os.path.join(os.path.dirname(filename), ".comments")
-      myxmlfile = os.path.join(commentsdir, os.path.basename(filename) + ".xml")
       mydata = {}
       mydata["Place"] = self.fields.get("Location", "")
       mydata["Time"] = self.fields.get("DateTimeOriginal", "")
@@ -122,9 +119,9 @@ class Gthumb:
          element.appendChild(text)
          comment.appendChild(element)
 
-      if not os.path.isdir(commentsdir):
-         os.makedirs(commentsdir)
-      gzip.open(myxmlfile, "wb").write(mydom.toxml(encoding="utf-8"))
+      if not os.path.isdir(self.commentsdir):
+         os.makedirs(self.commentsdir)
+      gzip.open(self.commentsfile, "wb").write(mydom.toxml(encoding="utf-8"))
 
 
    def get_mtime(self):
@@ -137,7 +134,7 @@ class Gthumb:
          return 0
 
 
-   def set_mtime(self, mtime)
+   def set_mtime(self, mtime):
       """
       Set modification time of comment file to mtime.
       Returns True on success and False if no comment file exists.

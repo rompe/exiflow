@@ -73,6 +73,7 @@ def exif():
    config = ConfigParser.ConfigParser()
 # Create some defaults
    config.add_section("all")
+# TODO: initialize defaults for these values from the currently logged in user
    config.set("all", "Artist", "xxx yyy")
    config.set("all", "Contact", "xy@example.org")
    config.set("all", "Copyright", "(c)2005 xy@example.org")
