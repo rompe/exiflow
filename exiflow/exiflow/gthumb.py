@@ -137,3 +137,14 @@ class Gthumb:
          return 0
 
 
+   def set_mtime(self, mtime)
+      """
+      Set modification time of comment file to mtime.
+      Returns True on success and False if no comment file exists.
+      """
+      if os.path.isfile(self.commentsfile):
+         os.utime(self.commentsfile, (mtime, mtime))
+         return True
+      else:
+         return False
+
