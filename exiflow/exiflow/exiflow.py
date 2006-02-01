@@ -1,11 +1,14 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.4
 # -*- coding: UTF-8 -*-
 
+import os.path
+import sys
 import pygtk
 pygtk.require("2.0")
 import gtk
 import gtk.glade
 
+import exirename
 
 class Filechooser1(object):
    def __init__(self, parent = None, callback=None):
@@ -41,8 +44,8 @@ class Aboutdialog1(object):
 
 class Window1(object):
    def __init__(self):
-      self.wTree = gtk.glade.XML("exiflow.glade", "window1")
-      self.window = self.wTree.get_widget("window1")
+      self.wTree = gtk.glade.XML("exiflow.glade", "mainwindow")
+      self.window = self.wTree.get_widget("mainwindow")
 # Initialize treeview
       treeview = self.wTree.get_widget("treeview1")
       self.liststore = gtk.ListStore(str)
@@ -65,22 +68,53 @@ class Window1(object):
    def on_info1_activate(self, widget, data=None):
       diag = Aboutdialog1(self.window)
 
-   def on_window1_destroy(self, widget, data = None):
+   def on_mainwindow_destroy(self, widget, data = None):
       gtk.main_quit()
 
    def set_filelist(self, files):
-      print "FILES:", files
       self.liststore.clear()
-      for file in files:
-         self.liststore.append([file])
+      for file in map(os.path.abspath, files):
+         if os.path.exists(file):
+            self.liststore.append([file])
+         else:
+            print >>sys.stderr, file, "doesn't exist!"
 
+   def on_exirename_camid_auto_activate(self, widget, data=None):
+      self.wTree.get_widget("exirename_cam_id_entry").set_sensitive(False)
 
-def main():
+   def on_exirename_camid_custom_activate(self, widget, data=None):
+      self.wTree.get_widget("exirename_cam_id_entry").set_sensitive(True)
+
+   def on_exirename_artist_auto_activate(self, widget, data=None):
+      self.wTree.get_widget("exirename_artist_initials_entry").set_sensitive(False)
+
+   def on_exirename_artist_custom_activate(self, widget, data=None):
+      self.wTree.get_widget("exirename_artist_initials_entry").set_sensitive(True)
+
+   def on_exirename_activate(self, widget, data=None):
+      self.wTree.get_widget("exirename_cancel_button").set_sensitive(True)
+      widget.set_sensitive(False)
+      args = []
+      artist_initials = self.wTree.get_widget("exirename_artist_initials_entry")
+      cam_id = self.wTree.get_widget("exirename_cam_id_entry")
+      if artist_initials.state != gtk.STATE_INSENSITIVE:
+         args.append("--artist_initials=" + artist_initials.get_text())
+      if cam_id.state != gtk.STATE_INSENSITIVE:
+         args.append("--cam_id=" + cam_id.get_text())
+      args += map(lambda x: x[0], self.liststore)
+      print "addparms:", args
+      exirename.run(args)
+
+      
+
+def run(argv):
    win1 = Window1()
+   if len(sys.argv) > 1:
+      win1.set_filelist(argv)
    gtk.main()
    return 0
 
 
 if __name__ == "__main__":
-   main() 
+   run(sys.argv[1:]) 
 
