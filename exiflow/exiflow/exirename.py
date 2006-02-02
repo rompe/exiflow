@@ -20,7 +20,7 @@ import exiflow.exif
 import exiflow.filelist
 import exiflow.configfile
 
-def run(argv):
+def run(argv, callback=None):
    parser = optparse.OptionParser(usage="usage: %prog [options] <files or dirs>")
    parser.add_option("--cam_id", "-c", dest="cam_id",
                      help="ID string for the camera model. Should normally be" \
@@ -107,6 +107,8 @@ def run(argv):
       if options.verbose:
           print "%3s%% %s -> %s" % (percentage, filename, newname)
       os.rename(filename, os.path.join(os.path.dirname(filename), newname))
+      if callable(callback):
+         callback(filename, os.path.join(os.path.dirname(filename), newname))
 
 
 if __name__ == "__main__":

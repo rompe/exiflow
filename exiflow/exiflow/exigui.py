@@ -8,11 +8,11 @@ pygtk.require("2.0")
 import gtk
 import gtk.glade
 
-import exirename
+import exiflow.exirename
 
 class Filechooser1(object):
    def __init__(self, parent = None, callback=None):
-      self.wTree = gtk.glade.XML("exiflow.glade", "filechooserdialog1")
+      self.wTree = gtk.glade.XML("exigui.glade", "filechooserdialog1")
       self.window = self.wTree.get_widget("filechooserdialog1")
       dic = {}
       for key in dir(self.__class__):
@@ -31,7 +31,7 @@ class Filechooser1(object):
 
 class Aboutdialog1(object):
    def __init__(self, parent = None):
-      self.wTree = gtk.glade.XML("exiflow.glade", "aboutdialog1")
+      self.wTree = gtk.glade.XML("exigui.glade", "aboutdialog1")
       self.window = self.wTree.get_widget("aboutdialog1")
       dic = {}
       for key in dir(self.__class__):
@@ -44,7 +44,7 @@ class Aboutdialog1(object):
 
 class Window1(object):
    def __init__(self):
-      self.wTree = gtk.glade.XML("exiflow.glade", "mainwindow")
+      self.wTree = gtk.glade.XML("exigui.glade", "mainwindow")
       self.window = self.wTree.get_widget("mainwindow")
 # Initialize treeview
       treeview = self.wTree.get_widget("treeview1")
