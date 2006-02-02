@@ -10,9 +10,11 @@ import gtk.glade
 
 import exiflow.exirename
 
+gladefile = os.path.join(sys.path[0], "exiflow", "exigui.glade")
+
 class Filechooser1(object):
    def __init__(self, parent = None, callback=None):
-      self.wTree = gtk.glade.XML("exigui.glade", "filechooserdialog1")
+      self.wTree = gtk.glade.XML(gladefile, "filechooserdialog1")
       self.window = self.wTree.get_widget("filechooserdialog1")
       dic = {}
       for key in dir(self.__class__):
@@ -31,7 +33,7 @@ class Filechooser1(object):
 
 class Aboutdialog1(object):
    def __init__(self, parent = None):
-      self.wTree = gtk.glade.XML("exigui.glade", "aboutdialog1")
+      self.wTree = gtk.glade.XML(gladefile, "aboutdialog1")
       self.window = self.wTree.get_widget("aboutdialog1")
       dic = {}
       for key in dir(self.__class__):
@@ -44,7 +46,7 @@ class Aboutdialog1(object):
 
 class Window1(object):
    def __init__(self):
-      self.wTree = gtk.glade.XML("exigui.glade", "mainwindow")
+      self.wTree = gtk.glade.XML(gladefile, "mainwindow")
       self.window = self.wTree.get_widget("mainwindow")
 # Initialize treeview
       treeview = self.wTree.get_widget("treeview1")
@@ -94,7 +96,7 @@ class Window1(object):
    def on_exirename_activate(self, widget, data=None):
       self.wTree.get_widget("exirename_cancel_button").set_sensitive(True)
       widget.set_sensitive(False)
-      args = []
+      args = ["-v"]
       artist_initials = self.wTree.get_widget("exirename_artist_initials_entry")
       cam_id = self.wTree.get_widget("exirename_cam_id_entry")
       if artist_initials.state != gtk.STATE_INSENSITIVE:
@@ -103,7 +105,9 @@ class Window1(object):
          args.append("--cam_id=" + cam_id.get_text())
       args += map(lambda x: x[0], self.liststore)
       print "addparms:", args
-      exirename.run(args)
+      exiflow.exirename.run(args)
+      self.wTree.get_widget("exirename_cancel_button").set_sensitive(False)
+      widget.set_sensitive(True)
 
       
 

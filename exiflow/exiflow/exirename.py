@@ -30,7 +30,7 @@ def run(argv, callback=None):
                           " long.")
    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
                      help="Be verbose.")
-   options, args = parser.parse_args()
+   options, args = parser.parse_args(args=argv)
 
    cameraconfig, read_config_files = exiflow.configfile.cameras()
 
