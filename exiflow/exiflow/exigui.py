@@ -12,6 +12,34 @@ import exiflow.exirename
 
 gladefile = os.path.join(sys.path[0], "exiflow", "exigui.glade")
 
+
+class WritableTextView:
+   def __init__(self, textview, color=None):
+      self.textview = textview
+      self.buffer = self.textview.get_buffer()
+      self.tag_names = []
+      tag_table = self.buffer.get_tag_table()
+      if not tag_table.lookup("warning"):
+         tag = gtk.TextTag("warning")
+         tag.set_property("foreground", "red")
+         tag.set_property("background", "yellow")
+         tag_table.add(tag)
+      if color:
+         if not tag_table.lookup(color):
+            tag = gtk.TextTag(color)
+            tag.set_property("foreground", color)
+            tag_table.add(tag)
+         self.tag_names.append(color)
+
+   def write(self, msg):		
+      iter = self.buffer.get_end_iter()
+      tag_names = self.tag_names[:]
+      if msg.startswith("WARNING") or msg.startswith("ERROR"):
+         tag_names.append("warning")
+      self.buffer.insert_with_tags_by_name(iter, msg, *tag_names)
+      self.textview.scroll_mark_onscreen(self.buffer.get_insert())
+
+
 class Filechooser1(object):
    def __init__(self, parent = None, callback=None):
       self.wTree = gtk.glade.XML(gladefile, "filechooserdialog1")
@@ -93,6 +121,22 @@ class Window1(object):
    def on_exirename_artist_custom_activate(self, widget, data=None):
       self.wTree.get_widget("exirename_artist_initials_entry").set_sensitive(True)
 
+   def _progress_callback(self, filename, newname, percentage):
+      """
+      This callback is given as a callable to the main programs and is
+      called after each processed file. filename and newname may of course
+      be the same.
+      """
+      if filename != newname:
+         for rownum in range(0, len(self.liststore)):
+            if self.liststore[rownum][0] == filename:
+               self.liststore[rownum][0] = newname
+      progressbar = self.wTree.get_widget("progressbar1")
+      progressbar.set_fraction(float(percentage) / 100)
+      progressbar.set_text(u"%s %%" % percentage)
+      while gtk.events_pending():
+         gtk.main_iteration(False)
+      
    def on_exirename_activate(self, widget, data=None):
       self.wTree.get_widget("exirename_cancel_button").set_sensitive(True)
       widget.set_sensitive(False)
@@ -104,8 +148,14 @@ class Window1(object):
       if cam_id.state != gtk.STATE_INSENSITIVE:
          args.append("--cam_id=" + cam_id.get_text())
       args += map(lambda x: x[0], self.liststore)
-      print "addparms:", args
-      exiflow.exirename.run(args)
+# Create TextView and use it
+      outputwindow = WritableTextView(self.wTree.get_widget("textview1"))
+      sys.stdout = WritableTextView(self.wTree.get_widget("textview1"))
+      sys.stderr = WritableTextView(self.wTree.get_widget("textview1"), "blue")
+      try:
+         exiflow.exirename.run(args, self._progress_callback)
+      except IOError, msg:
+         outputwindow.write("\nERROR: %s\n" % str(msg))
       self.wTree.get_widget("exirename_cancel_button").set_sensitive(False)
       widget.set_sensitive(True)
 
