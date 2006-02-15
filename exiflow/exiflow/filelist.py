@@ -5,6 +5,7 @@ An (iterable!) class that hosts information about files given in it's contructor
 """
 
 import os
+import sys
 import time
 import exiflow.configfile
 
@@ -52,7 +53,8 @@ class Filelist:
                for basefile in files:
                   filelist.append(os.path.join(root, basefile))
          else:
-            raise IOError, path + " is not a regular file or directory."
+            print >> sys.stderr, "WARNING: " + path + \
+                  " is not a regular file or directory. Skipping."
       for filename in filelist:
          basefilename = os.path.basename(filename).lower()
          if (self._process_unknown_types == True or \
