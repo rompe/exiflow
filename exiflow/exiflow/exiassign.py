@@ -24,7 +24,7 @@ import exiflow.exif
 import exiflow.filelist
 
 
-def run(argv):
+def run(argv, callback=None):
    parser = optparse.OptionParser(usage="usage: %prog [options] <files or dirs>")
    parser.add_option("-f", "--force", action="store_true", dest="force",
                      help="Force update even if EXIF is already present. " \
@@ -59,6 +59,8 @@ def run(argv):
          if not options.force and exif_file.fields.has_key("DateTimeOriginal"):
             if options.verbose:
                print "Skipping %s, it seems to contain EXIF data." % filename
+            if callable(callback):
+               callback(filename, filename, percentage)
             continue
          mtimes = {}
          for otherfile in glob.glob(os.path.join(os.path.dirname(filename),
@@ -80,7 +82,10 @@ def run(argv):
                if options.verbose:
                   print "Updating %s from %s." % (filename, mtimes[otherfile])
                exif_file.update_exif(mtimes[otherfile])
+               if callable(callback):
+                  callback(filename, filename, percentage)
                break
+
 
 
 if __name__ == "__main__":

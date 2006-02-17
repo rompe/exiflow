@@ -8,6 +8,7 @@ pygtk.require("2.0")
 import gtk
 import gtk.glade
 
+import exiflow.exiassign
 import exiflow.exirename
 
 gladefile = os.path.join(sys.path[0], "exiflow", "exigui.glade")
@@ -157,6 +158,25 @@ class Window1(object):
       except IOError, msg:
          outputwindow.write("\nERROR: %s\n" % str(msg))
       self.wTree.get_widget("exirename_cancel_button").set_sensitive(False)
+      widget.set_sensitive(True)
+
+   def on_exiassign_activate(self, widget, data=None):
+      self.wTree.get_widget("exiassign_cancel_button").set_sensitive(True)
+      widget.set_sensitive(False)
+      args = ["-v"]
+      forcebutton = self.wTree.get_widget("exiassign_force_checkbutton")
+      if forcebutton.get_active() == True:
+         args.append("--force")
+      args += map(lambda x: x[0], self.liststore)
+# Create TextView and use it
+      outputwindow = WritableTextView(self.wTree.get_widget("textview1"))
+      sys.stdout = WritableTextView(self.wTree.get_widget("textview1"))
+      sys.stderr = WritableTextView(self.wTree.get_widget("textview1"), "blue")
+      try:
+         exiflow.exiassign.run(args, self._progress_callback)
+      except IOError, msg:
+         outputwindow.write("\nERROR: %s\n" % str(msg))
+      self.wTree.get_widget("exiassign_cancel_button").set_sensitive(False)
       widget.set_sensitive(True)
 
       
