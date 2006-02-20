@@ -9,6 +9,8 @@ import gtk
 import gtk.glade
 
 import exiflow.exiassign
+import exiflow.exigate
+import exiflow.exiperson
 import exiflow.exirename
 
 gladefile = os.path.join(sys.path[0], "exiflow", "exigui.glade")
@@ -122,6 +124,12 @@ class Window1(object):
    def on_exirename_artist_custom_activate(self, widget, data=None):
       self.wTree.get_widget("exirename_artist_initials_entry").set_sensitive(True)
 
+   def on_exiperson_section_auto_activate(self, widget, data=None):
+      self.wTree.get_widget("exiperson_section_entry").set_sensitive(False)
+
+   def on_exiperson_section_custom_activate(self, widget, data=None):
+      self.wTree.get_widget("exiperson_section_entry").set_sensitive(True)
+
    def _progress_callback(self, filename, newname, percentage):
       """
       This callback is given as a callable to the main programs and is
@@ -179,6 +187,48 @@ class Window1(object):
       self.wTree.get_widget("exiassign_cancel_button").set_sensitive(False)
       widget.set_sensitive(True)
 
+   def on_exiperson_activate(self, widget, data=None):
+      self.wTree.get_widget("exiperson_cancel_button").set_sensitive(True)
+      widget.set_sensitive(False)
+      args = ["-v"]
+      exif_section = self.wTree.get_widget("exiperson_section_entry")
+      if exif_section.state != gtk.STATE_INSENSITIVE:
+         args.append("--section=" + exif_section.get_text())
+      args += map(lambda x: x[0], self.liststore)
+# Create TextView and use it
+      outputwindow = WritableTextView(self.wTree.get_widget("textview1"))
+      sys.stdout = WritableTextView(self.wTree.get_widget("textview1"))
+      sys.stderr = WritableTextView(self.wTree.get_widget("textview1"), "blue")
+      try:
+         exiflow.exiperson.run(args, self._progress_callback)
+      except IOError, msg:
+         outputwindow.write("\nERROR: %s\n" % str(msg))
+      self.wTree.get_widget("exiperson_cancel_button").set_sensitive(False)
+      widget.set_sensitive(True)
+      
+   def on_exigate_gthumb_activate(self, widget, data=None):
+      self.wTree.get_widget("exigate_gthumb_cancel_button").set_sensitive(True)
+      widget.set_sensitive(False)
+      if self.wTree.get_widget("exigate_gthumb_nooptions").get_active() == True:
+         args = ["-v"]
+      if self.wTree.get_widget("exigate_gthumb_addfields").get_active() == True:
+         args = ["--additional-fields"]
+      if self.wTree.get_widget("exigate_gthumb_template").get_active() == True:
+         args = ["--template"]
+      if self.wTree.get_widget("exigate_gthumb_cleanup").get_active() == True:
+         args = ["--cleanup"]
+      args.append("-v")
+      args += map(lambda x: x[0], self.liststore)
+# Create TextView and use it
+      outputwindow = WritableTextView(self.wTree.get_widget("textview1"))
+      sys.stdout = WritableTextView(self.wTree.get_widget("textview1"))
+      sys.stderr = WritableTextView(self.wTree.get_widget("textview1"), "blue")
+      try:
+         exiflow.exigate.run(args, self._progress_callback)
+      except IOError, msg:
+         outputwindow.write("\nERROR: %s\n" % str(msg))
+      self.wTree.get_widget("exigate_gthumb_cancel_button").set_sensitive(False)
+      widget.set_sensitive(True)
       
 
 def run(argv):

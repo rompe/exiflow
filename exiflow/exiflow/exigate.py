@@ -60,7 +60,7 @@ def autogate_gthumb(filename, myoptions):
    return True
 
 
-def run(argv):
+def run(argv, callback=None):
    parser = optparse.OptionParser(usage="usage: %prog [options] <files or dirs>")
    parser.add_option("--gthumb", action="store_true", dest="gthumb",
                      help="Gateway to/from gthumb comment files."
@@ -90,6 +90,8 @@ def run(argv):
    for filename, percentage in filelist:
       if options.verbose:
          print "%3s%% " % percentage,
+      if callable(callback):
+         callback(filename, filename, percentage)
       autogate_gthumb(filename, options)
       if options.cleanup:
          log_prefix = "Leaving"

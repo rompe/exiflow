@@ -16,7 +16,7 @@ import exiflow.exif
 import exiflow.filelist
 import exiflow.configfile
 
-def run(argv):
+def run(argv, callback=None):
    parser = optparse.OptionParser(usage="usage: %prog [options] [-- -TAGNAME=" \
                                         "VALUE [...]] <files or dirs>")
    parser.add_option("--section", "-s", dest="section",
@@ -55,6 +55,8 @@ def run(argv):
    for filename, percentage in filelist:
       if options.verbose:
          print "%3s%% %s" % (percentage, filename)
+      if callable(callback):
+         callback(filename, filename, percentage)
 
       exif_file = exiflow.exif.Exif(filename)
       try:
@@ -62,6 +64,8 @@ def run(argv):
       except IOError, msg:
          if options.verbose:
             print "Skipping %s: %s" % (filename, msg)
+         if callable(callback):
+            callback(filename, filename, percentage)
          continue
 
 # Note to programmer: The [:] is needed to get a slice copy instead of a reference.
