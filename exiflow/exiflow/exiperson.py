@@ -11,7 +11,6 @@ Exiftool documentation for information about possible names.
 import os
 import sys
 import optparse
-import subprocess
 import exiflow.exif
 import exiflow.filelist
 import exiflow.configfile

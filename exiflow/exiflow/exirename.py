@@ -15,7 +15,6 @@ import re
 import sys
 import time
 import optparse
-import subprocess
 import exiflow.exif
 import exiflow.filelist
 import exiflow.configfile

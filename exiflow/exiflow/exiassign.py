@@ -19,7 +19,6 @@ import re
 import sys
 import glob
 import optparse
-import subprocess
 import exiflow.exif
 import exiflow.filelist
 

@@ -59,11 +59,13 @@ class Exif:
             command += " -%s=\"%s\"" % (field, self.fields[field])
       command += " " + self.filename
       ret = True
-      exiftool = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE)
+      exiftool = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
+                                  stderr=subprocess.PIPE)
 # exiftool doesn't reflect errors in it's return code, so we have to
 # assume an error if something is written to stderr.
-      for line in exiftool.stderr:
-         raise IOError, "".join(exiftool.stderr)
+      errors = exiftool.stderr.readlines()
+      if len(errors) > 0:
+         raise IOError, "".join(errors + exiftool.stdout.readlines())
       return exiftool.wait()
 
 
@@ -87,11 +89,13 @@ class Exif:
                command += " -%s=\"%s\"" % (field, self.fields[field])
       command += " " + self.filename
       ret = True
-      exiftool = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE)
+      exiftool = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
+                                  stderr=subprocess.PIPE)
 # exiftool doesn't reflect errors in it's return code, so we have to
 # assume an error if something is written to stderr.
-      for line in exiftool.stderr:
-         raise IOError, "".join(exiftool.stderr)
+      errors = exiftool.stderr.readlines()
+      if len(errors) > 0:
+         raise IOError, "".join(errors + exiftool.stdout.readlines())
       return exiftool.wait()
 
 
