@@ -14,5 +14,6 @@ distutils.core.setup(name='exiflow',
                               'exiimport',
                               'exiperson',
                               'exirename'],
-                     packages=['exiflow'])
+                     packages=['exiflow'],
+                     package_data={'exiflow': ['*.glade']})
 
