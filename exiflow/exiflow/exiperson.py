@@ -55,7 +55,8 @@ def run(argv, callback=None):
       if options.verbose:
          print "%3s%% %s" % (percentage, filename)
       if callable(callback):
-         callback(filename, filename, percentage)
+         if callback(filename, filename, percentage):
+	    break
 
       exif_file = exiflow.exif.Exif(filename)
       try:
@@ -64,7 +65,8 @@ def run(argv, callback=None):
          if options.verbose:
             print "Skipping %s: %s" % (filename, msg)
          if callable(callback):
-            callback(filename, filename, percentage)
+            if callback(filename, filename, percentage):
+	       break
          continue
 
 # Note to programmer: The [:] is needed to get a slice copy instead of a reference.

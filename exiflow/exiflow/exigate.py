@@ -91,7 +91,8 @@ def run(argv, callback=None):
       if options.verbose:
          print "%3s%% " % percentage,
       if callable(callback):
-         callback(filename, filename, percentage)
+         if callback(filename, filename, percentage):
+	    break
       autogate_gthumb(filename, options)
       if options.cleanup:
          log_prefix = "Leaving"

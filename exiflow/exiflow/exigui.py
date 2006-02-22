@@ -192,9 +192,7 @@ class Window1(object):
       except IOError, msg:
          sys.stdout.write("\nERROR: %s\n" % str(msg))
 
-   def on_exiassign_activate(self, widget, data=None):
-      self.wTree.get_widget("cancel_button").set_sensitive(True)
-      widget.set_sensitive(False)
+   def run_exiassign(self):
       args = ["-v"]
       forcebutton = self.wTree.get_widget("exiassign_force_checkbutton")
       if forcebutton.get_active() == True:
@@ -204,13 +202,8 @@ class Window1(object):
          exiflow.exiassign.run(args, self._progress_callback)
       except IOError, msg:
          sys.stdout.write("\nERROR: %s\n" % str(msg))
-      self._cancelled = False
-      self.wTree.get_widget("cancel_button").set_sensitive(False)
-      widget.set_sensitive(True)
 
-   def on_exiperson_activate(self, widget, data=None):
-      self.wTree.get_widget("cancel_button").set_sensitive(True)
-      widget.set_sensitive(False)
+   def run_exiperson(self):
       args = ["-v"]
       exif_section = self.wTree.get_widget("exiperson_section_entry")
       if exif_section.state != gtk.STATE_INSENSITIVE:
@@ -220,13 +213,8 @@ class Window1(object):
          exiflow.exiperson.run(args, self._progress_callback)
       except IOError, msg:
          sys.stdout.write("\nERROR: %s\n" % str(msg))
-      self._cancelled = False
-      self.wTree.get_widget("cancel_button").set_sensitive(False)
-      widget.set_sensitive(True)
       
-   def on_exigate_gthumb_activate(self, widget, data=None):
-      self.wTree.get_widget("cancel_button").set_sensitive(True)
-      widget.set_sensitive(False)
+   def run_exigate_gthumb(self):
       if self.wTree.get_widget("exigate_gthumb_nooptions").get_active() == True:
          args = ["-v"]
       if self.wTree.get_widget("exigate_gthumb_addfields").get_active() == True:
@@ -241,10 +229,6 @@ class Window1(object):
          exiflow.exigate.run(args, self._progress_callback)
       except IOError, msg:
          sys.stdout.write("\nERROR: %s\n" % str(msg))
-      self._cancelled = False
-      self.wTree.get_widget("cancel_button").set_sensitive(False)
-      widget.set_sensitive(True)
-      
 
 def run(argv):
    win1 = Window1()
