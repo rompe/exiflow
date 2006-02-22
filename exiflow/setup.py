@@ -8,7 +8,8 @@ import distutils.core
 
 distutils.core.setup(name='exiflow',
                      version='0.1',
-                     scripts=['exiassign',
+                     scripts=['exigui',
+                              'exiassign',
                               'exigate',
                               'exiimport',
                               'exiperson',
