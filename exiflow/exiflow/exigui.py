@@ -94,6 +94,9 @@ class Window1(object):
          dic[key] = getattr(self, key)
       self.wTree.signal_autoconnect(dic)
       self.window.show()
+# Create TextView and use it
+      sys.stdout = WritableTextView(self.wTree.get_widget("textview1"))
+      sys.stderr = WritableTextView(self.wTree.get_widget("textview1"), "blue")
 
    def on_button_open_clicked(self, widget, data = None):
       diag = Filechooser1(self.window, self.set_filelist)
@@ -134,7 +137,7 @@ class Window1(object):
       """
       This callback is given as a callable to the main programs and is
       called after each processed file. filename and newname may of course
-      be the same.
+      be the same. Return self._cancelled which is True when Cancel is pressed.
       """
       if filename != newname:
          for rownum in range(0, len(self.liststore)):
@@ -145,10 +148,37 @@ class Window1(object):
       progressbar.set_text(u"%s %%" % percentage)
       while gtk.events_pending():
          gtk.main_iteration(False)
+      return self._cancelled
       
-   def on_exirename_activate(self, widget, data=None):
-      self.wTree.get_widget("exirename_cancel_button").set_sensitive(True)
+   def on_cancel_activate(self, widget, data=None):
+      """
+      Called from the cancel button.
+      """
+      self._cancelled = True
       widget.set_sensitive(False)
+      sys.stderr.write("CANCELLED!\n")
+
+   def on_run_activate(self, widget, data=None):
+      """
+      Called from the run button.
+      """
+      cancel_button = self.wTree.get_widget("cancel_button")
+      cancel_button.set_sensitive(True)
+      nbook = self.wTree.get_widget("notebook1")
+      nbook.set_sensitive(False)
+      widget.set_sensitive(False)
+      self._cancelled = False
+      
+      label = nbook.get_tab_label(nbook.get_nth_page(nbook.get_current_page())).get_text()
+      sys.stderr.write("Running %s\n" % label)
+      method = getattr(self, "run_" + label.replace(" ", "_"))
+      method()
+      
+      nbook.set_sensitive(True)
+      cancel_button.set_sensitive(False)
+      widget.set_sensitive(True)
+
+   def run_exirename(self):
       args = ["-v"]
       artist_initials = self.wTree.get_widget("exirename_artist_initials_entry")
       cam_id = self.wTree.get_widget("exirename_cam_id_entry")
@@ -157,57 +187,45 @@ class Window1(object):
       if cam_id.state != gtk.STATE_INSENSITIVE:
          args.append("--cam_id=" + cam_id.get_text())
       args += map(lambda x: x[0], self.liststore)
-# Create TextView and use it
-      outputwindow = WritableTextView(self.wTree.get_widget("textview1"))
-      sys.stdout = WritableTextView(self.wTree.get_widget("textview1"))
-      sys.stderr = WritableTextView(self.wTree.get_widget("textview1"), "blue")
       try:
          exiflow.exirename.run(args, self._progress_callback)
       except IOError, msg:
-         outputwindow.write("\nERROR: %s\n" % str(msg))
-      self.wTree.get_widget("exirename_cancel_button").set_sensitive(False)
-      widget.set_sensitive(True)
+         sys.stdout.write("\nERROR: %s\n" % str(msg))
 
    def on_exiassign_activate(self, widget, data=None):
-      self.wTree.get_widget("exiassign_cancel_button").set_sensitive(True)
+      self.wTree.get_widget("cancel_button").set_sensitive(True)
       widget.set_sensitive(False)
       args = ["-v"]
       forcebutton = self.wTree.get_widget("exiassign_force_checkbutton")
       if forcebutton.get_active() == True:
          args.append("--force")
       args += map(lambda x: x[0], self.liststore)
-# Create TextView and use it
-      outputwindow = WritableTextView(self.wTree.get_widget("textview1"))
-      sys.stdout = WritableTextView(self.wTree.get_widget("textview1"))
-      sys.stderr = WritableTextView(self.wTree.get_widget("textview1"), "blue")
       try:
          exiflow.exiassign.run(args, self._progress_callback)
       except IOError, msg:
-         outputwindow.write("\nERROR: %s\n" % str(msg))
-      self.wTree.get_widget("exiassign_cancel_button").set_sensitive(False)
+         sys.stdout.write("\nERROR: %s\n" % str(msg))
+      self._cancelled = False
+      self.wTree.get_widget("cancel_button").set_sensitive(False)
       widget.set_sensitive(True)
 
    def on_exiperson_activate(self, widget, data=None):
-      self.wTree.get_widget("exiperson_cancel_button").set_sensitive(True)
+      self.wTree.get_widget("cancel_button").set_sensitive(True)
       widget.set_sensitive(False)
       args = ["-v"]
       exif_section = self.wTree.get_widget("exiperson_section_entry")
       if exif_section.state != gtk.STATE_INSENSITIVE:
          args.append("--section=" + exif_section.get_text())
       args += map(lambda x: x[0], self.liststore)
-# Create TextView and use it
-      outputwindow = WritableTextView(self.wTree.get_widget("textview1"))
-      sys.stdout = WritableTextView(self.wTree.get_widget("textview1"))
-      sys.stderr = WritableTextView(self.wTree.get_widget("textview1"), "blue")
       try:
          exiflow.exiperson.run(args, self._progress_callback)
       except IOError, msg:
-         outputwindow.write("\nERROR: %s\n" % str(msg))
-      self.wTree.get_widget("exiperson_cancel_button").set_sensitive(False)
+         sys.stdout.write("\nERROR: %s\n" % str(msg))
+      self._cancelled = False
+      self.wTree.get_widget("cancel_button").set_sensitive(False)
       widget.set_sensitive(True)
       
    def on_exigate_gthumb_activate(self, widget, data=None):
-      self.wTree.get_widget("exigate_gthumb_cancel_button").set_sensitive(True)
+      self.wTree.get_widget("cancel_button").set_sensitive(True)
       widget.set_sensitive(False)
       if self.wTree.get_widget("exigate_gthumb_nooptions").get_active() == True:
          args = ["-v"]
@@ -219,15 +237,12 @@ class Window1(object):
          args = ["--cleanup"]
       args.append("-v")
       args += map(lambda x: x[0], self.liststore)
-# Create TextView and use it
-      outputwindow = WritableTextView(self.wTree.get_widget("textview1"))
-      sys.stdout = WritableTextView(self.wTree.get_widget("textview1"))
-      sys.stderr = WritableTextView(self.wTree.get_widget("textview1"), "blue")
       try:
          exiflow.exigate.run(args, self._progress_callback)
       except IOError, msg:
-         outputwindow.write("\nERROR: %s\n" % str(msg))
-      self.wTree.get_widget("exigate_gthumb_cancel_button").set_sensitive(False)
+         sys.stdout.write("\nERROR: %s\n" % str(msg))
+      self._cancelled = False
+      self.wTree.get_widget("cancel_button").set_sensitive(False)
       widget.set_sensitive(True)
       
 

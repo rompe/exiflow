@@ -107,8 +107,10 @@ def run(argv, callback=None):
           print "%3s%% %s -> %s" % (percentage, filename, newname)
       os.rename(filename, os.path.join(os.path.dirname(filename), newname))
       if callable(callback):
-         callback(filename, os.path.join(os.path.dirname(filename), newname),
-                  percentage)
+         if callback(filename,
+                     os.path.join(os.path.dirname(filename), newname),
+                     percentage):
+            break
 
 
 if __name__ == "__main__":
