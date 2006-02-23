@@ -13,8 +13,7 @@ import exiflow.exigate
 import exiflow.exiperson
 import exiflow.exirename
 
-gladefile = os.path.join(sys.path[0], "exiflow", "exigui.glade")
-
+gladefile = __file__.replace(".py", ".glade")
 
 class WritableTextView:
    def __init__(self, textview, color=None):
