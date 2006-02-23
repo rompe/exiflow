@@ -40,7 +40,7 @@ install: build
 	dh_clean -k
 	dh_installdirs
 
-	python2.4 setup.py install --prefix $(CURDIR)/debian/exiflow/usr
+	python2.4 setup.py install -O2 --prefix $(CURDIR)/debian/exiflow/usr
 
 binary-indep: build install
 	dh_testdir
