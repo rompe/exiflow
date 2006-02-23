@@ -13,7 +13,7 @@ import exiflow.exigate
 import exiflow.exiperson
 import exiflow.exirename
 
-gladefile = __file__.replace(".py", ".glade")
+gladefile = os.path.splitext(__file__)[0] + ".glade"
 
 class WritableTextView:
    def __init__(self, textview, color=None):
