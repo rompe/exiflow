@@ -3,12 +3,12 @@ Section: python
 Priority: optional
 Maintainer: Ulf Rompe <debian@rompe.org>
 Uploaders: Ulf Rompe <debian@rompe.org>
-Build-Depends-Indep: debhelper (>> 4.1.65), python, python2.4-dev
+Build-Depends-Indep: debhelper (>> 4.1.65), python2.4-dev
 Standards-Version: 3.6.1.1
 
 Package: exiflow
 Architecture: all
-Depends: libimage-exiftool-perl
+Depends: libimage-exiftool-perl, ${python:Depends}, ${python:Depends}-glade2, ${python:Depends}-gtk2
 Suggests: gthumb
 Description: A set of tools to provide a complete digital photo workflow
  exiflow is a set of tools to provide a complete digital photo workflow for
