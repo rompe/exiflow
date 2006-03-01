@@ -4,6 +4,8 @@
 Personalize images by setting EXIF fields to values spezified in exif.cfg or
 on command line. Any arbitrary field name may be configured or given.
 
+This is normally used for artist and copyright information.
+
 Field names are the short versions supported by Exiftool. Look up the
 Exiftool documentation for information about possible names.
 """
