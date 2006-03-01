@@ -1,6 +1,12 @@
-exiflow (0.1.0) UNRELEASED; urgency=low
+exiflow (0.2.0-1) UNRELEASED; urgency=low
 
   * First public alpha version.
+
+ -- Ulf Rompe <debian@rompe.org>  Thu, 1 Mar 2006 22:12:06 +0100
+
+exiflow (0.1.0) UNRELEASED; urgency=low
+
+  * First alpha version.
 
  -- Ulf Rompe <debian@rompe.org>  Thu, 23 Feb 2006 10:12:06 +0100
 
