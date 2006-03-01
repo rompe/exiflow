@@ -136,3 +136,34 @@ piece of software.
 
 
 
+What does a typical workflow look like?
+
+1. Take some photos. :-)
+2. Import them with exiimport. You may want to configure
+   your system to automatically run exiimport once you
+   insert a media containing images.
+3. exirename the images.
+4. exiperson the images.
+
+Only if you shoot raw images:
+5. Convert raw files to jpegs, maybe using ufraw or dcraw.
+6. exiassign to get the EXIF tags into the JPG files.
+
+7. View, sort, tag and describe your photos with gthumb.
+8. exigate all information from gthumb to EXIF.
+
+If you made derivates by converting or editing manually:
+9. exiassign to have the derivates tagged like the
+   originals.
+
+Your images are now prepared to be archived, sent out to
+other people, published on the web by hand or automatically
+with software like Gallery which can make use of the EXIF
+fields to generate descriptions, titles and more.
+We promised you: You may change your software at any time.
+The resulting images are fully selfcontained, making use
+of existing and well established standards. You can
+continue to use ExiFlow to manage them, but if you decide
+to drop ExiFlow you won't loose any information. ExiFlow
+is here to help you, not to bind you.
+
