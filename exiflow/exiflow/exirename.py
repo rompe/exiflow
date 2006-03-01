@@ -44,6 +44,13 @@ editing history (if there's any) by just looking at the
 filename. If this is too complicated for your needs you
 are free to use these three bytes in another way or to
 leave them alone.
+
+There's one exception regarding the initial "000" revision:
+If the software detects the presence of a low quality JPG
+accompanying a raw image, the raw file gets revision 000 as
+usual, but the low quality file will get revision 00l so
+that it can't be confused with an automatically converted
+*000.jpg of high quality.
 """
 
 import os
