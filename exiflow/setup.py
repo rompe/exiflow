@@ -17,7 +17,8 @@ distutils.core.setup(name='exiflow',
                      packages=['exiflow'],
                      package_data={'exiflow': ['*.glade']},
                      author='Ulf Rompe, Sebastian Berthold',
-                     author_email='exiflow@rompe.org',
+                     author_email='exiflow-devel@lists.sourceforge.net',
+                     license='GNU General Public License (GPL)',
                      url='http://sourceforge.net/projects/exiflow/',
                      description='A set of tools including a little GUI to '
                                  'provide a complete digital photo workflow '
