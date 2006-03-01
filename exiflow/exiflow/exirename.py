@@ -3,11 +3,47 @@
 """
 Rename a bunch of image files according to our holy file naming schema.
 
-Example:
-dsc_1235.jpg  becomes  20050914-n001235-jd000.jpg
+Given a camera that saves a file as:
 
-Here's why:
-TODO: too lazy to document right now
+dsc_1234.nef
+
+we will rename that file to:
+
+20050412-n001234-ur000.nef
+
+At first there is 20050412. That's a date, telling us the
+photo has been taken on 2005-04-12. This is determined by
+looking it up in the image's EXIF information.
+
+Then there is n001234. The "n00" part is read from a config
+file as the three byte string to be put there for a given
+camera model. In this case, the camera model information in
+the EXIF header reads "Nikon D70", and the config section
+for that model reads "n00", meaning an "n" as a model
+indicator since I also own an HP camera for which I
+configured "h00", and the "00" as a way to extend the
+counting possibilities beyond 9999 pictures. Once the
+camera switches from 9999 to 0000 I will change that string
+to "n01". The "1234" part is just the numeric part of the
+original filename.
+
+At last there is ur000. "ur" are my initials; I have
+simply configured "If it's a Nikon D70, the artist is me".
+Of course there are possibilities to override that. The
+"000" part is a revision number. This is an original,
+untouched file, so it's revision is 000. An automatic
+conversion to JPG would also have revision 000 since there
+is no interaction and the files are still distinguishable
+by their suffixes. Once I convert it with custom parameters
+or do some kind of editing, I will save it as revision 100.
+Another derivate of the original will get revision 200.
+A derivate of revision 100 will get 110, a derivate of 110
+will get 111 and another one will get 112. Got the idea?
+Using this revision scheme lets you know about the basic
+editing history (if there's any) by just looking at the
+filename. If this is too complicated for your needs you
+are free to use these three bytes in another way or to
+leave them alone.
 """
 
 import os
