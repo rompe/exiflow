@@ -1,0 +1,131 @@
+What is ExiFlow?
+
+A set of tools (command line and GUI) to provide a complete
+digital photo workflow for Unixes. EXIF headers are used as
+the central information repository, so users may change
+their software at any time without loosing their data.
+ 
+
+
+Are we defining a fixed workflow?
+
+Not really. You may integrate these tools into your workflow
+in any way you want. However, it may be good to understand
+what kind of workflow we are in, and eventually adapt as
+much of it as possible for two reasons:
+
+1. The workflow we use is of course fully supported by our
+   tools.
+
+2. We killed huge amounts of time with reading and thinking
+   before we started to code, so there's nothing in our
+   workflow we can't explain. Read on to learn about it.
+
+
+
+Are filenames important?
+
+Yes, absolutely. The names that your camera generates are
+neither expressive nor unique, so they are not the first
+choice for long term archiving.
+
+Some theory:
+
+It's good to have the image number in the filename, but it
+would be better to have the date and time of shooting in
+there, too, as well as the artist name and the full camera
+model used, and of course the revision number of edited
+pictures as parts of the filename would also be handy.
+Put all that together and you come up with names of
+100 characters or more. Sadly, most photo professionals
+recommend limiting filenames to 26 characters over all to
+satisfy the needs of all photo databases, printing
+services and commercial archiving software. At the same
+time they recommend to include at least the date, the
+artists initials and a revision number.
+
+The solution:
+
+Considering all this, we came up with the following
+file naming scheme to include as much information as
+possible in 26 bytes:
+
+Given a camera that saves a file as:
+
+dsc_1234.nef
+
+we will rename that file to:
+
+20050412-n001234-ur000.nef
+
+At first there is 20050412. That's a date, telling us the
+photo has been taken on 2005-04-12. This is determined by
+looking it up in the image's EXIF information.
+
+Then there is n001234. The "n00" part is read from a config
+file as the three byte string to be put there for a given
+camera model. In this case, the camera model information in
+the EXIF header reads "Nikon D70", and the config section
+for that model reads "n00", meaning an "n" as a model
+indicator since I also own an HP camera for which I
+configured "h00", and the "00" as a way to extend the
+counting possibilities beyond 9999 pictures. Once the
+camera switches from 9999 to 0000 I will change that string
+to "n01". The "1234" part is just the numeric part of the
+original filename.
+
+At last there is ur000. "ur" are my initials; I have
+simply configured "If it's a Nikon D70, the artist is me".
+Of course there are possibilities to override that. The
+"000" part is a revision number. This is an original,
+untouched file, so it's revision is 000. An automatic
+conversion to JPG would also have revision 000 since there
+is no interaction and the files are still distinguishable
+by their suffixes. Once I convert it with custom parameters
+or do some kind of editing, I will save it as revision 100.
+Another derivate of the original will get revision 200.
+A derivate of revision 100 will get 110, a derivate of 110
+will get 111 and another one will get 112. Got the idea?
+Using this revision scheme lets you know about the basic
+editing history (if there's any) by just looking at the
+filename. If this is too complicated for your needs you
+are free to use these three bytes in another way or to
+leave them alone.
+
+
+
+Which tools are provided by ExiFlow?
+
+exigui
+This is the GTK frontend for all other tools but exiimport.
+If the mouse is your best friend you will like this one.
+
+exiimport
+Import files from given directories to your photo folder.
+Optionally unmounts source media after successfull import.
+
+exirename
+Rename a bunch of image files according to our holy file
+naming schema.
+
+exiperson
+Personalize images by setting EXIF fields to values
+spezified in exif.cfg or on command line. Any arbitrary
+field name may be configured or given. This is normally
+used for artist and copyright information.
+
+exiassign
+Find groups of derived images and exchange EXIF information
+between them. That way, a freshly edited derivate can
+automatically inherit it's mothers EXIF information.
+
+exigate
+Automatically gate information between gthumb metadata and
+the image's EXIF information. This let's you describe and
+tag your photos whith gthumb and transfer everything to the
+according EXIF tags afterwards. The other direction is also
+possible, so you are never bound to using one specific
+piece of software.
+
+
+
