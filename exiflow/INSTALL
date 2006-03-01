@@ -1,0 +1,67 @@
+
+LATEST VERSION
+==============
+
+Before going further, you can check that this package you have is
+the latest version by checking the exiflow download page at:
+
+    http://sourceforge.net/project/showfiles.php?group_id=151136
+
+
+EXECUTION REQUIREMENTS
+======================
+
+Running exiflow requires Python version 2.4 or later and the following 
+toolkits and modules:
+
+ -- ExifTool by Phil Harvey for reading and writing exif informations 
+     in image files  (http://www.sno.phy.queensu.ca/~phil/exiftool/)
+
+ -- python-gtk2  (http://www.daa.com.au/~james/software/pygtk/)
+
+ -- python-glade2  (http://www.daa.com.au/~james/software/pygtk/)
+
+
+RECOMMENDATIONS
+===============
+
+In this first step exiflow is designed to work together with gthumb
+as image viewer and browser (http://gthumb.sourceforge.net/)
+
+
+INSTALLATION REQUIREMENTS
+=========================
+
+Installing exiflow from this package requires the Python distutils
+package which are part from Python2.4. 
+
+INSTALLATION
+============
+
+Your options are:
+
+    --  (Recommended.)  Install from a pre-packaged exiflow package that
+        does not require distutils:
+
+            Red Hat Linux / SuSE  exiflow-x.x.x-1.noarch.rpm
+
+            Debian GNU/Linux    exiflow_x.x.x-1_all.deb
+
+    --  (Optional.)  Install from this source package.
+    
+        Assuming your system satisfies the installation requirements in the
+        previous section, install exiflow from this package simply by 
+	running the provided Python-standard setup script as follows:
+
+        # python2.4 setup.py install
+
+        By default, the above command will do the following:
+
+	--  Install the "exiflow" scripts in the default system script 
+	    directory (/usr/bin for example). 
+	
+	--  Install the "exiflow" python module in the standard Python
+	    library directory (/usr/lib/python2.4/site-packages for example).
+	
+
+
