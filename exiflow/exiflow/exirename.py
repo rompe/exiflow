@@ -63,7 +63,7 @@ import exiflow.filelist
 import exiflow.configfile
 
 
-def rename_file(filename, cameraconfig, cam_id=None, artist_initials=None):
+def rename_file(filename, cameraconfig, filelist, cam_id=None, artist_initials=None):
    """
    Rename filename and return the newly generated name without dir.
    """
@@ -148,7 +148,7 @@ def run(argv, callback=None):
 
    for filename, percentage in filelist:
       try:
-         newname = rename_file(filename, cameraconfig,
+         newname = rename_file(filename, cameraconfig, filelist,
                                options.cam_id, options.artist_initials)
       except IOError, msg:
          newname = os.path.basename(filename)
