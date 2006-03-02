@@ -5,6 +5,10 @@ digital photo workflow for Unixes. EXIF headers are used as
 the central information repository, so users may change
 their software at any time without loosing their data.
  
+The latest version is available at our project page:
+
+http://sourceforge.net/projects/exiflow/
+
 
 
 Are we defining a fixed workflow?
@@ -101,6 +105,19 @@ that it can't be confused with an automatically converted
 
 
 
+What's up with these config files?
+
+Some of our tools get their wisdom by reading config files.
+These files reside in ~/.exiflow and will be created an the
+fly, but you should edit them to contain information that
+matches your real circumstances. For example, your initials
+are unlikely to be "xy". We strongly advise you to fiddle
+with these settings using some test data until you are
+satisfied with the results. To quickly check the EXIF data
+of an image you may use tools like exiftool or exiv2.
+
+
+
 Which tools are provided by ExiFlow?
 
 exigui
@@ -142,19 +159,22 @@ What does a typical workflow look like?
 2. Import them with exiimport. You may want to configure
    your system to automatically run exiimport once you
    insert a media containing images.
-3. exirename the images.
-4. exiperson the images.
+3. Make a backup copy of the whole directory. Do this until
+   you are sure that there are no bugs in this or other
+   software you are using that could cause data loss.
+4. exirename the images.
+5. exiperson the images.
 
 Only if you shoot raw images:
-5. Convert raw files to jpegs, maybe using ufraw or dcraw.
-6. exiassign to get the EXIF tags into the JPG files.
+6. Convert raw files to jpegs, maybe using ufraw or dcraw.
+7. exiassign to get the EXIF tags into the JPG files.
 
-7. View, sort, tag and describe your photos with gthumb.
-8. exigate all information from gthumb to EXIF.
+8. View, sort, tag and describe your photos with gthumb.
+9. exigate all information from gthumb to EXIF.
 
 If you made derivates by converting or editing manually:
-9. exiassign to have the derivates tagged like the
-   originals.
+10. exiassign to have the derivates tagged like the
+    originals.
 
 Your images are now prepared to be archived, sent out to
 other people, published on the web by hand or automatically
@@ -164,6 +184,20 @@ We promised you: You may change your software at any time.
 The resulting images are fully selfcontained, making use
 of existing and well established standards. You can
 continue to use ExiFlow to manage them, but if you decide
-to drop ExiFlow you won't loose any information. ExiFlow
-is here to help you, not to bind you.
+to drop ExiFlow you won't loose anything but our good will.
+ExiFlow is here to help you, not to bind you.
+
+
+
+And then?
+
+Have fun using our tools! If you find bugs, please report
+them at our bug tracker:
+
+http://sf.net/tracker/?group_id=151136&atid=780011
+
+Thanks in advance,
+
+Ulf Rompe, developer
+Sebastian Berthold, developer
 
