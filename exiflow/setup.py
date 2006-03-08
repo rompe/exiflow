@@ -7,7 +7,7 @@ Install the exiflow collection on your computer.
 import distutils.core
 
 distutils.core.setup(name='exiflow',
-                     version='0.1.0',
+                     version='0.2.0',
                      scripts=['exigui',
                               'exiassign',
                               'exigate',
@@ -30,7 +30,7 @@ distutils.core.setup(name='exiflow',
                                       'used as the central information '
                                       'repository, so users may change their '
                                       'software at any time without loosing '
-                                      'their data. The tools may be used '
+                                      'any data. The tools may be used '
                                       'individually or combined.',
                      download_url='http://sourceforge.net/project/showfiles.php?group_id=151136',
                      classifiers=['Development Status :: 3 - Alpha',
