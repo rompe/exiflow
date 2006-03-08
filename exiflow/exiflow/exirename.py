@@ -97,8 +97,6 @@ def rename_file(filename, cameraconfig, filelist, cam_id=None, artist_initials=N
       elif cameraconfig.has_section("all") and cameraconfig.has_option("all",
                                                                      "cam_id"):
          cam_id = cameraconfig.get("all", "cam_id")
-      else:
-         cam_id = "000"
 
    if not artist_initials:
       if cameraconfig.has_section(model) and cameraconfig.has_option(model,
@@ -107,8 +105,11 @@ def rename_file(filename, cameraconfig, filelist, cam_id=None, artist_initials=N
       elif cameraconfig.has_section("all") and cameraconfig.has_option("all",
                                                            "artist_initials"):
          artist_initials = cameraconfig.get("all", "artist_initials")
-      else:
-         artist_initials = "xy"
+
+   if not cam_id or not artist_initials:
+      exiflow.configfile.append("cameras", model, "cam_id", "artist_initials")
+      sys.stderr.write("Skipping %s.\n" % filename)
+      return os.path.basename(filename)
 
    revision = "000"
 # Look for high quality versions of this image

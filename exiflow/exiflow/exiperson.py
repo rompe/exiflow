@@ -41,7 +41,10 @@ def run(argv, callback=None):
       else:
          remaining_args.append(arg)
 
-   defaultpersonals = exifconfig.items("all")
+   defaultpersonals = []
+   if exifconfig.has_section("all"):
+      defaultpersonals += exifconfig.items("all")
+
    if options.section:
       if exifconfig.has_section(options.section):
          defaultpersonals += exifconfig.items(options.section)
@@ -58,7 +61,7 @@ def run(argv, callback=None):
          print "%3s%% %s" % (percentage, filename)
       if callable(callback):
          if callback(filename, filename, percentage):
-	    break
+            break
 
       exif_file = exiflow.exif.Exif(filename)
       try:
@@ -68,13 +71,24 @@ def run(argv, callback=None):
             print "Skipping %s: %s" % (filename, msg)
          if callable(callback):
             if callback(filename, filename, percentage):
-	       break
+               break
          continue
 
 # Note to programmer: The [:] is needed to get a slice copy instead of a reference.
       personals = defaultpersonals[:]
-      if exif_file.fields.has_key("Model") and exifconfig.has_section(exif_file.fields["Model"]):
-         personals += exifconfig.items(exif_file.fields["Model"])
+      if exif_file.fields.has_key("Model"):
+         if exifconfig.has_section(exif_file.fields["Model"]):
+            personals += exifconfig.items(exif_file.fields["Model"])
+         else:
+            exiflow.configfile.append("exif", exif_file.fields["Model"], "Artist", "Contact")
+            sys.stderr.write("Get rid of this message by defining at least"
+                             " an empty [%s] section.\n" %
+                             exif_file.fields["Model"])
+      
+      if len(personals) == 0:
+         sys.stderr.write("No [all] or [%s] section with data, skipping.\n" % 
+                          exif_file.fields["Model"])
+         continue
 
       exif_file.fields = {}
       for key, value in personals:
