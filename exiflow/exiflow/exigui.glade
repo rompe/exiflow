@@ -289,7 +289,7 @@
 				  <property name="spacing">0</property>
 
 				  <child>
-				    <widget class="GtkRadioButton" id="radiobutton1">
+				    <widget class="GtkRadioButton" id="exirename_cam_id_entry_button_auto">
 				      <property name="visible">True</property>
 				      <property name="tooltip" translatable="yes">Automatically determined by looking for a section in your INI file that matches the model tag of the EXIF information.</property>
 				      <property name="can_focus">True</property>
@@ -310,7 +310,7 @@
 				  </child>
 
 				  <child>
-				    <widget class="GtkRadioButton" id="radiobutton2">
+				    <widget class="GtkRadioButton" id="exirename_cam_id_entry_button_custom">
 				      <property name="visible">True</property>
 				      <property name="tooltip" translatable="yes">Choose a fixed string of 3 characters.</property>
 				      <property name="can_focus">True</property>
@@ -321,7 +321,7 @@
 				      <property name="active">False</property>
 				      <property name="inconsistent">False</property>
 				      <property name="draw_indicator">True</property>
-				      <property name="group">radiobutton1</property>
+				      <property name="group">exirename_cam_id_entry_button_auto</property>
 				      <signal name="clicked" handler="on_exirename_camid_custom_activate" last_modification_time="Wed, 01 Feb 2006 23:05:57 GMT"/>
 				    </widget>
 				    <packing>
@@ -412,7 +412,7 @@
 				  <property name="spacing">0</property>
 
 				  <child>
-				    <widget class="GtkRadioButton" id="radiobutton3">
+				    <widget class="GtkRadioButton" id="exirename_artist_initials_entry_button_auto">
 				      <property name="visible">True</property>
 				      <property name="tooltip" translatable="yes">Automatically determined by looking for a section in your INI file that matches the model tag of the EXIF information.</property>
 				      <property name="can_focus">True</property>
@@ -433,7 +433,7 @@
 				  </child>
 
 				  <child>
-				    <widget class="GtkRadioButton" id="radiobutton4">
+				    <widget class="GtkRadioButton" id="exirename_artist_initials_entry_button_custom">
 				      <property name="visible">True</property>
 				      <property name="tooltip" translatable="yes">Choose a fixed string of 2 characters.</property>
 				      <property name="can_focus">True</property>
@@ -444,7 +444,7 @@
 				      <property name="active">False</property>
 				      <property name="inconsistent">False</property>
 				      <property name="draw_indicator">True</property>
-				      <property name="group">radiobutton3</property>
+				      <property name="group">exirename_artist_initials_entry_button_auto</property>
 				      <signal name="clicked" handler="on_exirename_artist_custom_activate" last_modification_time="Wed, 01 Feb 2006 23:06:15 GMT"/>
 				    </widget>
 				    <packing>
@@ -655,7 +655,7 @@
 			      <property name="spacing">0</property>
 
 			      <child>
-				<widget class="GtkRadioButton" id="radiobutton5">
+				<widget class="GtkRadioButton" id="exiperson_section_entry_button_auto">
 				  <property name="visible">True</property>
 				  <property name="tooltip" translatable="yes">Automatically determined by looking for a section in your INI file that matches the model tag of the EXIF information.</property>
 				  <property name="can_focus">True</property>
@@ -676,7 +676,7 @@
 			      </child>
 
 			      <child>
-				<widget class="GtkRadioButton" id="radiobutton6">
+				<widget class="GtkRadioButton" id="exiperson_section_entry_button_custom">
 				  <property name="visible">True</property>
 				  <property name="tooltip" translatable="yes">Choose an other section in exif.conf.</property>
 				  <property name="can_focus">True</property>
@@ -687,7 +687,7 @@
 				  <property name="active">False</property>
 				  <property name="inconsistent">False</property>
 				  <property name="draw_indicator">True</property>
-				  <property name="group">radiobutton5</property>
+				  <property name="group">exiperson_section_entry_button_auto</property>
 				  <signal name="clicked" handler="on_exiperson_section_custom_activate" last_modification_time="Mon, 20 Feb 2006 19:39:13 GMT"/>
 				</widget>
 				<packing>

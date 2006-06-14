@@ -181,9 +181,9 @@ class Window1(object):
       args = ["-v"]
       artist_initials = self.wTree.get_widget("exirename_artist_initials_entry")
       cam_id = self.wTree.get_widget("exirename_cam_id_entry")
-      if artist_initials.state != gtk.STATE_INSENSITIVE:
+      if self.wTree.get_widget("exirename_artist_initials_entry_button_custom").get_active():
          args.append("--artist_initials=" + artist_initials.get_text())
-      if cam_id.state != gtk.STATE_INSENSITIVE:
+      if self.wTree.get_widget("exirename_cam_id_entry_button_custom").get_active():
          args.append("--cam_id=" + cam_id.get_text())
       args += map(lambda x: x[0], self.liststore)
       try:
@@ -205,7 +205,7 @@ class Window1(object):
    def run_exiperson(self):
       args = ["-v"]
       exif_section = self.wTree.get_widget("exiperson_section_entry")
-      if exif_section.state != gtk.STATE_INSENSITIVE:
+      if self.wTree.get_widget("exiperson_section_entry_button_custom").get_active():
          args.append("--section=" + exif_section.get_text())
       args += map(lambda x: x[0], self.liststore)
       try:
