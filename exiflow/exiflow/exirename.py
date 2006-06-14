@@ -53,6 +53,8 @@ that it can't be confused with an automatically converted
 *000.jpg of high quality.
 """
 
+__revision__ = "$Id$"
+
 import os
 import re
 import sys
@@ -63,7 +65,8 @@ import exiflow.filelist
 import exiflow.configfile
 
 
-def rename_file(filename, cameraconfig, filelist, cam_id=None, artist_initials=None):
+def rename_file(filename, cameraconfig, filelist, cam_id=None,
+                artist_initials=None):
    """
    Rename filename and return the newly generated name without dir.
    """
@@ -71,8 +74,8 @@ def rename_file(filename, cameraconfig, filelist, cam_id=None, artist_initials=N
    if filename_re.match(os.path.basename(filename)):
       raise IOError, filename + " already seems to be formatted."
    leader, extension = os.path.splitext(filename)
-   number = [char for char in leader[-4:] if char.isdigit()]
-   if not number.isdigit():
+   number = "".join([char for char in leader[-4:] if char.isdigit()])
+   if not number:
       raise IOError, "Can't find a number in " + filename
 
    exif_file = exiflow.exif.Exif(filename)
@@ -109,14 +112,11 @@ def rename_file(filename, cameraconfig, filelist, cam_id=None, artist_initials=N
       return os.path.basename(filename)
 
    revision = "000"
-# Look for high quality versions of this image
+# Look for high quality versions of this image. This is the case if we are
+# a .jpg and more than one file exists with the same prefix.
    if extension == ".jpg":
-# TODO: find a simpler version of this loop, maybe fnmatch.filter()?
-      count = 0
-      for tmpfile, tmppercentage in filelist:
-         if tmpfile.startswith(leader):
-            count += 1
-      if count > 1:
+      versions = [vers[0] for vers in filelist if vers[0].startswith(leader)]
+      if len(versions) > 1:
          revision = "00l"
    newname = date + "-" + cam_id + number.zfill(4) + \
              "-" + artist_initials + revision + extension
@@ -125,7 +125,14 @@ def rename_file(filename, cameraconfig, filelist, cam_id=None, artist_initials=N
 
 
 def run(argv, callback=None):
-   parser = optparse.OptionParser(usage="usage: %prog [options] <files or dirs>")
+   """
+   Take an equivalent of sys.argv[1:] and optionally a callable.
+   Parse options, rename files and optionally call the callable on every
+   processed file with 3 arguments: filename, newname, percentage.
+   If the callable returns True, stop the processing.
+   """
+   parser = optparse.OptionParser(usage="usage: %prog [options] "
+                                        "<files or dirs>")
    parser.add_option("--cam_id", "-c", dest="cam_id",
                      help="ID string for the camera model. Should normally be" \
                           " three characters long.")
@@ -140,8 +147,10 @@ def run(argv, callback=None):
 
    filelist = exiflow.filelist.Filelist(*args)
    if options.verbose:
-      print "Read settings config files:", " ".join(filelist.get_read_config_files())
-      print "Read camera config files:", " ".join(read_config_files)
+      print "Read settings config files:", \
+            " ".join(filelist.get_read_config_files()), \
+            "\nRead camera config files:", \
+            " ".join(read_config_files)
 
 
    for filename, percentage in filelist:
@@ -152,7 +161,7 @@ def run(argv, callback=None):
          newname = os.path.basename(filename)
          sys.stderr.write("ERROR, skipping %s:\n%s\n" % (filename, str(msg)))
       if options.verbose:
-          print "%3s%% %s -> %s" % (percentage, filename, newname)
+         print "%3s%% %s -> %s" % (percentage, filename, newname)
       if callable(callback):
          if callback(filename,
                      os.path.join(os.path.dirname(filename), newname),
