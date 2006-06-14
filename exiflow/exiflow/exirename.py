@@ -70,14 +70,11 @@ def rename_file(filename, cameraconfig, filelist, cam_id=None, artist_initials=N
    filename_re = re.compile("^\d{8}-.{3}\d{4}-.{5}\.[^.]*$")
    if filename_re.match(os.path.basename(filename)):
       raise IOError, filename + " already seems to be formatted."
-   tmpindex = filename.rfind(".")
-   number = filename[tmpindex - 4 : tmpindex].ljust(4, "0")
-   try:
-      int(number)
-   except ValueError:
+   leader, extension = os.path.splitext(filename)
+   number = [char for char in leader[-4:] if char.isdigit()]
+   if not number.isdigit():
       raise IOError, "Can't find a number in " + filename
-   extension = filename[tmpindex + 1 : len(filename)].lower()
-   leader = filename[0 : tmpindex]
+
    exif_file = exiflow.exif.Exif(filename)
 # read_exif may throw IOError. We leave the catching to our caller.
    exif_file.read_exif()
@@ -113,7 +110,7 @@ def rename_file(filename, cameraconfig, filelist, cam_id=None, artist_initials=N
 
    revision = "000"
 # Look for high quality versions of this image
-   if extension == "jpg":
+   if extension == ".jpg":
 # TODO: find a simpler version of this loop, maybe fnmatch.filter()?
       count = 0
       for tmpfile, tmppercentage in filelist:
@@ -121,8 +118,8 @@ def rename_file(filename, cameraconfig, filelist, cam_id=None, artist_initials=N
             count += 1
       if count > 1:
          revision = "00l"
-   newname = date + "-" + cam_id + number + "-" + artist_initials + revision + \
-             "." + extension
+   newname = date + "-" + cam_id + number.zfill(4) + \
+             "-" + artist_initials + revision + extension
    os.rename(filename, os.path.join(os.path.dirname(filename), newname))
    return newname
 
