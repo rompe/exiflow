@@ -13,7 +13,7 @@ import optparse
 import subprocess
 import exiflow.filelist
 
-def run(argv):
+def run(argv, callback=None):
 # Parse command line.
    parser = optparse.OptionParser()
    parser.add_option("-m", "--mount", dest="mount",
@@ -55,7 +55,12 @@ def run(argv):
 # Copy files
    progress_size = 0
    for filename, percentage in filelist:
-      print "%3s%% %s" % (percentage, filename)
+      if options.verbose:
+         print "%3s%% %s" % (percentage, filename)
+      if callable(callback):
+         if callback("", os.path.join(targetdir, os.path.basename(filename)), percentage, keep_original=True):
+            break
+
       shutil.copy2(filename, targetdir)
       os.chmod(os.path.join(targetdir, os.path.basename(filename)), stat.S_IMODE(0644))
 

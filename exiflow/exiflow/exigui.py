@@ -44,6 +44,24 @@ class WritableTextView:
       self.textview.scroll_mark_onscreen(self.buffer.get_insert())
 
 
+class Directorychooser1(object):
+   def __init__(self, parent = None, callback=None):
+      self.wTree = gtk.glade.XML(gladefile, "directorychooserdialog1")
+      self.window = self.wTree.get_widget("directorychooserdialog1")
+      dic = {}
+      for key in dir(self.__class__):
+         dic[key] = getattr(self, key)
+      self.wTree.signal_autoconnect(dic)
+      if parent:
+         self.window.set_transient_for(parent)
+      self.callback = callback
+      self.window.show()
+
+   def on_directorychooserdialog1_response(self, widget, data = None):
+      if data == gtk.RESPONSE_OK and callable(self.callback):
+         self.callback(widget.get_filename())
+      self.window.destroy()
+
 class Filechooser1(object):
    def __init__(self, parent = None, callback=None):
       self.wTree = gtk.glade.XML(gladefile, "filechooserdialog1")
@@ -101,6 +119,9 @@ class Window1(object):
 
    def on_button_open_clicked(self, widget, data = None):
       diag = Filechooser1(self.window, self.set_filelist)
+
+   def on_button_exiimport_browse_importdir_clicked(self, widget, data = None):
+      diag = Directorychooser1(self.window, self.set_filelist)
 
    def on_info1_activate(self, widget, data=None):
       diag = Aboutdialog1(self.window)
