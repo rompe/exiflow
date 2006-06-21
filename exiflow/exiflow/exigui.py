@@ -3,6 +3,7 @@
 
 import os.path
 import sys
+import optparse
 import pygtk
 pygtk.require("2.0")
 import gtk
@@ -10,6 +11,7 @@ import gtk.glade
 
 import exiflow.exiassign
 import exiflow.exigate
+import exiflow.exiimport
 import exiflow.exiperson
 import exiflow.exirename
 
@@ -229,10 +231,47 @@ class Window1(object):
       except IOError, msg:
          sys.stdout.write("\nERROR: %s\n" % str(msg))
 
+   def run_exiimport(self):
+      args = ["-v"]
+      import_dir = self.wTree.get_widget("exiimport_importdir_entry")
+      device = self.wTree.get_widget("exiimport_device_entry")
+      target_dir = self.wTree.get_widget("exiimport_targetdir_entry")
+      if import_dir.get_text():
+         args.append("--mount=" + import_dir.get_text())
+      if device.get_text():
+         args.append("--device=" + device.get_text())
+      if target_dir.get_text():
+         args.append("--target=" + target_dir.get_text())
+      try:
+         exiflow.exiimport.run(args, self._progress_callback)
+      except IOError, msg:
+         sys.stdout.write("\nERROR: %s\n" % str(msg))
+
 def run(argv):
+   parser = optparse.OptionParser()
+   parser.add_option("-m", "--mount", dest="mount",
+                     help="Mountpoint of directory to import. Corresponds" \
+                          " to %m in the gnome-volume-manager config dialog.")
+   parser.add_option("-t", "--target", dest="target",
+                     help="Target directory. A subdirectory will be created" \
+                          " in this directory.")
+   parser.add_option("-d", "--device", dest="device",
+                     help="Mounted device file. If given, this device will be " \
+                          "unmounted using pumount after the import. Corresponds" \
+                          " to %d in the gnome-volume-manager config dialog.")
+   parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
+                     help="Be verbose.")
+   options, args = parser.parse_args(argv)
+
    win1 = Window1()
-   if len(sys.argv) > 1:
-      win1.set_filelist(argv)
+   if options.mount:
+      win1.wTree.get_widget("exiimport_importdir_entry").set_text(options.mount)
+   if options.device:
+      win1.wTree.get_widget("exiimport_device_entry").set_text(options.device)
+   if options.target:
+      win1.wTree.get_widget("exiimport_targetdir_entry").set_text(options.target)
+   if len(args) > 0:
+      win1.set_filelist(args)
    gtk.main()
    return 0
 
