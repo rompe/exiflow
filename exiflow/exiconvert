@@ -1,0 +1,4 @@
+#!/usr/bin/env python2.4
+import sys
+import exiflow.exiconvert
+sys.exit(exiflow.exiconvert.run(sys.argv[1:]))

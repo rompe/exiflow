@@ -53,7 +53,8 @@ def cameras():
       if not os.path.isdir(local_config_dir):
          os.makedirs(local_config_dir)
       file(local_config, "w").write("""# cameras.cfg
-# This file defines values to be used as filename parts. An example filename:
+# This file defines values to be used as filename parts and converters to be
+# used for conversion of RAW file formats to JPEG.. An example filename:
 #
 # 20050807-n005965-sb000.jpg
 #
@@ -70,6 +71,8 @@ def cameras():
 #[NIKON D70]
 #cam_id = n00
 #artist_initials = yz
+#raw_extension = .nef
+#raw_converter = ufraw-batch --gamma=0.45 --saturation=1.0 --exposure=0.0 --black-point=0 --interpolation=ahd --compression=85 --noexif --wb=camera --curve=linear --linearity=0.06 --clip --out-type=jpeg
 
 #[HP PhotoSmart 715]
 #cam_id = hp0
