@@ -10,14 +10,22 @@ Field names are the short versions supported by Exiftool. Look up the
 Exiftool documentation for information about possible names.
 """
 
-import os
+__revision__ = "$Id$"
+
 import sys
+import logging
 import optparse
 import exiflow.exif
 import exiflow.filelist
 import exiflow.configfile
 
 def run(argv, callback=None):
+   """
+   Take an equivalent of sys.argv[1:] and optionally a callable.
+   Parse options, personalize files and optionally call the callable
+   on every processed file with 3 arguments: filename, newname, percentage.
+   If the callable returns True, stop the processing.
+   """
    parser = optparse.OptionParser(usage="usage: %prog [options] [-- -TAGNAME=" \
                                         "VALUE [...]] <files or dirs>")
    parser.add_option("--section", "-s", dest="section",
@@ -29,6 +37,10 @@ def run(argv, callback=None):
    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
                      help="Be verbose.")
    options, args = parser.parse_args(argv)
+
+   if options.verbose:
+      logging.basicConfig(level=logging.INFO)
+   logger = logging.getLogger("exiperson")
 
    exifconfig, read_config_files = exiflow.configfile.exif()
 
@@ -49,16 +61,16 @@ def run(argv, callback=None):
       if exifconfig.has_section(options.section):
          defaultpersonals += exifconfig.items(options.section)
       else:
-         sys.exit("ERROR: Section %s not found in config files" % options.section)
+         sys.exit("ERROR: Section %s not found in config files" % \
+                  options.section)
 
    filelist = exiflow.filelist.Filelist(*args)
-   if options.verbose:
-      print "Read settings config files:", " ".join(filelist.get_read_config_files())
-      print "Read exif config files:", " ".join(read_config_files)
+   logger.info("Read settings config files: %s",
+               " ".join(filelist.get_read_config_files()))
+   logger.info("Read exif config files: %s", " ".join(read_config_files))
 
    for filename, percentage in filelist:
-      if options.verbose:
-         print "%3s%% %s" % (percentage, filename)
+      logger.info("%3s%% %s", percentage, filename)
       if callable(callback):
          if callback(filename, filename, percentage):
             break
@@ -67,8 +79,7 @@ def run(argv, callback=None):
       try:
          exif_file.read_exif()
       except IOError, msg:
-         if options.verbose:
-            print "Skipping %s: %s" % (filename, msg)
+         logger.warning("Skipping %s: %s", filename, msg)
          if callable(callback):
             if callback(filename, filename, percentage):
                break

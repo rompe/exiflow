@@ -24,7 +24,7 @@ prefix as the input file with an extension of ".jpg".
 For example, a file "test.nef" should result in "test.jpg".
 """
 
-__revision__ = "$Id:  $"
+__revision__ = "$Id$"
 
 import os
 import sys
