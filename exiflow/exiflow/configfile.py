@@ -6,6 +6,7 @@ They look for existance of ~/.exiflow/<classname>.cfg and will create it if
 it doesn't exist. Afterwards a configparser object of this file and
 /etc/exiflow/<classname>.cfg is returned.
 """
+__revision__ = "$Id: "
 
 import os
 import sys
@@ -13,6 +14,7 @@ import ConfigParser
 
 global_config_dir = "/etc/exiflow"
 local_config_dir = os.path.expanduser('~/.exiflow')
+
 
 def settings():
    """
@@ -34,9 +36,11 @@ image_extensions = .jpg .nef .raw .crw .tif
 unwantend_files = nikon001.dsc
 unwantend_dirs = .comments
 """)
+      sys.stderr.write("Created example " + local_config + "\n")
    config = ConfigParser.ConfigParser()
    read_files = config.read([global_config, local_config])
    return config, read_files
+
 
 def cameras():
    """
@@ -73,6 +77,7 @@ def cameras():
 #[C2040Z]
 #cam_id = o00
 """)
+      sys.stderr.write("Created example " + local_config + "\n")
    config = ConfigParser.ConfigParser()
    read_files = config.read([global_config, local_config])
    return config, read_files
@@ -110,6 +115,7 @@ def exif():
 #[NIKON D70]
 #artist = I. R. Baboon
 """)
+      sys.stderr.write("Created example " + local_config + "\n")
    config = ConfigParser.ConfigParser()
    read_files = config.read([global_config, local_config])
    return config, read_files
