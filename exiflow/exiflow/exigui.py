@@ -134,16 +134,21 @@ class Window1(object):
    def on_exiperson_section_custom_activate(self, widget, data=None):
       self.wTree.get_widget("exiperson_section_entry").set_sensitive(True)
 
-   def _progress_callback(self, filename, newname, percentage):
+   def _progress_callback(self, filename, newname, percentage, keep_original=False):
       """
       This callback is given as a callable to the main programs and is
       called after each processed file. filename and newname may of course
-      be the same. Return self._cancelled which is True when Cancel is pressed.
+      be the same. If keep_original is True, add newname instead of replacing
+      filename with it.
+      Return self._cancelled which is True after Cancel has been pressed.
       """
       if filename != newname:
-         for rownum in range(0, len(self.liststore)):
-            if self.liststore[rownum][0] == filename:
-               self.liststore[rownum][0] = newname
+         if keep_original:
+            self.liststore.append([newname])
+         else:
+            for rownum in range(0, len(self.liststore)):
+               if self.liststore[rownum][0] == filename:
+                  self.liststore[rownum][0] = newname
       progressbar = self.wTree.get_widget("progressbar1")
       progressbar.set_fraction(float(percentage) / 100)
       progressbar.set_text(u"%s %%" % percentage)
