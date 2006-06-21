@@ -121,7 +121,10 @@ class Window1(object):
       diag = Filechooser1(self.window, self.set_filelist)
 
    def on_button_exiimport_browse_importdir_clicked(self, widget, data = None):
-      diag = Directorychooser1(self.window, self.set_filelist)
+      diag = Directorychooser1(self.window, self.wTree.get_widget("exiimport_importdir_entry").set_text)
+
+   def on_button_exiimport_browse_targetdir_clicked(self, widget, data = None):
+      diag = Directorychooser1(self.window, self.wTree.get_widget("exiimport_targetdir_entry").set_text)
 
    def on_info1_activate(self, widget, data=None):
       diag = Aboutdialog1(self.window)
