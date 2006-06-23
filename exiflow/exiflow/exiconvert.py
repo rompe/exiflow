@@ -42,7 +42,7 @@ def convert_file(filename, cameraconfig):
    """
    logger = logging.getLogger("exiconvert.convert_file")
    basename = os.path.basename(filename)
-# Sanity check - no sense in trying to convert jpeg  to jpeg
+# Sanity check - no sense in trying to convert jpeg to jpeg
    if basename.lower().endswith(".jpg"):
       logger.debug("%s is a Jpeg file, skipping.", basename)
       return basename
@@ -83,15 +83,16 @@ def convert_file(filename, cameraconfig):
    newname = os.path.splitext(filename)[0] + ".jpg"
    if os.path.exists(newname):
       logger.info("%s already exists, skipping %s.", newname, basename)
-      return basename
-   command = raw_converter + " " + filename
-   if subprocess.call(command, shell=True) > 0:
-      logger.error("Converter invocation returned an error:\n%s", command)
-      return basename
-   if not os.path.exists(newname):
-      logger.error("Converter returned 0, but %s is absent!", newname)
    else:
-      return os.path.basename(newname)
+      command = raw_converter + " " + filename
+      if subprocess.call(command, shell=True) > 0:
+         logger.error("Converter invocation returned an error:\n%s", command)
+      else:
+         if not os.path.exists(newname):
+            logger.error("Converter returned 0, but %s is absent!", newname)
+         else:
+            return os.path.basename(newname)
+   return basename
 
 
 
@@ -113,7 +114,7 @@ def run(argv, callback=None):
       logging.basicConfig(level=logging.INFO)
    logger = logging.getLogger("exiconvert")
 
-   cameraconfig, read_config_files = exiflow.configfile.cameras()
+   cameraconfig, read_config_files = exiflow.configfile.parse("cameras")
 
    filelist = exiflow.filelist.Filelist(*args)
    logger.info("Read settings config files: %s",

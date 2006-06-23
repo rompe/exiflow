@@ -42,7 +42,7 @@ def run(argv, callback=None):
       logging.basicConfig(level=logging.INFO)
    logger = logging.getLogger("exiperson")
 
-   exifconfig, read_config_files = exiflow.configfile.exif()
+   exifconfig, read_config_files = exiflow.configfile.parse("exif")
 
 # collect args for Exiftool
    exiftool_args = ""
@@ -91,7 +91,8 @@ def run(argv, callback=None):
          if exifconfig.has_section(exif_file.fields["Model"]):
             personals += exifconfig.items(exif_file.fields["Model"])
          else:
-            exiflow.configfile.append("exif", exif_file.fields["Model"], "Artist", "Contact")
+            exiflow.configfile.append("exif", exif_file.fields["Model"],
+                                      ("Artist", "Contact"))
             sys.stderr.write("Get rid of this message by defining at least"
                              " an empty [%s] section.\n" %
                              exif_file.fields["Model"])

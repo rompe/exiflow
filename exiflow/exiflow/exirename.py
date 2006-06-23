@@ -107,7 +107,7 @@ def rename_file(filename, cameraconfig, filelist, cam_id=None,
          artist_initials = cameraconfig.get("all", "artist_initials")
 
    if not cam_id or not artist_initials:
-      exiflow.configfile.append("cameras", model, "cam_id", "artist_initials")
+      exiflow.configfile.append("cameras", model, ("cam_id", "artist_initials"))
       sys.stderr.write("Skipping %s.\n" % filename)
       return os.path.basename(filename)
 
@@ -143,7 +143,7 @@ def run(argv, callback=None):
                      help="Be verbose.")
    options, args = parser.parse_args(args=argv)
 
-   cameraconfig, read_config_files = exiflow.configfile.cameras()
+   cameraconfig, read_config_files = exiflow.configfile.parse("cameras")
 
    filelist = exiflow.filelist.Filelist(*args)
    if options.verbose:
