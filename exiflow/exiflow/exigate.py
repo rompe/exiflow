@@ -1,11 +1,14 @@
 #!/usr/bin/env python2.4
 # -*- coding: utf-8 -*-
+"""
+Automatically gate image meta information between EXIF
+headers and Gthumb comment files.
+"""
+__revision__ = "$Id$"
+
 import optparse
 import os
 import sys
-import gzip
-import xml.dom.minidom
-import re
 import exiflow.exif
 import exiflow.gthumb
 import exiflow.filelist
@@ -27,7 +30,7 @@ def autogate_gthumb(filename, myoptions):
       try:
          gthumbfile.read()
       except IOError, msg:
-         print "Error reading gthumb comment:\n", myxmlfile, "\n", msg
+         print "Error reading gthumb comment for", filename, "\n", msg
          return False
       exif_file = exiflow.exif.Exif(filename)
       exif_file.fields = gthumbfile.fields
@@ -41,7 +44,9 @@ def autogate_gthumb(filename, myoptions):
       #             myoptions.template)
       gthumbfile.set_mtime(filetimestamp)
       os.utime(filename, (filetimestamp, filetimestamp))
-   elif filetimestamp > gthumbtimestamp or myoptions.addfields or myoptions.template:
+   elif filetimestamp > gthumbtimestamp \
+      or myoptions.addfields \
+      or myoptions.template:
       if myoptions.verbose:
          print "Updating comment file from", filename
       exif_file = exiflow.exif.Exif(filename)
@@ -61,7 +66,14 @@ def autogate_gthumb(filename, myoptions):
 
 
 def run(argv, callback=None):
-   parser = optparse.OptionParser(usage="usage: %prog [options] <files or dirs>")
+   """
+   Take an equivalent of sys.argv[1:] and optionally a callable.
+   Parse options, gate meta information and optionally call the callable on
+   every processed file with 3 arguments: filename, newname, percentage.
+   If the callable returns True, stop the processing.
+   """
+   parser = optparse.OptionParser(usage="usage: %prog [options] "
+                                        "<files or dirs>")
    parser.add_option("--gthumb", action="store_true", dest="gthumb",
                      help="Gateway to/from gthumb comment files."
                           "This is the default.")
@@ -92,7 +104,7 @@ def run(argv, callback=None):
          print "%3s%% " % percentage,
       if callable(callback):
          if callback(filename, filename, percentage):
-	    break
+            break
       autogate_gthumb(filename, options)
       if options.cleanup:
          log_prefix = "Leaving"
