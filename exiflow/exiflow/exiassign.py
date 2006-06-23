@@ -13,6 +13,7 @@ Example:
  look at 20050914-n001235-jd100.jpg and 20050914-n001235-jd000.nef in this
  order to copy the EXIF header from.
 """
+__revision__ = "$Id$"
 
 import os
 import re
@@ -24,10 +25,18 @@ import exiflow.filelist
 
 
 def run(argv, callback=None):
-   parser = optparse.OptionParser(usage="usage: %prog [options] <files or dirs>")
+   """
+   Take an equivalent of sys.argv[1:] and optionally a callable.
+   Parse options, assign relating files and gate meta information between them,
+   and optionally call the callable on every processed file with 3 arguments:
+   filename, newname, percentage.
+   If the callable returns True, stop the processing.
+   """
+   parser = optparse.OptionParser(usage="usage: %prog [options] "
+                                        "<files or dirs>")
    parser.add_option("-f", "--force", action="store_true", dest="force",
-                     help="Force update even if EXIF is already present. " \
-                          "The fields handled by these scripts are kept " \
+                     help="Force update even if EXIF is already present. "
+                          "The fields handled by these scripts are kept "
                           "anyway.")
    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
                      help="Be verbose.")
@@ -48,7 +57,7 @@ def run(argv, callback=None):
       if mymatch:
          if options.verbose:
             print "%3s%% " % percentage,
-         leader, revision = mymatch.groups()
+         leader, dummy = mymatch.groups()
          exif_file = exiflow.exif.Exif(filename)
          try:
             exif_file.read_exif()
@@ -60,7 +69,7 @@ def run(argv, callback=None):
                print "Skipping %s, it seems to contain EXIF data." % filename
             if callable(callback):
                if callback(filename, filename, percentage):
-	          break
+                  break
             continue
          mtimes = {}
          for otherfile in glob.glob(os.path.join(os.path.dirname(filename),
@@ -84,7 +93,7 @@ def run(argv, callback=None):
                exif_file.update_exif(mtimes[otherfile])
                if callable(callback):
                   if callback(filename, filename, percentage):
-		     break
+                     break
                break
 
 
