@@ -10,6 +10,7 @@ __revision__ = "$Id: "
 
 import os
 import sys
+import logging
 import ConfigParser
 
 __global_config_dir = "/etc/exiflow"
@@ -80,11 +81,13 @@ __default_contents = {"settings": """# settings.cfg
 # ConfigParser Caches
 __cache = {}
 
+
 def parse(configname):
    """
    Handle cached access to <configname>.cfg.
    Return a configparser object and a list of processed files.
    """
+   logger = logging.getLogger("configfile.parse")
    if not __cache[configname]:
       local_config = os.path.join(__local_config_dir, configname + ".cfg")
       global_config = os.path.join(__global_config_dir, configname + ".cfg")
@@ -92,10 +95,11 @@ def parse(configname):
          if not os.path.isdir(__local_config_dir):
             os.makedirs(__local_config_dir)
          file(local_config, "w").write(__default_contents[configname])
-         sys.stderr.write("Created example " + local_config + "\n")
+         logger.warning("Created example " + local_config)
       config = ConfigParser.ConfigParser()
       read_files = config.read([global_config, local_config])
-      __cache[configname] = (config, read_files)
+      logger.info("Read %s config files: %s", " ".join(read_files))
+      __cache[configname] = config
    return __cache[configname]
 
 

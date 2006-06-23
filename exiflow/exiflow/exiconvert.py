@@ -83,7 +83,6 @@ def convert_file(filename):
    return basename
 
 
-
 def run(argv, callback=None):
    """
    Take an equivalent of sys.argv[1:] and optionally a callable.
@@ -102,14 +101,7 @@ def run(argv, callback=None):
       logging.basicConfig(level=logging.INFO)
    logger = logging.getLogger("exiconvert")
 
-   dummy, read_config_files = exiflow.configfile.parse("cameras")
-
    filelist = exiflow.filelist.Filelist(*args)
-   logger.info("Read settings config files: %s",
-               " ".join(filelist.get_read_config_files()))
-   logger.info("Read camera config files: %s",
-               " ".join(read_config_files))
-
    for filename, percentage in filelist:
       try:
          newname = convert_file(filename)

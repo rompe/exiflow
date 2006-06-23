@@ -59,6 +59,7 @@ import os
 import re
 import sys
 import time
+import logging
 import optparse
 import exiflow.exif
 import exiflow.filelist
@@ -70,6 +71,7 @@ def rename_file(filename, cameraconfig, filelist, cam_id=None,
    """
    Rename filename and return the newly generated name without dir.
    """
+   logger = logging.getLogger("exirename.rename_file")
    filename_re = re.compile("^\d{8}-.{3}\d{4}-.{5}\.[^.]*$")
    if filename_re.match(os.path.basename(filename)):
       raise IOError, filename + " already seems to be formatted."
@@ -108,7 +110,7 @@ def rename_file(filename, cameraconfig, filelist, cam_id=None,
 
    if not cam_id or not artist_initials:
       exiflow.configfile.append("cameras", model, ("cam_id", "artist_initials"))
-      sys.stderr.write("Skipping %s.\n" % filename)
+      logger.warning("Skipping %s.", filename)
       return os.path.basename(filename)
 
    revision = "000"
@@ -143,25 +145,21 @@ def run(argv, callback=None):
                      help="Be verbose.")
    options, args = parser.parse_args(args=argv)
 
-   cameraconfig, read_config_files = exiflow.configfile.parse("cameras")
+   if options.verbose:
+      logging.basicConfig(level=logging.INFO)
+   logger = logging.getLogger("exirename")
+
+   cameraconfig = exiflow.configfile.parse("cameras")
 
    filelist = exiflow.filelist.Filelist(*args)
-   if options.verbose:
-      print "Read settings config files:", \
-            " ".join(filelist.get_read_config_files()), \
-            "\nRead camera config files:", \
-            " ".join(read_config_files)
-
-
    for filename, percentage in filelist:
       try:
          newname = rename_file(filename, cameraconfig, filelist,
                                options.cam_id, options.artist_initials)
       except IOError, msg:
          newname = os.path.basename(filename)
-         sys.stderr.write("ERROR, skipping %s:\n%s\n" % (filename, str(msg)))
-      if options.verbose:
-         print "%3s%% %s -> %s" % (percentage, filename, newname)
+         logger.error("Skipping %s:\n%s", filename, str(msg))
+      logger.info("%3s%% %s -> %s", percentage, filename, newname)
       if callable(callback):
          if callback(filename,
                      os.path.join(os.path.dirname(filename), newname),

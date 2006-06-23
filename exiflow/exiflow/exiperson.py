@@ -42,7 +42,7 @@ def run(argv, callback=None):
       logging.basicConfig(level=logging.INFO)
    logger = logging.getLogger("exiperson")
 
-   exifconfig, read_config_files = exiflow.configfile.parse("exif")
+   exifconfig = exiflow.configfile.parse("exif")
 
 # collect args for Exiftool
    exiftool_args = ""
@@ -65,10 +65,6 @@ def run(argv, callback=None):
                   options.section)
 
    filelist = exiflow.filelist.Filelist(*args)
-   logger.info("Read settings config files: %s",
-               " ".join(filelist.get_read_config_files()))
-   logger.info("Read exif config files: %s", " ".join(read_config_files))
-
    for filename, percentage in filelist:
       logger.info("%3s%% %s", percentage, filename)
       if callable(callback):
