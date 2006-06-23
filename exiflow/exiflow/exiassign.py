@@ -19,6 +19,7 @@ import os
 import re
 import sys
 import glob
+import logging
 import optparse
 import exiflow.exif
 import exiflow.filelist
@@ -46,27 +47,29 @@ def run(argv, callback=None):
       parser.print_help()
       sys.exit(1)
 
-   filelist = exiflow.filelist.Filelist(*args)
    if options.verbose:
-      print "Read config files:", " ".join(filelist.get_read_config_files())
+      logging.basicConfig(level=logging.INFO)
+   logger = logging.getLogger("exiperson")
+
+   filelist = exiflow.filelist.Filelist(*args)
+   logger.info("Read config files: %s",
+               " ".join(filelist.get_read_config_files()))
 
    filename_re = re.compile("^(\d{8}-.{3}\d{4}-)(.{5})\.[^.]*$")
 
    for filename, percentage in filelist:
       mymatch = filename_re.match(os.path.basename(filename))
       if mymatch:
-         if options.verbose:
-            print "%3s%% " % percentage,
+         logger.info("%3s%% %s", percentage, filename)
          leader, dummy = mymatch.groups()
          exif_file = exiflow.exif.Exif(filename)
          try:
             exif_file.read_exif()
          except IOError, msg:
-            print msg
+            logger.warning(str(msg))
             continue
          if not options.force and exif_file.fields.has_key("DateTimeOriginal"):
-            if options.verbose:
-               print "Skipping %s, it seems to contain EXIF data." % filename
+            logger.info("Skipping %s, it seems to contain EXIF data.", filename)
             if callable(callback):
                if callback(filename, filename, percentage):
                   break
@@ -78,8 +81,8 @@ def run(argv, callback=None):
                continue
             else:
                mtimes[str(os.stat(otherfile).st_mtime) + otherfile] = otherfile
-         if len(mtimes) == 0 and options.verbose:
-            print "No sibling found for %s." % filename
+         if len(mtimes) == 0:
+            logger.info("No sibling found for %s.", filename)
          for otherfile in sorted(mtimes, None, None, True):
             other_exif_file = exiflow.exif.Exif(mtimes[otherfile])
             try:
@@ -88,8 +91,7 @@ def run(argv, callback=None):
                continue
             other_exif_file.fields.update(exif_file.fields)
             if other_exif_file.fields != exif_file.fields:
-               if options.verbose:
-                  print "Updating %s from %s." % (filename, mtimes[otherfile])
+               logger.info("Updating %s from %s.", filename, mtimes[otherfile])
                exif_file.update_exif(mtimes[otherfile])
                if callable(callback):
                   if callback(filename, filename, percentage):
