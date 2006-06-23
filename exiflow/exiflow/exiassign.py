@@ -25,6 +25,53 @@ import exiflow.exif
 import exiflow.filelist
 
 
+def find_siblings(filename, prefix):
+   """
+   Try to find siblings for "filename" in the same directory and return them
+   as a list of files reverse sorted by modification time.
+   Return [] if no sibling is found.
+   A file is considered a sibling if it's basename starts with "prefix".
+   """
+   mtimes = {}
+   for otherfile in glob.glob(os.path.join(os.path.dirname(filename),
+                                           prefix + "*")):
+      if otherfile == filename:
+         continue
+      else:
+         mtimes[str(os.stat(otherfile).st_mtime) + otherfile] = otherfile
+   return [mtimes[mtime] for mtime in sorted(mtimes, reverse=True)]
+
+
+def assign_file(filename, prefix, force=False):
+   """
+   Process "filename", passing "prefix" to find_siblings().
+   With force=True, force update even if EXIF is already present.
+   """
+   logger = logging.getLogger("exiassign.assign_file")
+   exif_file = exiflow.exif.Exif(filename)
+   try:
+      exif_file.read_exif()
+   except IOError, msg:
+      logger.warning(str(msg))
+      return 1
+   if not force and exif_file.fields.has_key("DateTimeOriginal"):
+      logger.info("Skipping %s, it seems to contain EXIF data.", filename)
+      return 0
+   for sibling in find_siblings(filename, prefix):
+      other_exif_file = exiflow.exif.Exif(sibling)
+      try:
+         other_exif_file.read_exif()
+      except IOError:
+         continue
+      other_exif_file.fields.update(exif_file.fields)
+      if other_exif_file.fields != exif_file.fields:
+         logger.info("Updating %s from %s.", filename, sibling)
+         exif_file.update_exif(sibling)
+         return 0
+   logger.info("No sibling found for %s.", filename)
+   return 0
+
+
 def run(argv, callback=None):
    """
    Take an equivalent of sys.argv[1:] and optionally a callable.
@@ -49,7 +96,7 @@ def run(argv, callback=None):
 
    if options.verbose:
       logging.basicConfig(level=logging.INFO)
-   logger = logging.getLogger("exiperson")
+   logger = logging.getLogger("exiassign")
 
    filelist = exiflow.filelist.Filelist(*args)
    logger.info("Read config files: %s",
@@ -61,41 +108,10 @@ def run(argv, callback=None):
       mymatch = filename_re.match(os.path.basename(filename))
       if mymatch:
          logger.info("%3s%% %s", percentage, filename)
-         leader, dummy = mymatch.groups()
-         exif_file = exiflow.exif.Exif(filename)
-         try:
-            exif_file.read_exif()
-         except IOError, msg:
-            logger.warning(str(msg))
-            continue
-         if not options.force and exif_file.fields.has_key("DateTimeOriginal"):
-            logger.info("Skipping %s, it seems to contain EXIF data.", filename)
-            if callable(callback):
-               if callback(filename, filename, percentage):
-                  break
-            continue
-         mtimes = {}
-         for otherfile in glob.glob(os.path.join(os.path.dirname(filename),
-                                                 leader + "*")):
-            if otherfile == filename:
-               continue
-            else:
-               mtimes[str(os.stat(otherfile).st_mtime) + otherfile] = otherfile
-         if len(mtimes) == 0:
-            logger.info("No sibling found for %s.", filename)
-         for otherfile in sorted(mtimes, None, None, True):
-            other_exif_file = exiflow.exif.Exif(mtimes[otherfile])
-            try:
-               other_exif_file.read_exif()
-            except IOError:
-               continue
-            other_exif_file.fields.update(exif_file.fields)
-            if other_exif_file.fields != exif_file.fields:
-               logger.info("Updating %s from %s.", filename, mtimes[otherfile])
-               exif_file.update_exif(mtimes[otherfile])
-               if callable(callback):
-                  if callback(filename, filename, percentage):
-                     break
+         prefix = mymatch.groups()[0]
+         assign_file(filename, prefix, options.force)
+         if callable(callback):
+            if callback(filename, filename, percentage):
                break
 
 
