@@ -36,7 +36,7 @@ import exiflow.filelist
 import exiflow.configfile
 
 
-def convert_file(filename, cameraconfig):
+def convert_file(filename):
    """
    Convert filename and return the newly generated name without dir.
    """
@@ -52,15 +52,11 @@ def convert_file(filename, cameraconfig):
    exif_file.read_exif()
    model = exif_file.fields.get("Model", "all")
 
-   if cameraconfig.has_section(model) \
-      and cameraconfig.has_option(model, "raw_extension"):
-      raw_extension = cameraconfig.get(model, "raw_extension")
-   elif cameraconfig.has_section("all") \
-      and cameraconfig.has_option("all", "raw_extension"):
-      raw_extension = cameraconfig.get("all", "raw_extension")
-   else:
-      exiflow.configfile.append("cameras", model,
-                                "raw_extension", "raw_converter")
+   raw_extension, raw_converter = \
+      exiflow.configfile.get_options("cameras", model,
+                                     ("raw_extension", "raw_converter"))
+
+   if raw_extension == "":
       logger.warning("No raw_extension configured, skipping %s", basename)
       return basename
 
@@ -68,15 +64,7 @@ def convert_file(filename, cameraconfig):
       logger.debug("%s doesn't match, skipping.", filename)
       return basename
       
-   if cameraconfig.has_section(model) \
-      and cameraconfig.has_option(model, "raw_converter"):
-      raw_converter = cameraconfig.get(model, "raw_converter")
-   elif cameraconfig.has_section("all") \
-      and cameraconfig.has_option("all", "raw_converter"):
-      raw_converter = cameraconfig.get("all", "raw_converter")
-   else:
-      exiflow.configfile.append("cameras", model,
-                                "raw_extension", "raw_converter")
+   if raw_converter == "":
       logger.warning("No raw_converter configured, skipping %s", basename)
       return basename
 
@@ -114,7 +102,7 @@ def run(argv, callback=None):
       logging.basicConfig(level=logging.INFO)
    logger = logging.getLogger("exiconvert")
 
-   cameraconfig, read_config_files = exiflow.configfile.parse("cameras")
+   dummy, read_config_files = exiflow.configfile.parse("cameras")
 
    filelist = exiflow.filelist.Filelist(*args)
    logger.info("Read settings config files: %s",
@@ -124,7 +112,7 @@ def run(argv, callback=None):
 
    for filename, percentage in filelist:
       try:
-         newname = convert_file(filename, cameraconfig)
+         newname = convert_file(filename)
       except IOError, msg:
          newname = os.path.basename(filename)
          logger.error("Skipping %s:\n%s\n", filename, msg)

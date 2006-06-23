@@ -99,7 +99,7 @@ def parse(configname):
    return __cache[configname]
 
 
-def get_option(configname, section, options):
+def get_options(configname, section, options):
    """
    Try to get options from section "section" from configfile "configname".
    If section doesn't exist or options don't exist in it, fall back to
