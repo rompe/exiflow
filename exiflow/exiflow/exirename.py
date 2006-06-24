@@ -66,8 +66,27 @@ import exiflow.filelist
 import exiflow.configfile
 
 
-def rename_file(filename, cameraconfig, filelist, cam_id=None,
-                artist_initials=None):
+def get_exif_information(filename):
+   """
+   Read camera model and date from filename and return them.
+   If The date isn't contained in EXIF, use the file's mtime.
+   """
+   exif_file = exiflow.exif.Exif(filename)
+# read_exif may throw IOError. We leave the catching to our caller.
+   exif_file.read_exif()
+   model = exif_file.fields.get("Model", "all")
+   date = exif_file.fields.get("DateTimeOriginal", "0")
+   if ":" in date:
+      date = date[0:4] + date[5:7] + date[8:10]
+   else:
+      if date == "0":
+         date = os.stat(filename).st_mtime
+      date = time.strftime("%Y%m%d", time.localtime(float(date)))
+   return model, date
+
+
+def rename_file(filename, filelist, cam_id_override=None,
+                artist_initials_override=None):
    """
    Rename filename and return the newly generated name without dir.
    """
@@ -80,37 +99,16 @@ def rename_file(filename, cameraconfig, filelist, cam_id=None,
    if not number:
       raise IOError, "Can't find a number in " + filename
 
-   exif_file = exiflow.exif.Exif(filename)
-# read_exif may throw IOError. We leave the catching to our caller.
-   exif_file.read_exif()
-   model = exif_file.fields.get("Model", "all")
-   date = exif_file.fields.get("DateTimeOriginal", "0")
-   if ":" in date:
-      date = date[0:4] + date[5:7] + date[8:10]
-   else:
-      if date == "0":
-         date = os.stat(filename).st_mtime
-      date = time.strftime("%Y%m%d", time.localtime(float(date)))
+   model, date = get_exif_information(filename)
 
-   if not cam_id:
-      if cameraconfig.has_section(model) and cameraconfig.has_option(model,
-                                                                     "cam_id"):
-         cam_id = cameraconfig.get(model, "cam_id")
-      elif cameraconfig.has_section("all") and cameraconfig.has_option("all",
-                                                                     "cam_id"):
-         cam_id = cameraconfig.get("all", "cam_id")
+   cam_id, artist_initials = exiflow.configfile.get_options("cameras", model,
+                                                 ("cam_id", "artist_initials"))
+   cam_id = cam_id_override or cam_id
+   artist_initials = artist_initials_override or artist_initials
 
-   if not artist_initials:
-      if cameraconfig.has_section(model) and cameraconfig.has_option(model,
-                                                           "artist_initials"):
-         artist_initials = cameraconfig.get(model, "artist_initials")
-      elif cameraconfig.has_section("all") and cameraconfig.has_option("all",
-                                                           "artist_initials"):
-         artist_initials = cameraconfig.get("all", "artist_initials")
-
-   if not cam_id or not artist_initials:
-      exiflow.configfile.append("cameras", model, ("cam_id", "artist_initials"))
-      logger.warning("Skipping %s.", filename)
+   if cam_id == "" or artist_initials == "":
+      logger.warning("Missing cam_id or artist_initials, skipping %s.",
+                     filename)
       return os.path.basename(filename)
 
    revision = "000"
@@ -149,12 +147,10 @@ def run(argv, callback=None):
       logging.basicConfig(level=logging.INFO)
    logger = logging.getLogger("exirename")
 
-   cameraconfig = exiflow.configfile.parse("cameras")
-
    filelist = exiflow.filelist.Filelist(args)
    for filename, percentage in filelist:
       try:
-         newname = rename_file(filename, cameraconfig, filelist,
+         newname = rename_file(filename, filelist,
                                options.cam_id, options.artist_initials)
       except IOError, msg:
          newname = os.path.basename(filename)
