@@ -1,16 +1,20 @@
 #!/usr/bin/env python2.4
 # -*- coding: utf-8 -*-
 """
-A class that handles reading and writing gthumb comment files for an image file.
+Handle reading and writing gthumb comment files.
 """
+__revision__ = "$Id$"
 
 import os
 import re
-import sys
 import gzip
 import xml.dom.minidom
 
 class Gthumb:
+   """
+   A class that handles reading and writing gthumb comment files
+   for an image file.
+   """
 
    def __init__(self, filename):
       """
@@ -46,6 +50,10 @@ class Gthumb:
       In fact, any line of "Note" that consists of a keyword followed by
       two colons and some random text is converted into it's EXIF equivalent.
       """
+      gthumb_to_exif = {"Time": "DateTimeOriginal",
+                        "Place": "Location",
+                        "Keywords": "Keywords"}
+
       if os.path.isfile(self.commentsfile):
          mydata = {}
          mydom = xml.dom.minidom.parse(gzip.open(self.commentsfile))
@@ -56,12 +64,9 @@ class Gthumb:
                if len(mynodes) > 0:
                   mydata[field] = mynodes[0].wholeText
 
-         if "Time" in mydata:
-            self.fields["DateTimeOriginal"] = mydata["Time"]
-         if "Place" in mydata:
-            self.fields["Location"] = mydata["Place"]
-         if "Keywords" in mydata:
-            self.fields["Keywords"] = mydata["Keywords"]
+         for gthumb_key in gthumb_to_exif:
+            if gthumb_key in mydata:
+               self.fields[gthumb_to_exif[gthumb_key]] = mydata[gthumb_key]
          if "Note" in mydata:
             note = []
             myregex = re.compile("(\w+)::(.*)$")
@@ -87,7 +92,8 @@ class Gthumb:
       myaddfields: Write some additional fields.
       mytemplate: Write empty fields as well.
       """
-      exiffields = ["Artist", "Credit", "Copyright", "CopyrightNotice", "UserComment"]
+      exiffields = ["Artist", "Credit", "Copyright", "CopyrightNotice",
+                    "UserComment"]
       mydata = {}
       mydata["Place"] = self.fields.get("Location", "")
       mydata["Time"] = self.fields.get("DateTimeOriginal", "")
