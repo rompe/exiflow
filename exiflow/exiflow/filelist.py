@@ -1,8 +1,10 @@
 #!/usr/bin/env python2.4
 # -*- coding: utf-8 -*-
 """
-An (iterable!) class that hosts information about files given in it's contructor.
+Generate lists of files given as names or searched in directories and
+provide an iterable interface to them.
 """
+__revision__ = "$Id$"
 
 import os
 import sys
@@ -10,6 +12,10 @@ import time
 import exiflow.configfile
 
 class Filelist:
+   """
+   An iterable class that hosts information about files
+   given in it's contructor.
+   """
 
    def __init__(self, *pathes):
       """
@@ -65,7 +71,8 @@ class Filelist:
             filestat = os.stat(filename)
             self._filestats[filename] = filestat
             self._fullsize += filestat.st_size
-            filedate = time.strftime("%Y-%m-%d", time.localtime(filestat.st_mtime))
+            filedate = time.strftime("%Y-%m-%d",
+                                     time.localtime(filestat.st_mtime))
             self._filedates[filename] = filedate
          else:
             found_unknown = True
