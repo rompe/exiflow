@@ -88,7 +88,7 @@ def parse(configname):
    Return a configparser object and a list of processed files.
    """
    logger = logging.getLogger("configfile.parse")
-   if not __cache[configname]:
+   if not __cache.has_key(configname):
       local_config = os.path.join(__local_config_dir, configname + ".cfg")
       global_config = os.path.join(__global_config_dir, configname + ".cfg")
       if not os.path.exists(local_config):

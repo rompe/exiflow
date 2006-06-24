@@ -19,6 +19,47 @@ import exiflow.exif
 import exiflow.filelist
 import exiflow.configfile
 
+
+def personalize_file(filename, personals):
+   """
+   Personalize an image using data from the dictionary "personals".
+   """
+   logger = logging.getLogger("exiperson.personalize_file")
+   exifconfig = exiflow.configfile.parse("exif")
+   exif_file = exiflow.exif.Exif(filename)
+   try:
+      exif_file.read_exif()
+   except IOError, msg:
+      logger.warning("Skipping %s: %s", filename, msg)
+      return 1
+
+   if exif_file.fields.has_key("Model"):
+      if exifconfig.has_section(exif_file.fields["Model"]):
+         personals += exifconfig.items(exif_file.fields["Model"])
+      else:
+         exiflow.configfile.append("exif", exif_file.fields["Model"],
+                                   ("Artist", "Contact"))
+         sys.stderr.write("Get rid of this message by defining at least"
+                          " an empty [%s] section.\n" %
+                          exif_file.fields["Model"])
+   
+   if len(personals) == 0:
+      logger.warning("No [all] or [%s] section with data, skipping.", 
+                     exif_file.fields["Model"])
+      return 1
+
+   exif_file.fields = {}
+   for key, value in personals:
+      exif_file.fields[key] = value
+
+   try:
+      exif_file.write_exif()
+   except IOError, msg:
+      logger.error("Error writing EXIF data:%s\n%s", filename, msg)
+      return 1
+   return 0
+
+
 def run(argv, callback=None):
    """
    Take an equivalent of sys.argv[1:] and optionally a callable.
@@ -70,42 +111,9 @@ def run(argv, callback=None):
       if callable(callback):
          if callback(filename, filename, percentage):
             break
-
-      exif_file = exiflow.exif.Exif(filename)
-      try:
-         exif_file.read_exif()
-      except IOError, msg:
-         logger.warning("Skipping %s: %s", filename, msg)
-         if callable(callback):
-            if callback(filename, filename, percentage):
-               break
-         continue
-
-# Note to programmer: The [:] is needed to get a slice copy instead of a reference.
-      personals = defaultpersonals[:]
-      if exif_file.fields.has_key("Model"):
-         if exifconfig.has_section(exif_file.fields["Model"]):
-            personals += exifconfig.items(exif_file.fields["Model"])
-         else:
-            exiflow.configfile.append("exif", exif_file.fields["Model"],
-                                      ("Artist", "Contact"))
-            sys.stderr.write("Get rid of this message by defining at least"
-                             " an empty [%s] section.\n" %
-                             exif_file.fields["Model"])
-      
-      if len(personals) == 0:
-         sys.stderr.write("No [all] or [%s] section with data, skipping.\n" % 
-                          exif_file.fields["Model"])
-         continue
-
-      exif_file.fields = {}
-      for key, value in personals:
-         exif_file.fields[key] = value
-
-      try:
-         exif_file.write_exif()
-      except IOError, msg:
-         print "Error writing EXIF data:\n", filename, "\n", msg
+# Note to programmer:
+# The [:] is needed to get a slice copy instead of a reference.
+      personalize_file(filename, defaultpersonals[:])
 
 
 if __name__ == "__main__":
