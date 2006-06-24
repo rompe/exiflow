@@ -1,12 +1,16 @@
 #!/usr/bin/env python2.4
 # -*- coding: utf-8 -*-
 """
-A class for reading and writing EXIF information.
+A module for reading and writing EXIF information.
 """
+__revision__ = "$Id$"
 
 import subprocess
 
 class Exif:
+   """
+   A class for reading and writing EXIF information.
+   """
 
    def __init__(self, filename):
       """
@@ -20,8 +24,9 @@ class Exif:
       Read EXIF information from self.filename into self.fields
       Raises IOError on errors.
       """
-      exiftool = subprocess.Popen("exiftool -d %s -S " + self.filename, shell=True,
-                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+      exiftool = subprocess.Popen("exiftool -d %s -S " + self.filename,
+                                  shell=True, stdout=subprocess.PIPE,
+                                  stderr=subprocess.PIPE)
       for line in exiftool.stdout:
          if ": " in line:
             key, value = line.split(": ", 1)
@@ -34,8 +39,9 @@ class Exif:
 # We have to read the ImageDescription binary because it may contain
 # things like line breaks.
          self.fields["ImageDescription"] = \
-            "".join(subprocess.Popen("exiftool -b -ImageDescription " + self.filename,
-                                shell=True, stdout=subprocess.PIPE).stdout)
+            "".join(subprocess.Popen("exiftool -b -ImageDescription "
+                                     + self.filename, shell=True,
+                                     stdout=subprocess.PIPE).stdout)
 # Be shure to have proper UTF8 strings
       for key in self.fields:
          self.fields[key] = unicode(self.fields[key], "utf-8")
@@ -58,7 +64,6 @@ class Exif:
          else:
             command += " -%s=\"%s\"" % (field, self.fields[field])
       command += " " + self.filename
-      ret = True
       exiftool = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE)
 # exiftool doesn't reflect errors in it's return code, so we have to
@@ -88,7 +93,6 @@ class Exif:
             else:
                command += " -%s=\"%s\"" % (field, self.fields[field])
       command += " " + self.filename
-      ret = True
       exiftool = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE)
 # exiftool doesn't reflect errors in it's return code, so we have to
