@@ -134,11 +134,12 @@ class Window1(object):
 
    def set_filelist(self, files):
       self.liststore.clear()
-      for file in map(os.path.abspath, files):
-         if os.path.exists(file):
-            self.liststore.append([file])
+      for filename in files:
+         filename = os.path.abspath(filename)
+         if os.path.exists(filename):
+            self.liststore.append([filename])
          else:
-            print >>sys.stderr, file, "doesn't exist!"
+            print >>sys.stderr, filename, "doesn't exist!"
 
    def on_exirename_camid_auto_activate(self, widget, data=None):
       self.wTree.get_widget("exirename_cam_id_entry").set_sensitive(False)
@@ -216,7 +217,7 @@ class Window1(object):
          args.append("--artist_initials=" + artist_initials.get_text())
       if self.wTree.get_widget("exirename_cam_id_entry_button_custom").get_active():
          args.append("--cam_id=" + cam_id.get_text())
-      args += map(lambda x: x[0], self.liststore)
+      args += [entry[0] for entry in self.liststore]
       try:
          exiflow.exirename.run(args, self._progress_callback)
       except IOError, msg:
@@ -227,7 +228,7 @@ class Window1(object):
       forcebutton = self.wTree.get_widget("exiassign_force_checkbutton")
       if forcebutton.get_active() == True:
          args.append("--force")
-      args += map(lambda x: x[0], self.liststore)
+      args += [entry[0] for entry in self.liststore]
       try:
          exiflow.exiassign.run(args, self._progress_callback)
       except IOError, msg:
@@ -238,7 +239,7 @@ class Window1(object):
       exif_section = self.wTree.get_widget("exiperson_section_entry")
       if self.wTree.get_widget("exiperson_section_entry_button_custom").get_active():
          args.append("--section=" + exif_section.get_text())
-      args += map(lambda x: x[0], self.liststore)
+      args += [entry[0] for entry in self.liststore]
       try:
          exiflow.exiperson.run(args, self._progress_callback)
       except IOError, msg:
@@ -254,7 +255,7 @@ class Window1(object):
       if self.wTree.get_widget("exigate_gthumb_cleanup").get_active() == True:
          args = ["--cleanup"]
       args.append("-v")
-      args += map(lambda x: x[0], self.liststore)
+      args += [entry[0] for entry in self.liststore]
       try:
          exiflow.exigate.run(args, self._progress_callback)
       except IOError, msg:
