@@ -85,15 +85,6 @@ def run(argv, callback=None):
 
    exifconfig = exiflow.configfile.parse("exif")
 
-# collect args for Exiftool
-   exiftool_args = ""
-   remaining_args = []
-   for arg in args:
-      if arg.startswith("-"):
-         exiftool_args += " \"" + arg +"\""
-      else:
-         remaining_args.append(arg)
-
    defaultpersonals = []
    if exifconfig.has_section("all"):
       defaultpersonals += exifconfig.items("all")
@@ -105,7 +96,18 @@ def run(argv, callback=None):
          sys.exit("ERROR: Section %s not found in config files" % \
                   options.section)
 
-   filelist = exiflow.filelist.Filelist(*args)
+# collect EXIF data supplied on command line
+# TODO: This should be mixed in later. Now it will be overridden by the
+# camera specifig section data.
+   remaining_args = []
+   for arg in args:
+      if arg.startswith("-") and "=" in arg:
+         field, value = arg.lstrip("-").split("=")
+         defaultpersonals[field] += value
+      else:
+         remaining_args.append(arg)
+
+   filelist = exiflow.filelist.Filelist(*remaining_args)
    for filename, percentage in filelist:
       logger.info("%3s%% %s", percentage, filename)
       if callable(callback):
