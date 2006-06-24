@@ -17,7 +17,7 @@ class Filelist:
    given in it's contructor.
    """
 
-   def __init__(self, *pathes):
+   def __init__(self, pathes):
       """
       Create FileList object.
       Call add_files() with all arguments.
@@ -34,10 +34,10 @@ class Filelist:
       self._unwanted_files = settings.get("all", "unwantend_files").split()
       self._unwanted_dirs = settings.get("all", "unwantend_dirs").split()
       for path in pathes:
-         self.add_files(path)
+         self.add_files([path])
 
 
-   def add_files(self, *pathes):
+   def add_files(self, pathes):
       """
       Add filenames found in pathes either to _files or _skippedfiles,
       depending on their extension and the value of _process_unknown_types.

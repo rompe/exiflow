@@ -151,7 +151,7 @@ def run(argv, callback=None):
 
    cameraconfig = exiflow.configfile.parse("cameras")
 
-   filelist = exiflow.filelist.Filelist(*args)
+   filelist = exiflow.filelist.Filelist(args)
    for filename, percentage in filelist:
       try:
          newname = rename_file(filename, cameraconfig, filelist,

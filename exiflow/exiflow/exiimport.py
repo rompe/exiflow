@@ -45,7 +45,7 @@ def run(argv, callback=None):
    if options.verbose:
       print "Read config files:", " ".join(filelist.get_read_config_files())
    filelist.process_unknown_types()
-   filelist.add_files(options.mount)
+   filelist.add_files([options.mount])
 
 # Cry if we found no images
    if filelist.get_filecount() == 0:

@@ -101,7 +101,7 @@ def run(argv, callback=None):
       logging.basicConfig(level=logging.INFO)
    logger = logging.getLogger("exiconvert")
 
-   filelist = exiflow.filelist.Filelist(*args)
+   filelist = exiflow.filelist.Filelist(args)
    for filename, percentage in filelist:
       try:
          newname = convert_file(filename)

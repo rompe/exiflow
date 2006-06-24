@@ -108,7 +108,7 @@ def run(argv, callback=None):
       else:
          remaining_args.append(arg)
 
-   filelist = exiflow.filelist.Filelist(*remaining_args)
+   filelist = exiflow.filelist.Filelist(remaining_args)
    for filename, percentage in filelist:
       logger.info("%3s%% %s", percentage, filename)
       if callable(callback):

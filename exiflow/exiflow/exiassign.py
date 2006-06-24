@@ -98,7 +98,7 @@ def run(argv, callback=None):
       logging.basicConfig(level=logging.INFO)
    logger = logging.getLogger("exiassign")
 
-   filelist = exiflow.filelist.Filelist(*args)
+   filelist = exiflow.filelist.Filelist(args)
    logger.info("Read config files: %s",
                " ".join(filelist.get_read_config_files()))
 

@@ -95,7 +95,7 @@ def run(argv, callback=None):
                      help="Be verbose.")
    options, args = parser.parse_args(argv)
 
-   filelist = exiflow.filelist.Filelist(*args)
+   filelist = exiflow.filelist.Filelist(args)
    if options.verbose:
       print "Read config files:", " ".join(filelist.get_read_config_files())
 
