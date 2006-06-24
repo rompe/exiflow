@@ -9,6 +9,7 @@ __revision__ = "$Id$"
 import os
 import sys
 import time
+import logging
 import exiflow.configfile
 
 class Filelist:
@@ -45,6 +46,7 @@ class Filelist:
       True otherwise.
       Raises IOError on access errors.
       """
+      logger = logging.getLogger("filelist.add_files")
       found_known = False
       found_unknown = False
       filelist = []
@@ -59,8 +61,8 @@ class Filelist:
                for basefile in files:
                   filelist.append(os.path.join(root, basefile))
          else:
-            print >> sys.stderr, "WARNING: " + path + \
-                  " is not a regular file or directory. Skipping."
+            logger.warning("%s is not a regular file or directory. Skipping.",
+                           path)
       for filename in filelist:
          basefilename = os.path.basename(filename).lower()
          if (self._process_unknown_types == True or \
