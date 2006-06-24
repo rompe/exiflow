@@ -85,6 +85,25 @@ def get_exif_information(filename):
    return model, date
 
 
+def get_new_filename(filename, date, cam_id, artist_initials, filelist):
+   """
+   Return a new name for filename according to out holy naming scheme.
+   """
+   leader, extension = os.path.splitext(filename)
+   number = "".join([char for char in leader[-4:] if char.isdigit()])
+   revision = "000"
+# Look for high quality versions of this image. This is the case if we are
+# a .jpg and more than one file exists with the same prefix.
+   if extension == ".jpg":
+      versions = [vers[0] for vers in filelist if vers[0].startswith(leader)]
+      if len(versions) > 1:
+         revision = "00l"
+   if not number:
+      raise IOError, "Can't find a number in " + filename
+   return date + "-" + cam_id + number.zfill(4) + "-" + artist_initials \
+          + revision + extension
+
+
 def rename_file(filename, filelist, cam_id_override=None,
                 artist_initials_override=None):
    """
@@ -94,10 +113,6 @@ def rename_file(filename, filelist, cam_id_override=None,
    filename_re = re.compile("^\d{8}-.{3}\d{4}-.{5}\.[^.]*$")
    if filename_re.match(os.path.basename(filename)):
       raise IOError, filename + " already seems to be formatted."
-   leader, extension = os.path.splitext(filename)
-   number = "".join([char for char in leader[-4:] if char.isdigit()])
-   if not number:
-      raise IOError, "Can't find a number in " + filename
 
    model, date = get_exif_information(filename)
 
@@ -111,15 +126,7 @@ def rename_file(filename, filelist, cam_id_override=None,
                      filename)
       return os.path.basename(filename)
 
-   revision = "000"
-# Look for high quality versions of this image. This is the case if we are
-# a .jpg and more than one file exists with the same prefix.
-   if extension == ".jpg":
-      versions = [vers[0] for vers in filelist if vers[0].startswith(leader)]
-      if len(versions) > 1:
-         revision = "00l"
-   newname = date + "-" + cam_id + number.zfill(4) + \
-             "-" + artist_initials + revision + extension
+   newname = get_new_filename(filename, date, cam_id, artist_initials, filelist)
    os.rename(filename, os.path.join(os.path.dirname(filename), newname))
    return newname
 
