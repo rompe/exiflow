@@ -7,7 +7,6 @@ provide an iterable interface to them.
 __revision__ = "$Id$"
 
 import os
-import sys
 import time
 import logging
 import exiflow.configfile
@@ -30,10 +29,6 @@ class Filelist:
       self._filestats = {}
       self._fullsize = 0
       self._process_unknown_types = False
-      settings = exiflow.configfile.parse("settings")
-      self._image_extensions = settings.get("all", "image_extensions").split()
-      self._unwanted_files = settings.get("all", "unwantend_files").split()
-      self._unwanted_dirs = settings.get("all", "unwantend_dirs").split()
       for path in pathes:
          self.add_files([path])
 
@@ -47,39 +42,48 @@ class Filelist:
       Raises IOError on access errors.
       """
       logger = logging.getLogger("filelist.add_files")
-      found_known = False
-      found_unknown = False
-      filelist = []
+      settings = exiflow.configfile.parse("settings")
+      unwanted_dirs = settings.get("all", "unwantend_dirs").split()
       for path in pathes:
          if os.path.isfile(path):
-            filelist.append(path)
+            self._add_file(path)
          elif os.path.isdir(path):
             for root, dirs, files in os.walk(path, True):
-               for unwanted_dir in self._unwanted_dirs:
+               for unwanted_dir in unwanted_dirs:
                   if unwanted_dir in dirs:
                      dirs.remove(unwanted_dir)
                for basefile in files:
-                  filelist.append(os.path.join(root, basefile))
+                  self._add_file(os.path.join(root, basefile))
          else:
             logger.warning("%s is not a regular file or directory. Skipping.",
                            path)
-      for filename in filelist:
-         basefilename = os.path.basename(filename).lower()
-         if (self._process_unknown_types == True or \
-             os.path.splitext(basefilename)[1] in self._image_extensions) and \
-            not basefilename in self._unwanted_files:
-            found_known = True
-            self._files.append(filename)
-            filestat = os.stat(filename)
-            self._filestats[filename] = filestat
-            self._fullsize += filestat.st_size
-            filedate = time.strftime("%Y-%m-%d",
-                                     time.localtime(filestat.st_mtime))
-            self._filedates[filename] = filedate
-         else:
-            found_unknown = True
-            self._skippedfiles.append(filename)
-      return found_known and not found_unknown
+      return bool(len(self._files)) and not bool(len(self._skippedfiles))
+
+
+   def _add_file(self, filename):
+      """
+      Add filename and all it's data to the filelist.
+      Return True if the file is added, False otherwise.
+      """
+      logger = logging.getLogger("filelist._add_file")
+      settings = exiflow.configfile.parse("settings")
+      image_extensions = settings.get("all", "image_extensions").split()
+      unwanted_files = settings.get("all", "unwantend_files").split()
+      basefilename = os.path.basename(filename).lower()
+      if (self._process_unknown_types == True \
+          or os.path.splitext(basefilename)[1] in image_extensions) \
+         and not basefilename in unwanted_files:
+         self._files.append(filename)
+         filestat = os.stat(filename)
+         self._filestats[filename] = filestat
+         self._fullsize += filestat.st_size
+         self._filedates[filename] = \
+            time.strftime("%Y-%m-%d", time.localtime(filestat.st_mtime))
+         return True
+      else:
+         logger.info("Skipping %s.", filename)
+         self._skippedfiles.append(filename)
+         return False
 
 
    def process_unknown_types(self):
