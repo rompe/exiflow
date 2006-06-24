@@ -51,6 +51,8 @@ class Filelist:
             for root, dirs, files in os.walk(path, True):
                for unwanted_dir in unwanted_dirs:
                   if unwanted_dir in dirs:
+                     logger.info("Skipping unwanted dir %s.",
+                                 os.path.join(root, unwanted_dir))
                      dirs.remove(unwanted_dir)
                for basefile in files:
                   self._add_file(os.path.join(root, basefile))
