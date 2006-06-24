@@ -93,8 +93,9 @@ def run(argv, callback=None):
       if exifconfig.has_section(options.section):
          defaultpersonals += exifconfig.items(options.section)
       else:
-         sys.exit("ERROR: Section %s not found in config files" % \
-                  options.section)
+         logger.error("ERROR: Section %s not found in config files",
+                      options.section)
+         sys.exit(1)
 
 # collect EXIF data supplied on command line
 # TODO: This should be mixed in later. Now it will be overridden by the
