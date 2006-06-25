@@ -22,7 +22,13 @@ import exiflow.exirename
 gladefile = os.path.splitext(__file__)[0] + ".glade"
 
 class WritableTextView:
+   """
+   Provide a file object that writes to a GTK textview.
+   """
    def __init__(self, textview, color=None):
+      """
+      Construct the file object writing to textview, optionally using color.
+      """
       self.textview = textview
       self.buffer = self.textview.get_buffer()
       self.tag_names = []
@@ -40,6 +46,9 @@ class WritableTextView:
          self.tag_names.append(color)
 
    def write(self, msg):		
+      """
+      Output msg to the textview.
+      """
       my_iter = self.buffer.get_end_iter()
       tag_names = self.tag_names[:]
       if msg.startswith("WARNING") or msg.startswith("ERROR"):
@@ -49,7 +58,11 @@ class WritableTextView:
 
 
 class Directorychooser1(object):
+   """
+   Create a window that allows the user to select a directory.
+   """
    def __init__(self, parent = None, callback=None):
+      """ Instantiate the chooser. """
       self.wTree = gtk.glade.XML(gladefile, "directorychooserdialog1")
       self.window = self.wTree.get_widget("directorychooserdialog1")
       dic = {}
@@ -62,12 +75,17 @@ class Directorychooser1(object):
       self.window.show()
 
    def on_directorychooserdialog1_response(self, widget, data = None):
+      """ Callback function for the chooser. """
       if data == gtk.RESPONSE_OK and callable(self.callback):
          self.callback(widget.get_filename())
       self.window.destroy()
 
 class Filechooser1(object):
+   """
+   Create a window that allows the user to select files.
+   """
    def __init__(self, parent = None, callback=None):
+      """ Instantiate the chooser. """
       self.wTree = gtk.glade.XML(gladefile, "filechooserdialog1")
       self.window = self.wTree.get_widget("filechooserdialog1")
       dic = {}
@@ -80,13 +98,18 @@ class Filechooser1(object):
       self.window.show()
 
    def on_filechooserdialog1_response(self, widget, data = None):
+      """ Callback function for the chooser. """
       if data == gtk.RESPONSE_OK and callable(self.callback):
          self.callback(widget.get_filenames())
       self.window.destroy()
 
 
 class Aboutdialog1(object):
+   """
+   Pop up a window that gives some basic information about the program.
+   """
    def __init__(self, parent = None):
+      """ Instantiate the dialog. """
       self.wTree = gtk.glade.XML(gladefile, "aboutdialog1")
       self.window = self.wTree.get_widget("aboutdialog1")
       dic = {}
@@ -99,7 +122,11 @@ class Aboutdialog1(object):
 
 
 class Window1(object):
+   """
+   The program's main window.
+   """
    def __init__(self):
+      """ Instantiate the main window. """
       self.wTree = gtk.glade.XML(gladefile, "mainwindow")
       self.window = self.wTree.get_widget("mainwindow")
 # Initialize treeview
@@ -139,23 +166,29 @@ class Window1(object):
       self.wTree.get_widget(name).set_text(text)
 
    def on_button_open_clicked(self, *dummy):
+      """ Callback for the "open" button. """
       diag = Filechooser1(self.window, self.set_filelist)
 
    def on_button_exiimport_browse_importdir_clicked(self, *dummy):
+      """ Callback for the exiimport's "browse importdir" button. """
       diag = Directorychooser1(self.window,
                self.wTree.get_widget("exiimport_importdir_entry").set_text)
 
    def on_button_exiimport_browse_targetdir_clicked(self, *dummy):
+      """ Callback for the exiimport's "browse targetdir" button. """
       diag = Directorychooser1(self.window,
                self.wTree.get_widget("exiimport_targetdir_entry").set_text)
 
    def on_info1_activate(self, *dummy):
+      """ Callback for the "about" menu entry. """
       diag = Aboutdialog1(self.window)
 
    def on_mainwindow_destroy(self, *dummy):
+      """ Callback for the window's close button. """
       gtk.main_quit()
 
    def set_filelist(self, files):
+      """ Put files into the filelist. """
       self.liststore.clear()
       for filename in files:
          filename = os.path.abspath(filename)
@@ -165,21 +198,27 @@ class Window1(object):
             print >> sys.stderr, filename, "doesn't exist!"
 
    def on_exirename_camid_auto_activate(self, *dummy):
+      """ Callback for exirename's "auto cam_id" selection. """
       self._make_insensitive("exirename_cam_id_entry")
 
    def on_exirename_camid_custom_activate(self, *dummy):
+      """ Callback for exirename's "custom cam_id" selection. """
       self._make_sensitive("exirename_cam_id_entry")
 
    def on_exirename_artist_auto_activate(self, *dummy):
+      """ Callback for exirename's "auto artist" selection. """
       self._make_insensitive("exirename_artist_initials_entry")
 
    def on_exirename_artist_custom_activate(self, *dummy):
+      """ Callback for exirename's "custom artist" selection. """
       self._make_sensitive("exirename_artist_initials_entry")
 
    def on_exiperson_section_auto_activate(self, *dummy):
+      """ Callback for exirename's "auto section" selection. """
       self._make_insensitive("exiperson_section_entry")
 
    def on_exiperson_section_custom_activate(self, *dummy):
+      """ Callback for exirename's "custom section" selection. """
       self._make_sensitive("exiperson_section_entry")
 
    def _progress_callback(self, filename, newname, percentage,
