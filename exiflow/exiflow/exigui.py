@@ -1,5 +1,7 @@
 #!/usr/bin/env python2.4
 # -*- coding: UTF-8 -*-
+# Disable E0611 to supress false "No name 'xxx' in module gtk." pylint messages.
+# pylint: disable-msg=E0611
 """
 A nice PyGTK GUI for the exiflow tool collection.
 """
@@ -127,6 +129,7 @@ class Window1(object):
    """
    def __init__(self):
       """ Instantiate the main window. """
+      self._cancelled = False
       self.wTree = gtk.glade.XML(gladefile, "mainwindow")
       self.window = self.wTree.get_widget("mainwindow")
 # Initialize treeview
@@ -167,21 +170,21 @@ class Window1(object):
 
    def on_button_open_clicked(self, *dummy):
       """ Callback for the "open" button. """
-      diag = Filechooser1(self.window, self.set_filelist)
+      dummy = Filechooser1(self.window, self.set_filelist)
 
    def on_button_exiimport_browse_importdir_clicked(self, *dummy):
       """ Callback for the exiimport's "browse importdir" button. """
-      diag = Directorychooser1(self.window,
+      dummy = Directorychooser1(self.window,
                self.wTree.get_widget("exiimport_importdir_entry").set_text)
 
    def on_button_exiimport_browse_targetdir_clicked(self, *dummy):
       """ Callback for the exiimport's "browse targetdir" button. """
-      diag = Directorychooser1(self.window,
+      dummy = Directorychooser1(self.window,
                self.wTree.get_widget("exiimport_targetdir_entry").set_text)
 
    def on_info1_activate(self, *dummy):
       """ Callback for the "about" menu entry. """
-      diag = Aboutdialog1(self.window)
+      dummy = Aboutdialog1(self.window)
 
    def on_mainwindow_destroy(self, *dummy):
       """ Callback for the window's close button. """
