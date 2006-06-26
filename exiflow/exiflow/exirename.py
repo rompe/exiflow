@@ -121,8 +121,10 @@ def rename_file(filename, filelist, cam_id_override=None,
 
    cam_id, artist_initials = exiflow.configfile.get_options("cameras", model,
                                                  ("cam_id", "artist_initials"))
-   cam_id = cam_id_override or cam_id
-   artist_initials = artist_initials_override or artist_initials
+   if cam_id_override:
+      cam_id = cam_id_override
+   if artist_initials_override:
+      artist_initials = artist_initials_override
 
    if cam_id == "" or artist_initials == "":
       logger.warning("Missing cam_id or artist_initials, skipping %s.",

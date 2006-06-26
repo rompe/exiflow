@@ -75,7 +75,7 @@ class Filelist:
       image_extensions = settings.get("all", "image_extensions").split()
       unwanted_files = settings.get("all", "unwantend_files").split()
       basefilename = os.path.basename(filename).lower()
-      if (self._process_unknown_types == True \
+      if (self._process_unknown_types \
           or os.path.splitext(basefilename)[1] in image_extensions) \
          and not basefilename in unwanted_files:
          self._files.append(filename)
