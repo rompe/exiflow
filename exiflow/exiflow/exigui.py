@@ -1,7 +1,9 @@
 #!/usr/bin/env python2.4
 # -*- coding: UTF-8 -*-
+# Allow relative exiflow module imports.
+# Once the package is installed they are absolute.
 # Disable E0611 to supress false "No name 'xxx' in module gtk." pylint messages.
-# pylint: disable-msg=E0611
+# pylint: disable-msg=E0611, W0403
 """
 A nice PyGTK GUI for the exiflow tool collection.
 """

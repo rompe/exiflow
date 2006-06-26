@@ -1,5 +1,8 @@
 #!/usr/bin/env python2.4
 # -*- coding: utf-8 -*-
+# Allow relative exiflow module imports.
+# Once the package is installed they are absolute.
+# pylint: disable-msg=W0403
 """
 Generate lists of files given as names or searched in directories and
 provide an iterable interface to them.

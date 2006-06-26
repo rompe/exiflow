@@ -1,5 +1,8 @@
 #!/usr/bin/env python2.4
 # -*- coding: utf-8 -*-
+# Allow relative exiflow module imports.
+# Once the package is installed they are absolute.
+# pylint: disable-msg=W0403
 """
 Import files from given directories to your photo folder.
 Optionally unmounts source media after successfull import.
