@@ -162,6 +162,8 @@ class Window1(object):
 # Create TextView and use it
       sys.stdout = WritableTextView(self.wTree.get_widget("textview1"))
       sys.stderr = WritableTextView(self.wTree.get_widget("textview1"), "blue")
+      stdlog = WritableTextView(self.wTree.get_widget("textview1"), "red")
+      logging.getLogger().addHandler(logging.StreamHandler(stdlog))
 
    def _make_sensitive(self, name):
       """ Set widget called name sensitive. """
@@ -282,7 +284,7 @@ class Window1(object):
       
       ntab = nbook.get_tab_label(nbook.get_nth_page(nbook.get_current_page()))
       label = ntab.get_text()
-      logger.warning("Running %s\n" % label)
+      logger.warning("Running %s", label)
       method = getattr(self, "run_" + label.replace(" ", "_"))
       method()
       
