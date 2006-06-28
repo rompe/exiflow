@@ -100,8 +100,9 @@ def run(argv, callback=None):
                      help="Be verbose.")
    options, args = parser.parse_args(args=argv)
 
+   logging.basicConfig(format="%(module)s: %(message)s")
    if options.verbose:
-      logging.basicConfig(level=logging.INFO)
+      logging.getLogger().setLevel(logging.INFO)
    logger = logging.getLogger("exiconvert")
 
    filelist = exiflow.filelist.Filelist(args)

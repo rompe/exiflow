@@ -97,8 +97,9 @@ def run(argv, callback=None):
       parser.print_help()
       sys.exit(1)
 
+   logging.basicConfig(format="%(module)s: %(message)s")
    if options.verbose:
-      logging.basicConfig(level=logging.INFO)
+      logging.getLogger().setLevel(logging.INFO)
    logger = logging.getLogger("exiassign")
 
    filelist = exiflow.filelist.Filelist(args)

@@ -82,8 +82,9 @@ def run(argv, callback=None):
                      help="Be verbose.")
    options, args = parser.parse_args(argv)
 
+   logging.basicConfig(format="%(module)s: %(message)s")
    if options.verbose:
-      logging.basicConfig(level=logging.INFO)
+      logging.getLogger().setLevel(logging.INFO)
    logger = logging.getLogger("exiperson")
 
    exifconfig = exiflow.configfile.parse("exif")

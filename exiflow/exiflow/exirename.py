@@ -146,17 +146,18 @@ def run(argv, callback=None):
    parser = optparse.OptionParser(usage="usage: %prog [options] "
                                         "<files or dirs>")
    parser.add_option("--cam_id", "-c", dest="cam_id",
-                     help="ID string for the camera model. Should normally be" \
+                     help="ID string for the camera model. Should normally be"
                           " three characters long.")
    parser.add_option("--artist_initials", "-a", dest="artist_initials",
-                     help="Initials of the artist. Should be two characters" \
+                     help="Initials of the artist. Should be two characters"
                           " long.")
    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
                      help="Be verbose.")
    options, args = parser.parse_args(args=argv)
 
+   logging.basicConfig(format="%(module)s: %(message)s")
    if options.verbose:
-      logging.basicConfig(level=logging.INFO)
+      logging.getLogger().setLevel(logging.INFO)
    logger = logging.getLogger("exirename")
 
    filelist = exiflow.filelist.Filelist(args)
