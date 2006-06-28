@@ -78,10 +78,10 @@ def convert_file(filename):
       command = raw_converter + " " + filename
       process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE)
-      for line in process.stdout:
-         logger.info(line)
       for line in process.stderr:
          logger.warning(line)
+      for line in process.stdout:
+         logger.info(line)
       if process.wait() > 0:
          logger.error("Converter invocation returned an error:\n%s", command)
       else:
@@ -113,12 +113,15 @@ def run(argv, callback=None):
 
    filelist = exiflow.filelist.Filelist(args)
    for filename, percentage in filelist:
+      logger.info("%3s%% %s", percentage, filename)
+      if callable(callback):
+         if callback(filename, filename, percentage):
+            break
       try:
          newname = convert_file(filename)
       except IOError, msg:
          newname = os.path.basename(filename)
          logger.error("Skipping %s:\n%s\n", filename, msg)
-      logger.info("%3s%% %s", percentage, filename)
       if callable(callback):
          if callback(filename,
                      os.path.join(os.path.dirname(filename), newname),
