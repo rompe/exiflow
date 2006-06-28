@@ -61,6 +61,13 @@ class WritableTextView:
       self.buffer.insert_with_tags_by_name(my_iter, msg, *tag_names)
       self.textview.scroll_mark_onscreen(self.buffer.get_insert())
 
+   def flush(self):
+      """
+      Imitate a buffer flush.
+      Since a textview can't be flushed, do nothing.
+      """
+      pass
+
 
 class Directorychooser1(object):
    """
