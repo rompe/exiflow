@@ -44,7 +44,7 @@ def run(argv, callback=None):
       sys.exit("Wrong syntax, call with --help for info.")
 
 # Build file list whithout skipping unknown files
-   filelist = exiflow.filelist.Filelist()
+   filelist = exiflow.filelist.Filelist([])
    if options.verbose:
       print "Read config files:", " ".join(filelist.get_read_config_files())
    filelist.process_unknown_types()
