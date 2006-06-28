@@ -76,7 +76,13 @@ def convert_file(filename):
       logger.info("%s already exists, skipping %s.", newname, basename)
    else:
       command = raw_converter + " " + filename
-      if subprocess.call(command, shell=True) > 0:
+      process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE)
+      for line in process.stdout:
+         logger.info(line)
+      for line in process.stderr:
+         logger.warning(line)
+      if process.wait() > 0:
          logger.error("Converter invocation returned an error:\n%s", command)
       else:
          if not os.path.exists(newname):
