@@ -9,9 +9,10 @@ headers and Gthumb comment files.
 """
 __revision__ = "$Id$"
 
-import optparse
 import os
 import sys
+import logging
+import optparse
 import exiflow.exif
 import exiflow.gthumb
 import exiflow.filelist
@@ -23,24 +24,24 @@ def autogate_gthumb(filename, myoptions):
    time stamps of the comment and the Exif file.
    Run read and write functions accordingly.
    """
+   logger = logging.getLogger("exigate.autogate_gthumb")
    filename = os.path.abspath(filename)
    gthumbfile = exiflow.gthumb.Gthumb(filename)
    gthumbtimestamp = gthumbfile.get_mtime()
    filetimestamp = os.path.getmtime(filename)
    if gthumbtimestamp > filetimestamp:
-      if myoptions.verbose:
-         print "Updating", filename, "from comment file"
+      logger.info("Updating %s from comment file.", filename)
       try:
          gthumbfile.read()
       except IOError, msg:
-         print "Error reading gthumb comment for", filename, "\n", msg
+         logger.error("Error reading gthumb comment for %s:\n%s", filename, msg)
          return False
       exif_file = exiflow.exif.Exif(filename)
       exif_file.fields = gthumbfile.fields
       try:
          exif_file.write_exif()
       except IOError, msg:
-         print "Error writing EXIF data:\n", filename, "\n", msg
+         logger.error("Error writing EXIF data to %s:\n%s", filename, msg)
          return False
 # TODO: Find out why we intruduced this line. Seems odd...
       #write_gthumb(filename, gthumb, myoptions.addfields,
@@ -50,21 +51,18 @@ def autogate_gthumb(filename, myoptions):
    elif filetimestamp > gthumbtimestamp \
       or myoptions.addfields \
       or myoptions.template:
-      if myoptions.verbose:
-         print "Updating comment file from", filename
+      logger.info("Updating comment file from %s.", filename)
       exif_file = exiflow.exif.Exif(filename)
       try:
          exif_file.read_exif()
       except IOError, message:
-         if myoptions.verbose:
-            print "Skipping %s: %s" % (filename, message)
+         logger.info("Skipping %s: %s", filename, message)
          return 1
       gthumbfile.fields = exif_file.fields
       gthumbfile.write(myoptions.addfields, myoptions.template)
       gthumbfile.set_mtime(filetimestamp)
    else:
-      if myoptions.verbose:
-         print filename, "is in sync with comment file"
+      logger.info("%s is in sync with comment file.", filename)
    return True
 
 
@@ -98,23 +96,25 @@ def run(argv, callback=None):
                      help="Be verbose.")
    options, args = parser.parse_args(argv)
 
-   filelist = exiflow.filelist.Filelist(args)
+   logging.basicConfig(format="%(module)s: %(message)s")
    if options.verbose:
-      print "Read config files:", " ".join(filelist.get_read_config_files())
+      logging.getLogger().setLevel(logging.INFO)
+   logger = logging.getLogger("exigate")
+
+   filelist = exiflow.filelist.Filelist(args)
 
    for filename, percentage in filelist:
-      if options.verbose:
-         print "%3s%% " % percentage,
       if callable(callback):
          if callback(filename, filename, percentage):
             break
+      logger.info("%3s%% %s", percentage, filename)
       autogate_gthumb(filename, options)
       if options.cleanup:
          log_prefix = "Leaving"
          if exiflow.gthumb.Gthumb(filename).cleanup():
             log_prefix = "Cleaning"
          if options.verbose:
-            print log_prefix, "comment file of", filename
+            logger.info("%s comment file of %s.", log_prefix, filename)
 
 
 if __name__ == "__main__":
