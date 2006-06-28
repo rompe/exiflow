@@ -95,10 +95,10 @@ def parse(configname):
          if not os.path.isdir(__local_config_dir):
             os.makedirs(__local_config_dir)
          file(local_config, "w").write(__default_contents[configname])
-         logger.warning("Created example " + local_config)
+         logger.warning("Created example %s.", local_config)
       config = ConfigParser.ConfigParser()
       read_files = config.read([global_config, local_config])
-      logger.info("Read %s config files: %s", " ".join(read_files))
+      logger.info("Read %s config files: %s", configname, " ".join(read_files))
       __cache[configname] = config
    return __cache[configname]
 

@@ -13,6 +13,7 @@ import os
 import sys
 import stat
 import shutil
+import logging
 import optparse
 import subprocess
 import exiflow.filelist
@@ -40,19 +41,24 @@ def run(argv, callback=None):
    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
                      help="Be verbose.")
    options, args = parser.parse_args(argv)
+   logging.basicConfig(format="%(module)s: %(message)s")
+   if options.verbose:
+      logging.getLogger().setLevel(logging.INFO)
+   logger = logging.getLogger("exiimport")
    if len(args) > 0 or not options.mount or not options.target:
-      sys.exit("Wrong syntax, call with --help for info.")
+      logger.error("Wrong syntax.")
+      parser.print_help()
+      sys.exit(1)
 
 # Build file list whithout skipping unknown files
    filelist = exiflow.filelist.Filelist([])
-   if options.verbose:
-      print "Read config files:", " ".join(filelist.get_read_config_files())
    filelist.process_unknown_types()
    filelist.add_files([options.mount])
 
 # Cry if we found no images
    if filelist.get_filecount() == 0:
-      sys.exit("No files to import, sorry.")
+      logger.error("No files to import, sorry.")
+      sys.exit(1)
 
 # Create targetdir
    targetdir = os.path.join(options.target, filelist.get_daterange())
@@ -60,13 +66,13 @@ def run(argv, callback=None):
    while os.path.exists(targetdir):
       targetdir += "+"
    os.makedirs(targetdir)
-   print "Importing", filelist.get_fullsize() / 1024 / 1024 , "MB in", \
-         filelist.get_filecount(), "files to", targetdir
+   logger.warning("Importing %s MB in %s files to %s",
+                  filelist.get_fullsize() / 1024 / 1024,
+                  filelist.get_filecount(), targetdir)
 
 # Copy files
    for filename, percentage in filelist:
-      if options.verbose:
-         print "%3s%% %s" % (percentage, filename)
+      logger.info("%3s%% %s", percentage, filename)
       if callable(callback):
          if callback("", os.path.join(targetdir, os.path.basename(filename)),
                                       percentage, keep_original=True):
