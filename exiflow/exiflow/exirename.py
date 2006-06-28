@@ -93,6 +93,7 @@ def get_new_filename(filename, date, cam_id, artist_initials, filelist):
    Return a new name for filename according to out holy naming scheme.
    """
    leader, extension = os.path.splitext(filename)
+   extension = extension.lower()
    number = "".join([char for char in leader[-4:] if char.isdigit()])
    revision = "000"
 # Look for high quality versions of this image. This is the case if we are

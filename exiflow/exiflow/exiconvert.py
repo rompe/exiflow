@@ -64,7 +64,7 @@ def convert_file(filename):
       return basename
 
    if not filename.endswith(raw_extension):
-      logger.debug("%s doesn't match, skipping.", filename)
+      logger.info("%s doesn't match, skipping.", filename)
       return basename
       
    if raw_converter == "":
