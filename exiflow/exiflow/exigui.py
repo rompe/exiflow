@@ -11,6 +11,7 @@ __revision__ = "$Id$"
 
 import os.path
 import sys
+import logging
 import optparse
 import pygtk
 pygtk.require("2.0")
@@ -202,13 +203,14 @@ class Window1(object):
 
    def set_filelist(self, files):
       """ Put files into the filelist. """
+      logger = logging.getLogger("exigui.set_filelist")
       self.liststore.clear()
       for filename in files:
          filename = os.path.abspath(filename)
          if os.path.exists(filename):
             self.liststore.append([filename])
          else:
-            print >> sys.stderr, filename, "doesn't exist!"
+            logger.warning("%s doesn't exist!", filename)
 
    def on_exirename_camid_auto_activate(self, *dummy):
       """ Callback for exirename's "auto cam_id" selection. """
@@ -261,14 +263,16 @@ class Window1(object):
       """
       Called from the cancel button.
       """
+      logger = logging.getLogger("exigui.on_cancel_activate")
       self._cancelled = True
       widget.set_sensitive(False)
-      sys.stderr.write("CANCELLED!\n")
+      logger.warning("CANCELLED!")
 
    def on_run_activate(self, widget, *dummy):
       """
       Called from the run button.
       """
+      logger = logging.getLogger("exigui.on_run_activate")
       cancel_button = self.wTree.get_widget("cancel_button")
       cancel_button.set_sensitive(True)
       nbook = self.wTree.get_widget("notebook1")
@@ -278,7 +282,7 @@ class Window1(object):
       
       ntab = nbook.get_tab_label(nbook.get_nth_page(nbook.get_current_page()))
       label = ntab.get_text()
-      sys.stderr.write("Running %s\n" % label)
+      logger.warning("Running %s\n" % label)
       method = getattr(self, "run_" + label.replace(" ", "_"))
       method()
       
@@ -288,6 +292,7 @@ class Window1(object):
 
    def run_exiimport(self):
       """ Run exiimport. """
+      logger = logging.getLogger("exigui.run_exiimport")
       args = ["-v"]
       import_dir = self.wTree.get_widget("exiimport_importdir_entry")
       device = self.wTree.get_widget("exiimport_device_entry")
@@ -301,10 +306,11 @@ class Window1(object):
       try:
          exiflow.exiimport.run(args, self._progress_callback)
       except IOError, msg:
-         sys.stdout.write("\nERROR: %s\n" % str(msg))
+         logger.error("ERROR: %s", msg)
 
    def run_exirename(self):
       """ Run exirename. """
+      logger = logging.getLogger("exigui.run_exirename")
       args = ["-v"]
       artist_initials = self.wTree.get_widget("exirename_artist_initials_entry")
       cam_id = self.wTree.get_widget("exirename_cam_id_entry")
@@ -316,10 +322,11 @@ class Window1(object):
       try:
          exiflow.exirename.run(args, self._progress_callback)
       except IOError, msg:
-         sys.stdout.write("\nERROR: %s\n" % str(msg))
+         logger.error("ERROR: %s", msg)
 
    def run_exiperson(self):
       """ Run exiperson. """
+      logger = logging.getLogger("exigui.run_exiperson")
       args = ["-v"]
       exif_section = self.wTree.get_widget("exiperson_section_entry")
       if self._is_active("exiperson_section_entry_button_custom"):
@@ -328,19 +335,21 @@ class Window1(object):
       try:
          exiflow.exiperson.run(args, self._progress_callback)
       except IOError, msg:
-         sys.stdout.write("\nERROR: %s\n" % str(msg))
+         logger.error("ERROR: %s", msg)
       
    def run_exiconvert(self):
       """ Run exiconvert. """
+      logger = logging.getLogger("exigui.run_exiconvert")
       args = ["-v"]
       args += [entry[0] for entry in self.liststore]
       try:
          exiflow.exiconvert.run(args, self._progress_callback)
       except IOError, msg:
-         sys.stdout.write("\nERROR: %s\n" % str(msg))
+         logger.error("ERROR: %s", msg)
 
    def run_exiassign(self):
       """ Run exiassign. """
+      logger = logging.getLogger("exigui.run_exiassign")
       args = ["-v"]
       if self._is_active("exiassign_force_checkbutton"):
          args.append("--force")
@@ -348,10 +357,11 @@ class Window1(object):
       try:
          exiflow.exiassign.run(args, self._progress_callback)
       except IOError, msg:
-         sys.stdout.write("\nERROR: %s\n" % str(msg))
+         logger.error("ERROR: %s", msg)
 
    def run_exigate_gthumb(self):
       """ Run exigate. """
+      logger = logging.getLogger("exigui.run_exigate_gthumb")
       if self._is_active("exigate_gthumb_nooptions"):
          args = ["-v"]
       if self._is_active("exigate_gthumb_addfields"):
@@ -365,7 +375,8 @@ class Window1(object):
       try:
          exiflow.exigate.run(args, self._progress_callback)
       except IOError, msg:
-         sys.stdout.write("\nERROR: %s\n" % str(msg))
+         logger.error("ERROR: %s", msg)
+
 
 def run(argv):
    """
@@ -386,6 +397,9 @@ def run(argv):
    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
                      help="Be verbose.")
    options, args = parser.parse_args(argv)
+   logging.basicConfig(format="%(module)s: %(message)s", level=logging.INFO)
+   if options.verbose:
+      logging.getLogger("exigui").setLevel(logging.INFO)
 
    win1 = Window1()
    if options.mount:
