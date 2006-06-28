@@ -18,6 +18,7 @@ import gtk
 import gtk.glade
 
 import exiflow.exiassign
+import exiflow.exiconvert
 import exiflow.exigate
 import exiflow.exiimport
 import exiflow.exiperson
@@ -278,6 +279,23 @@ class Window1(object):
       cancel_button.set_sensitive(False)
       widget.set_sensitive(True)
 
+   def run_exiimport(self):
+      """ Run exiimport. """
+      args = ["-v"]
+      import_dir = self.wTree.get_widget("exiimport_importdir_entry")
+      device = self.wTree.get_widget("exiimport_device_entry")
+      target_dir = self.wTree.get_widget("exiimport_targetdir_entry")
+      if import_dir.get_text():
+         args.append("--mount=" + import_dir.get_text())
+      if device.get_text():
+         args.append("--device=" + device.get_text())
+      if target_dir.get_text():
+         args.append("--target=" + target_dir.get_text())
+      try:
+         exiflow.exiimport.run(args, self._progress_callback)
+      except IOError, msg:
+         sys.stdout.write("\nERROR: %s\n" % str(msg))
+
    def run_exirename(self):
       """ Run exirename. """
       args = ["-v"]
@@ -293,17 +311,6 @@ class Window1(object):
       except IOError, msg:
          sys.stdout.write("\nERROR: %s\n" % str(msg))
 
-   def run_exiassign(self):
-      """ Run exiassign. """
-      args = ["-v"]
-      if self._is_active("exiassign_force_checkbutton"):
-         args.append("--force")
-      args += [entry[0] for entry in self.liststore]
-      try:
-         exiflow.exiassign.run(args, self._progress_callback)
-      except IOError, msg:
-         sys.stdout.write("\nERROR: %s\n" % str(msg))
-
    def run_exiperson(self):
       """ Run exiperson. """
       args = ["-v"]
@@ -316,6 +323,26 @@ class Window1(object):
       except IOError, msg:
          sys.stdout.write("\nERROR: %s\n" % str(msg))
       
+   def run_exiconvert(self):
+      """ Run exiconvert. """
+      args = ["-v"]
+      args += [entry[0] for entry in self.liststore]
+      try:
+         exiflow.exiconvert.run(args, self._progress_callback)
+      except IOError, msg:
+         sys.stdout.write("\nERROR: %s\n" % str(msg))
+
+   def run_exiassign(self):
+      """ Run exiassign. """
+      args = ["-v"]
+      if self._is_active("exiassign_force_checkbutton"):
+         args.append("--force")
+      args += [entry[0] for entry in self.liststore]
+      try:
+         exiflow.exiassign.run(args, self._progress_callback)
+      except IOError, msg:
+         sys.stdout.write("\nERROR: %s\n" % str(msg))
+
    def run_exigate_gthumb(self):
       """ Run exigate. """
       if self._is_active("exigate_gthumb_nooptions"):
@@ -330,23 +357,6 @@ class Window1(object):
       args += [entry[0] for entry in self.liststore]
       try:
          exiflow.exigate.run(args, self._progress_callback)
-      except IOError, msg:
-         sys.stdout.write("\nERROR: %s\n" % str(msg))
-
-   def run_exiimport(self):
-      """ Run exiimport. """
-      args = ["-v"]
-      import_dir = self.wTree.get_widget("exiimport_importdir_entry")
-      device = self.wTree.get_widget("exiimport_device_entry")
-      target_dir = self.wTree.get_widget("exiimport_targetdir_entry")
-      if import_dir.get_text():
-         args.append("--mount=" + import_dir.get_text())
-      if device.get_text():
-         args.append("--device=" + device.get_text())
-      if target_dir.get_text():
-         args.append("--target=" + target_dir.get_text())
-      try:
-         exiflow.exiimport.run(args, self._progress_callback)
       except IOError, msg:
          sys.stdout.write("\nERROR: %s\n" % str(msg))
 
