@@ -46,6 +46,9 @@ def autogate_gthumb(filename, myoptions):
 # TODO: Find out why we intruduced this line. Seems odd...
       #write_gthumb(filename, gthumb, myoptions.addfields,
       #             myoptions.template)
+# Maybe that way we wanted to update in addfields and template mode even if
+# the file's timestamp is older than the gthumb comment? Check if that is
+# needed and if so, if we can do it conditionally!
       gthumbfile.set_mtime(filetimestamp)
       os.utime(filename, (filetimestamp, filetimestamp))
    elif filetimestamp > gthumbtimestamp \
