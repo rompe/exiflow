@@ -23,9 +23,10 @@ import exiflow.filelist
 import exiflow.configfile
 
 
-def personalize_file(filename, personals):
+def personalize_file(filename, personals, forced_personals):
    """
    Personalize an image using data from the dictionary "personals".
+   The optional "forced_personals" override all other personals.
    """
    logger = logging.getLogger("exiperson.personalize_file")
    exifconfig = exiflow.configfile.parse("exif")
@@ -46,6 +47,9 @@ def personalize_file(filename, personals):
                           " an empty [%s] section.\n" %
                           exif_file.fields["Model"])
    
+   if len(forced_personals) > 0:
+      personals.update(forced_personals)
+
    if len(personals) == 0:
       logger.warning("No [all] or [%s] section with data, skipping.", 
                      exif_file.fields["Model"])
@@ -102,25 +106,23 @@ def run(argv, callback=None):
          sys.exit(1)
 
 # collect EXIF data supplied on command line
-# TODO: This should be mixed in later. Now it will be overridden by the
-# camera specifig section data.
+   forced_personals = {}
    remaining_args = []
    for arg in args:
       if arg.startswith("-") and "=" in arg:
          field, value = arg.lstrip("-").split("=")
-         defaultpersonals[field] += value
+         forced_personals[field] += value
       else:
          remaining_args.append(arg)
 
-   filelist = exiflow.filelist.Filelist(remaining_args)
-   for filename, percentage in filelist:
+   for filename, percentage in exiflow.filelist.Filelist(remaining_args):
       logger.info("%3s%% %s", percentage, filename)
       if callable(callback):
          if callback(filename, filename, percentage):
             break
 # Note to programmer:
 # The [:] is needed to get a slice copy instead of a reference.
-      personalize_file(filename, defaultpersonals[:])
+      personalize_file(filename, defaultpersonals[:], forced_personals)
 
 
 if __name__ == "__main__":
