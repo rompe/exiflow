@@ -7,9 +7,10 @@ Install the exiflow collection on your computer.
 import distutils.core
 
 distutils.core.setup(name='exiflow',
-                     version='0.2.0',
+                     version='0.3.0',
                      scripts=['exigui',
                               'exiassign',
+                              'exiconvert',
                               'exigate',
                               'exiimport',
                               'exiperson',

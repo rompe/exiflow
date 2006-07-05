@@ -1,3 +1,9 @@
+exiflow (0.3.0-1) UNRELEASED; urgency=low
+
+  * First public alpha version.
+
+ -- Ulf Rompe <debian@rompe.org>  Thu, 6 Jun 2006 00:31:06 +0100
+
 exiflow (0.2.0-1) UNRELEASED; urgency=low
 
   * First public alpha version.
