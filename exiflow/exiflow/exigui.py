@@ -288,6 +288,9 @@ class Window1(object):
       method = getattr(self, "run_" + label.replace(" ", "_"))
       method()
       
+      progressbar = self.wTree.get_widget("progressbar1")
+      progressbar.set_fraction(0 / 100)
+      progressbar.set_text(u"")
       nbook.set_sensitive(True)
       cancel_button.set_sensitive(False)
       widget.set_sensitive(True)
