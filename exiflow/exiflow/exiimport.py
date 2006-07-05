@@ -47,7 +47,7 @@ def run(argv, callback=None):
    logger = logging.getLogger("exiimport")
    if len(args) > 0 or not options.mount or not options.target:
       logger.error("Wrong syntax.")
-      parser.print_help()
+      logger.warning(parser.format_help())
       sys.exit(1)
 
 # Build file list whithout skipping unknown files

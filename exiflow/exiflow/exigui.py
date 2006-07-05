@@ -165,6 +165,8 @@ class Window1(object):
       sys.stderr = WritableTextView(self.wTree.get_widget("textview1"), "blue")
       stdlog = WritableTextView(self.wTree.get_widget("textview1"), "red")
       logging.getLogger().addHandler(logging.StreamHandler(stdlog))
+      self.batch_scripts = []
+      self.window.connect("map_event", self.batch_run)
 
    def _make_sensitive(self, name):
       """ Set widget called name sensitive. """
@@ -368,16 +370,16 @@ class Window1(object):
       except IOError, msg:
          logger.error("ERROR: %s", msg)
 
-   def run_exigate_gthumb(self):
+   def run_exigate(self):
       """ Run exigate. """
-      logger = logging.getLogger("exigui.run_exigate_gthumb")
-      if self._is_active("exigate_gthumb_nooptions"):
+      logger = logging.getLogger("exigui.run_exigate")
+      if self._is_active("exigate_nooptions"):
          args = ["-v"]
-      if self._is_active("exigate_gthumb_addfields"):
+      if self._is_active("exigate_addfields"):
          args = ["--additional-fields"]
-      if self._is_active("exigate_gthumb_template"):
+      if self._is_active("exigate_template"):
          args = ["--template"]
-      if self._is_active("exigate_gthumb_cleanup"):
+      if self._is_active("exigate_cleanup"):
          args = ["--cleanup"]
       args.append("-v")
       args += [entry[0] for entry in self.liststore]
@@ -386,12 +388,34 @@ class Window1(object):
       except IOError, msg:
          logger.error("ERROR: %s", msg)
 
+   def batch_run(self, *dummy):
+      """ Run "scripts" in a batch without user interaction. """
+      if len(self.batch_scripts) > 0:
+         logger = logging.getLogger("exigui.batch_run")
+         nbook = self.wTree.get_widget("notebook1")
+         tabs = []
+         for tabnum in range(0, nbook.get_n_pages()):
+            tabs.append(nbook.get_tab_label(nbook.get_nth_page(tabnum)).get_text())
+         print "Tabs:", tabs
+         for script in self.batch_scripts:
+            if script not in tabs:
+               logger.error("There is no %s tab available!", script)
+               return 1
+         run_button = self.wTree.get_widget("activate_button")
+         for script in self.batch_scripts:
+            nbook.set_current_page(tabs.index(script))
+            self.on_run_activate(run_button)
+         self.batch_scripts = []
+      return 0
+
 
 def run(argv):
    """
    Take an equivalent of sys.argv[1:] and run the GUI.
    """
    parser = optparse.OptionParser()
+   parser.set_defaults(batch_order="exiimport,exirename,exiperson,"
+                                   "exiconvert,exiassign,exigate")
    parser.add_option("-m", "--mount", dest="mount",
                      help="Mountpoint of directory to import. Corresponds"
                           " to %m in the gnome-volume-manager config dialog.")
@@ -406,6 +430,8 @@ def run(argv):
    parser.add_option("-b", "--batch", action="store_true", dest="batch",
                      help="Autorun from exiimport over exirename, exiperson "
                           "and exiconvert to exiassign.")
+   parser.add_option("--batch_order",
+                     help="Comma separated processing order for --batch. Default: %default")
    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
                      help="Be verbose.")
    options, args = parser.parse_args(argv)
@@ -422,6 +448,8 @@ def run(argv):
       win1.set_text("exiimport_targetdir_entry", options.target)
    if len(args) > 0:
       win1.set_filelist(args)
+   if options.batch:
+      win1.batch_scripts = options.batch_order.split(',')
    gtk.main()
    return 0
 
