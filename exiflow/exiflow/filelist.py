@@ -144,3 +144,9 @@ class Filelist:
       """
       return len(self._files)
 
+   def get_files(self):
+      """
+      Get al list of all files.
+      """
+      return self._files
+

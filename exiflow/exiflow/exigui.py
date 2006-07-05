@@ -18,6 +18,7 @@ pygtk.require("2.0")
 import gtk
 import gtk.glade
 
+import exiflow.filelist
 import exiflow.exiassign
 import exiflow.exiconvert
 import exiflow.exigate
@@ -204,10 +205,13 @@ class Window1(object):
       gtk.main_quit()
 
    def set_filelist(self, files):
-      """ Put files into the filelist. """
+      """
+      Put files into the filelist.
+      Directories are extrapolated via the Filelist class.
+      """
       logger = logging.getLogger("exigui.set_filelist")
       self.liststore.clear()
-      for filename in files:
+      for filename in exiflow.filelist.Filelist(files).get_files():
          filename = os.path.abspath(filename)
          if os.path.exists(filename):
             self.liststore.append([filename])
