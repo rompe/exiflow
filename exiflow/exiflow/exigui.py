@@ -403,6 +403,9 @@ def run(argv):
                           "unmounted using pumount after the import. "
                           "Corresponds to %d in the gnome-volume-manager "
                           "config dialog.")
+   parser.add_option("-b", "--batch", action="store_true", dest="batch",
+                     help="Autorun from exiimport over exirename, exiperson "
+                          "and exiconvert to exiassign.")
    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
                      help="Be verbose.")
    options, args = parser.parse_args(argv)
