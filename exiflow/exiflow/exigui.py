@@ -260,9 +260,12 @@ class Window1(object):
             for rownum in range(0, len(self.liststore)):
                if self.liststore[rownum][0] == filename:
                   self.liststore[rownum][0] = newname
+      nbook = self.wTree.get_widget("notebook1")
+      ntab = nbook.get_tab_label(nbook.get_nth_page(nbook.get_current_page()))
+      label = ntab.get_text()
       progressbar = self.wTree.get_widget("progressbar1")
       progressbar.set_fraction(float(percentage) / 100)
-      progressbar.set_text(u"%s %%" % percentage)
+      progressbar.set_text(u"%s:   %s %%" % (label, percentage))
       while gtk.events_pending():
          gtk.main_iteration(False)
       return self._cancelled
