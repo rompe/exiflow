@@ -48,6 +48,8 @@ class Filelist:
       settings = exiflow.configfile.parse("settings")
       unwanted_dirs = settings.get("all", "unwantend_dirs").split()
       for path in pathes:
+         if path.startswith("file:///"):
+            path = path[7:]
          if os.path.isfile(path):
             self._add_file(path)
          elif os.path.isdir(path):
