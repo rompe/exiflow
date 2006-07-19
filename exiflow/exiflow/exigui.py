@@ -295,7 +295,7 @@ class Window1(object):
       ntab = nbook.get_tab_label(nbook.get_nth_page(nbook.get_current_page()))
       label = ntab.get_text()
       logger.warning("Running %s", label)
-      method = getattr(self, "run_" + label.replace(" ", "_"))
+      method = getattr(self, "__run_" + label.replace(" ", "_"))
       method()
       
       progressbar = self.wTree.get_widget("progressbar1")
@@ -305,7 +305,7 @@ class Window1(object):
       cancel_button.set_sensitive(False)
       widget.set_sensitive(True)
 
-   def run_exiimport(self):
+   def __run_exiimport(self):
       """ Run exiimport. """
       logger = logging.getLogger("exigui.run_exiimport")
       args = ["-v"]
@@ -323,7 +323,7 @@ class Window1(object):
       except IOError, msg:
          logger.error("ERROR: %s", msg)
 
-   def run_exirename(self):
+   def __run_exirename(self):
       """ Run exirename. """
       logger = logging.getLogger("exigui.run_exirename")
       args = ["-v"]
@@ -339,7 +339,7 @@ class Window1(object):
       except IOError, msg:
          logger.error("ERROR: %s", msg)
 
-   def run_exiperson(self):
+   def __run_exiperson(self):
       """ Run exiperson. """
       logger = logging.getLogger("exigui.run_exiperson")
       args = ["-v"]
@@ -352,7 +352,7 @@ class Window1(object):
       except IOError, msg:
          logger.error("ERROR: %s", msg)
       
-   def run_exiconvert(self):
+   def __run_exiconvert(self):
       """ Run exiconvert. """
       logger = logging.getLogger("exigui.run_exiconvert")
       args = ["-v"]
@@ -362,7 +362,7 @@ class Window1(object):
       except IOError, msg:
          logger.error("ERROR: %s", msg)
 
-   def run_exiassign(self):
+   def __run_exiassign(self):
       """ Run exiassign. """
       logger = logging.getLogger("exigui.run_exiassign")
       args = ["-v"]
@@ -374,7 +374,7 @@ class Window1(object):
       except IOError, msg:
          logger.error("ERROR: %s", msg)
 
-   def run_exigate(self):
+   def __run_exigate(self):
       """ Run exigate. """
       logger = logging.getLogger("exigui.run_exigate")
       if self._is_active("exigate_nooptions"):
@@ -399,8 +399,8 @@ class Window1(object):
          nbook = self.wTree.get_widget("notebook1")
          tabs = []
          for tabnum in range(0, nbook.get_n_pages()):
-            tabs.append(nbook.get_tab_label(nbook.get_nth_page(tabnum)).get_text())
-         print "Tabs:", tabs
+            tab_label = nbook.get_tab_label(nbook.get_nth_page(tabnum))
+            tabs.append(tab_label.get_text())
          for script in self.batch_scripts:
             if script not in tabs:
                logger.error("There is no %s tab available!", script)
@@ -435,7 +435,8 @@ def run(argv):
                      help="Autorun from exiimport over exirename, exiperson "
                           "and exiconvert to exiassign.")
    parser.add_option("--batch_order",
-                     help="Comma separated processing order for --batch. Default: %default")
+                     help="Comma separated processing order for --batch. "
+                          "Default: %default")
    parser.add_option("--nofork", action="store_true",
                      help="Do not fork, stay in foreground instead.")
    options, args = parser.parse_args(argv)
