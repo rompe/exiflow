@@ -164,7 +164,8 @@ class Window1(object):
       sys.stdout = WritableTextView(self.wTree.get_widget("textview1"))
       sys.stderr = WritableTextView(self.wTree.get_widget("textview1"), "blue")
       stdlog = WritableTextView(self.wTree.get_widget("textview1"), "red")
-      logging.getLogger().addHandler(logging.StreamHandler(stdlog))
+      logging.basicConfig(format="%(module)s: %(message)s", stream=stdlog,
+                          level=logging.INFO)
       self.batch_scripts = []
       self.window.connect("map_event", self.batch_run)
 
@@ -437,12 +438,7 @@ def run(argv):
                      help="Comma separated processing order for --batch. Default: %default")
    parser.add_option("--nofork", action="store_true",
                      help="Do not fork, stay in foreground instead.")
-   parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
-                     help="Be verbose.")
    options, args = parser.parse_args(argv)
-   logging.basicConfig(format="%(module)s: %(message)s", level=logging.INFO)
-   if options.verbose:
-      logging.getLogger("exigui").setLevel(logging.INFO)
 
    if options.nofork or os.fork() == 0:
       win1 = Window1()
