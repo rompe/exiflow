@@ -9,7 +9,7 @@ A nice PyGTK GUI for the exiflow tool collection.
 """
 __revision__ = "$Id$"
 
-import os.path
+import os
 import sys
 import logging
 import optparse
@@ -435,6 +435,8 @@ def run(argv):
                           "and exiconvert to exiassign.")
    parser.add_option("--batch_order",
                      help="Comma separated processing order for --batch. Default: %default")
+   parser.add_option("--nofork", action="store_true",
+                     help="Do not fork, stay in foreground instead.")
    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
                      help="Be verbose.")
    options, args = parser.parse_args(argv)
@@ -442,18 +444,20 @@ def run(argv):
    if options.verbose:
       logging.getLogger("exigui").setLevel(logging.INFO)
 
-   win1 = Window1()
-   if options.mount:
-      win1.set_text("exiimport_importdir_entry", options.mount)
-   if options.device:
-      win1.set_text("exiimport_device_entry", options.device)
-   if options.target:
-      win1.set_text("exiimport_targetdir_entry", options.target)
-   if len(args) > 0:
-      win1.set_filelist(args)
-   if options.batch:
-      win1.batch_scripts = options.batch_order.split(',')
-   gtk.main()
+   if options.nofork or os.fork() == 0:
+      win1 = Window1()
+      if options.mount:
+         win1.set_text("exiimport_importdir_entry", options.mount)
+      if options.device:
+         win1.set_text("exiimport_device_entry", options.device)
+      if options.target:
+         win1.set_text("exiimport_targetdir_entry", options.target)
+      if len(args) > 0:
+         win1.set_filelist(args)
+      if options.batch:
+         win1.batch_scripts = options.batch_order.split(',')
+      gtk.main()
+
    return 0
 
 
