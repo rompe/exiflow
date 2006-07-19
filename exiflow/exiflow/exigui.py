@@ -356,6 +356,8 @@ class Window1(object):
       """ Run exiconvert. """
       logger = logging.getLogger("exigui.run_exiconvert")
       args = ["-v"]
+      if self._is_active("exiconvert_remove_lqjpeg_checkbutton"):
+         args.append("--remove-lqjpeg")
       args += [entry[0] for entry in self.liststore]
       try:
          exiflow.exiconvert.run(args, self._progress_callback)

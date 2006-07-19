@@ -30,6 +30,7 @@ For example, a file "test.nef" should result in "test.jpg".
 __revision__ = "$Id$"
 
 import os
+import re
 import sys
 import logging
 import optparse
@@ -102,6 +103,10 @@ def run(argv, callback=None):
    """
    parser = optparse.OptionParser(usage="usage: %prog [options] "
                                         "<files or dirs>")
+   parser.add_option("-r", "--remove-lqjpeg", action="store_true", 
+                     dest="remove_lqjpeg",
+                     help="removes the low quality jpeg (...00l.jpg) "
+                           "example yyyymmdd-a00000-xy00l.jpg")
    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
                      help="Be verbose.")
    options, args = parser.parse_args(args=argv)
@@ -122,11 +127,28 @@ def run(argv, callback=None):
       except IOError, msg:
          newname = os.path.basename(filename)
          logger.error("Skipping %s:\n%s\n", filename, msg)
-      if callable(callback):
-         if callback(filename,
-                     os.path.join(os.path.dirname(filename), newname),
-                     percentage, keep_original=True):
-            break
+      if options.remove_lqjpeg:
+         filename_re = re.compile("^(\d{8}-.{3}\d{4}-.{2})000\.jpg$")
+         mymatch = filename_re.match(newname)
+         if mymatch:
+            lqname = os.path.join(os.path.dirname(filename),
+                                     mymatch.group(1) + "00l.jpg")
+            if os.path.exists(lqname):
+               try:
+                  os.remove(lqname)
+                  if callable(callback):
+                     if callback(lqname,
+                                 os.path.join(os.path.dirname(filename), newname),
+                                 percentage):
+                        break
+               except IOError, msg:
+                  logger.error("Skipping remove of %s:\n%s\n", lqname, msg)
+      else:
+         if callable(callback):
+            if callback(filename,
+                        os.path.join(os.path.dirname(filename), newname),
+                        percentage, keep_original=True):
+               break
 
 
 if __name__ == "__main__":
