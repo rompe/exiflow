@@ -42,6 +42,9 @@ class Exif:
             "".join(subprocess.Popen("exiftool -b -ImageDescription "
                                      + self.filename, shell=True,
                                      stdout=subprocess.PIPE).stdout)
+# We don't need an empty "ImageDescription" for any merge operations.
+         if self.fields["ImageDescription"] == "":
+            del self.fields["ImageDescription"] 
 # Be shure to have proper UTF8 strings
       for key in self.fields:
          self.fields[key] = unicode(self.fields[key], "utf-8")
@@ -84,7 +87,7 @@ class Exif:
       exiffields = ["Artist", "Credit", "Copyright", "CopyrightNotice", 
                     "ImageDescription", "Keywords", "Location", "UserComment",
                     "XPTitle"]
-      command = "exiftool -overwrite_original -P -TagsFromFile " + sourcefile
+      command = "exiftool -overwrite_original -x Orientation -P -TagsFromFile " + sourcefile
       for field in exiffields:
          if field in self.fields:
             if field == "Keywords":
