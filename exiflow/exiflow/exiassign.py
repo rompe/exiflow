@@ -104,7 +104,7 @@ def run(argv, callback=None):
 
    filelist = exiflow.filelist.Filelist(args)
 
-   filename_re = re.compile("^(\d{8}-.{3}\d{4}-)(.{5})\.[^.]*$")
+   filename_re = re.compile("^(\d{8}(-\d{6})?-.{3}\d{4}-)(.{5})\.[^.]*$")
 
    for filename, percentage in filelist:
       mymatch = filename_re.match(os.path.basename(filename))

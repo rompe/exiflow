@@ -128,7 +128,7 @@ def run(argv, callback=None):
          newname = os.path.basename(filename)
          logger.error("Skipping %s:\n%s\n", filename, msg)
       if options.remove_lqjpeg:
-         filename_re = re.compile("^(\d{8}-.{3}\d{4}-.{2})000\.jpg$")
+         filename_re = re.compile("^(\d{8}(-\d{6})?-.{3}\d{4}-.{2})000\.jpg$")
          mymatch = filename_re.match(newname)
          if mymatch:
             lqname = os.path.join(os.path.dirname(filename),
