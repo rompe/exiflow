@@ -79,18 +79,22 @@ def get_exif_information(filename):
    exif_file.read_exif()
    model = exif_file.fields.get("Model", "all")
    date = exif_file.fields.get("DateTimeOriginal", "0")
+   image_time = date
    if ":" in date:
+      image_time = image_time[11:13] + image_time[14:16] + image_time[17:19]
       date = date[0:4] + date[5:7] + date[8:10]
    else:
       if date == "0":
          date = os.stat(filename).st_mtime
+         image_time = date
       date = time.strftime("%Y%m%d", time.localtime(float(date)))
-   return model, date
+      image_time = time.strftime("%H%M%S", time.localtime(float(image_time)))
+   return model, date, image_time
 
 
 def get_new_filename(filename, date, cam_id, artist_initials, filelist):
    """
-   Return a new name for filename according to out holy naming scheme.
+   Return a new name for filename according to our holy naming scheme.
    """
    leader, extension = os.path.splitext(filename)
    extension = extension.lower()
@@ -104,21 +108,23 @@ def get_new_filename(filename, date, cam_id, artist_initials, filelist):
          revision = "00l"
    if not number:
       raise IOError, "Can't find a number in " + filename
-   return date + "-" + cam_id + number.zfill(4) + "-" + artist_initials \
-          + revision + extension
+   return date + "-" + cam_id + number.zfill(4) + "-" \
+             + artist_initials + revision + extension
 
 
-def rename_file(filename, filelist, cam_id_override=None,
+def rename_file(filename, filelist, with_time, cam_id_override=None,
                 artist_initials_override=None):
    """
    Rename filename and return the newly generated name without dir.
    """
    logger = logging.getLogger("exirename.rename_file")
-   filename_re = re.compile("^\d{8}-.{3}\d{4}-.{5}\.[^.]*$")
+   filename_re = re.compile("^\d{8}(-\d{6})?-.{3}\d{4}-.{5}\.[^.]*$")
    if filename_re.match(os.path.basename(filename)):
       raise IOError, filename + " already seems to be formatted."
 
-   model, date = get_exif_information(filename)
+   model, date, image_time = get_exif_information(filename)
+   if with_time:
+      date += "-" + image_time
 
    cam_id, artist_initials = exiflow.configfile.get_options("cameras", model,
                                                  ("cam_id", "artist_initials"))
@@ -152,6 +158,10 @@ def run(argv, callback=None):
    parser.add_option("--artist_initials", "-a", dest="artist_initials",
                      help="Initials of the artist. Should be two characters"
                           " long.")
+   parser.add_option("-t", "--with_time", action="store_true", dest="with_time",
+                     help="Create filenames containing the image time, for "
+                         "example 20071231-235959-n001234-xy000.jpg instead of "
+                         "20071231-n001234-xy000.jpg .")
    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
                      help="Be verbose.")
    options, args = parser.parse_args(args=argv)
@@ -164,7 +174,7 @@ def run(argv, callback=None):
    filelist = exiflow.filelist.Filelist(args)
    for filename, percentage in filelist:
       try:
-         newname = rename_file(filename, filelist,
+         newname = rename_file(filename, filelist, options.with_time,
                                options.cam_id, options.artist_initials)
       except IOError, msg:
          newname = os.path.basename(filename)
