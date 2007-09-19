@@ -116,8 +116,8 @@ def run(argv, callback=None):
       logging.getLogger().setLevel(logging.INFO)
    logger = logging.getLogger("exiconvert")
 
-   filelist = exiflow.filelist.Filelist(args)
-   for filename, percentage in filelist:
+   for filename, percentage in exiflow.filelist.Filelist(args):
+      callback_filename = None
       logger.info("%3s%% %s", percentage, filename)
       if callable(callback):
          if callback(filename, filename, percentage):
@@ -128,6 +128,7 @@ def run(argv, callback=None):
          newname = os.path.basename(filename)
          logger.error("Skipping %s:\n%s\n", filename, msg)
       if options.remove_lqjpeg:
+         keep_original = False
          filename_re = re.compile("^(\d{8}(-\d{6})?-.{3}\d{4}-.{2})000\.jpg$")
          mymatch = filename_re.match(newname)
          if mymatch:
@@ -136,19 +137,18 @@ def run(argv, callback=None):
             if os.path.exists(lqname):
                try:
                   os.remove(lqname)
-                  if callable(callback):
-                     if callback(lqname,
-                                 os.path.join(os.path.dirname(filename), newname),
-                                 percentage):
-                        break
+                  callback_filename = lqname
                except IOError, msg:
                   logger.error("Skipping remove of %s:\n%s\n", lqname, msg)
       else:
-         if callable(callback):
-            if callback(filename,
-                        os.path.join(os.path.dirname(filename), newname),
-                        percentage, keep_original=True):
-               break
+         callback_filename = filename
+         keep_original = True
+
+      if callback_filename is not None and callable(callback):
+         if callback(callback_filename,
+                     os.path.join(os.path.dirname(filename), newname),
+                     percentage, keep_original=keep_original):
+            break
 
 
 if __name__ == "__main__":
