@@ -333,6 +333,8 @@ class Window1(object):
          args.append("--artist_initials=" + artist_initials.get_text())
       if self._is_active("exirename_cam_id_entry_button_custom"):
          args.append("--cam_id=" + cam_id.get_text())
+      if self._is_active("exirename_include_timestamp_checkbutton"):
+         args.append("--with_time")
       args += [entry[0] for entry in self.liststore]
       try:
          exiflow.exirename.run(args, self._progress_callback)
