@@ -50,7 +50,7 @@ namespace RawPlusJpegExiflowExtension
 
 				if (p != null && previousphoto != null && !ExiflowMatch(p, previousphoto)) {
 					if (currentphotos.Count > 1) {
-						ExiflowMerge(currentphotos);
+						merge_requests.Add (new MergeRequest (currentphotos));
 					}
 					currentphotos.Clear();
 				}
@@ -58,8 +58,14 @@ namespace RawPlusJpegExiflowExtension
 				previousphoto = p;
 			}
 			if (currentphotos.Count > 1) {
-				ExiflowMerge(currentphotos);
+				merge_requests.Add (new MergeRequest (currentphotos));
 			}
+
+			if (merge_requests.Count == 0)
+				return;
+
+			foreach (MergeRequest mr in merge_requests)
+				mr.Merge ();
 			
 			MainWindow.Toplevel.UpdateQuery ();
 		}
@@ -72,15 +78,6 @@ namespace RawPlusJpegExiflowExtension
 				p1.Name.Substring (0, 19) == p2.Name.Substring (0, 19);
 		}
 
-
-		private static void ExiflowMerge (ArrayList photos)
-		{
-			photos.Sort(new CompareNameWithRaw ());
-			Console.WriteLine ("Maybe merging these photos:");
-			foreach (Photo photo in photos) {
-				Console.WriteLine (photo.Name);
-			}
-		}
 
 		/* IComparer to sort photos by name. */
 		class CompareName : System.Collections.IComparer
@@ -110,41 +107,51 @@ namespace RawPlusJpegExiflowExtension
 
 		class MergeRequest 
 		{
-			Photo raw;
-			Photo jpeg;
+			ArrayList photos;
 
-			public MergeRequest (Photo raw, Photo jpeg)
+			public MergeRequest (ArrayList photos)
 			{
-				this.raw = raw;
-				this.jpeg = jpeg;
+				this.photos = (ArrayList) photos.Clone();
 			}
 
 			public void Merge ()
 			{
-				Console.WriteLine ("Merging {0} and {1}", raw.VersionUri (Photo.OriginalVersionId), jpeg.VersionUri (Photo.OriginalVersionId));
-				foreach (uint version_id in jpeg.VersionIds) {
-					string name = jpeg.GetVersion (version_id).Name;
-					try {
-						raw.DefaultVersionId = raw.CreateReparentedVersion (jpeg.GetVersion (version_id) as PhotoVersion);
-						if (version_id == Photo.OriginalVersionId)
-							raw.RenameVersion (raw.DefaultVersionId, "Jpeg");
-						else
-							raw.RenameVersion (raw.DefaultVersionId, name);
-					} catch (Exception e) {
-						Console.WriteLine (e);
-					}
+				photos.Sort(new CompareNameWithRaw ());
+				Console.WriteLine ("Maybe merging these photos:");
+				foreach (Photo photo in this.photos) {
+					Console.WriteLine (photo.Name);
 				}
-				uint [] version_ids = jpeg.VersionIds;
-				Array.Reverse (version_ids);
-				foreach (uint version_id in version_ids) {
-					try {
-						jpeg.DeleteVersion (version_id, true, true);
-					} catch (Exception e) {
-						Console.WriteLine (e);
+
+				Photo raw = (Photo) this.photos[0];
+				foreach (Photo jpeg in this.photos.GetRange(1, this.photos.Count - 1)) {
+					Console.WriteLine ("...merging {0} into {1}...", jpeg.Name, raw.Name);
+
+					Console.WriteLine ("Merging {0} and {1}", raw.VersionUri (Photo.OriginalVersionId), jpeg.VersionUri (Photo.OriginalVersionId));
+					foreach (uint version_id in jpeg.VersionIds) {
+						string name = jpeg.GetVersion (version_id).Name;
+						try {
+							raw.DefaultVersionId = raw.CreateReparentedVersion (jpeg.GetVersion (version_id) as PhotoVersion);
+							if (version_id == Photo.OriginalVersionId)
+								// Just the filename part that follows the last "-", e.g. "xy100.jpg".
+								raw.RenameVersion (raw.DefaultVersionId, jpeg.Name.Substring(jpeg.Name.LastIndexOf('-') + 1));
+							else
+								raw.RenameVersion (raw.DefaultVersionId, name);
+						} catch (Exception e) {
+							Console.WriteLine (e);
+						}
 					}
-				}	
-				Core.Database.Photos.Commit (raw);
-				Core.Database.Photos.Remove (jpeg);
+					uint [] version_ids = jpeg.VersionIds;
+					Array.Reverse (version_ids);
+					foreach (uint version_id in version_ids) {
+						try {
+							jpeg.DeleteVersion (version_id, true, true);
+						} catch (Exception e) {
+							Console.WriteLine (e);
+						}
+					}	
+					Core.Database.Photos.Commit (raw);
+					Core.Database.Photos.Remove (jpeg);
+				}
 			}
 		}
 	}
