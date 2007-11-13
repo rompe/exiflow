@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<title>ExiFlow - Homepage</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="description" content="A set of tools (command line and GUI) to provide a complete digital photo workflow for Unixes. EXIF headers are used as the central information repository, so users may change their software at any time without loosing their data." />
+<meta name="keywords" content="workflow, exiflow, exif, photo, photographer, linux, unix, raw, jpg, jpeg, python, archiving, software" />
+<link rel="alternate" type="application/rss+xml" title="ExiFlow News" href="http://sourceforge.net/export/rss2_projnews.php?group_id=151136&amp;rss_fulltext=1" />
+<link rel="alternate" type="application/rss+xml" title="ExiFlow File Releases" href="http://sourceforge.net/export/rss2_projfiles.php?group_id=151136" />
+</head>
+<body>
+<p>Welcome to our very temporary homepage. The missing design is a known bug, please don't report it. Rest assured that our software has a better design. For screenshots you may want to look at the project page.</p>
+
+<h1>What is ExiFlow?</h1>
+
+<p>A set of tools (command line and GUI) to provide a complete
+digital photo workflow for Unixes. EXIF headers are used as
+the central information repository, so users may change
+their software at any time without loosing their data.</p>
+ 
+<p>The latest version is available at our project page:</p>
+
+<a href="http://sourceforge.net/projects/exiflow/">http://sourceforge.net/projects/exiflow/</a>
+
+
+
+<h1>Are we defining a fixed workflow?</h1>
+
+<p>Not really. You may integrate these tools into your workflow
+in any way you want. However, it may be good to understand
+what kind of workflow we are in, and eventually adapt as
+much of it as possible for two reasons:</p>
+
+<ol>
+<li>The workflow we use is of course fully supported by our
+   tools.</li>
+
+<li>We killed huge amounts of time with reading and thinking
+   before we started to code, so there's nothing in our
+   workflow we can't explain. Read on to learn about it.</li>
+</ol>
+
+
+<h1>Are filenames important?</h1>
+
+<p>Yes, absolutely. The names that your camera generates are
+neither expressive nor unique, so they are not the first
+choice for long term archiving.</p>
+
+<h3>Some theory:</h3>
+
+<p>It's good to have the image number in the filename, but it
+would be better to have the date and time of shooting in
+there, too, as well as the artist name and the full camera
+model used, and of course the revision number of edited
+pictures as parts of the filename would also be handy.
+Put all that together and you come up with names of
+100 characters or more. Sadly, most photo professionals
+recommend limiting filenames to 26 characters over all to
+satisfy the needs of all photo databases, printing
+services and commercial archiving software. At the same
+time they recommend to include at least the date, the
+artists initials and a revision number.</p>
+
+<h3>The solution:</h3>
+
+<p>Considering all this, we came up with the following
+file naming scheme to include as much information as
+possible in 26 bytes:</p>
+
+<p>Given a camera that saves a file as:
+<pre>
+dsc_1234.nef
+</pre>
+we will rename that file to:
+<pre>
+20050412-n001234-ur000.nef
+</pre>
+<p>At first there is 20050412. That's a date, telling us the
+photo has been taken on 2005-04-12. This is determined by
+looking it up in the image's EXIF information.</p>
+
+<p>Then there is n001234. The "n00" part is read from a config
+file as the three byte string to be put there for a given
+camera model. In this case, the camera model information in
+the EXIF header reads "Nikon D70", and the config section
+for that model reads "n00", meaning an "n" as a model
+indicator since I also own an HP camera for which I
+configured "h00", and the "00" as a way to extend the
+counting possibilities beyond 9999 pictures. Once the
+camera switches from 9999 to 0000 I will change that string
+to "n01". The "1234" part is just the numeric part of the
+original filename.</p>
+
+<p>At last there is ur000. "ur" are my initials; I have
+simply configured "If it's a Nikon D70, the artist is me".
+Of course there are possibilities to override that. The
+"000" part is a revision number. This is an original,
+untouched file, so it's revision is 000. An automatic
+conversion to JPG would also have revision 000 since there
+is no interaction and the files are still distinguishable
+by their suffixes. Once I convert it with custom parameters
+or do some kind of editing, I will save it as revision 100.
+Another derivate of the original will get revision 200.
+A derivate of revision 100 will get 110, a derivate of 110
+will get 111 and another one will get 112. Got the idea?
+Using this revision scheme lets you know about the basic
+editing history (if there's any) by just looking at the
+filename. If this is too complicated for your needs you
+are free to use these three bytes in another way or to
+leave them alone.</p>
+
+<p>There's one exception regarding the initial "000" revision:
+If the software detects the presence of a low quality JPG
+accompanying a raw image, the raw file gets revision 000 as
+usual, but the low quality file will get revision 00l so
+that it can't be confused with an automatically converted
+*000.jpg of high quality.</p>
+
+
+
+<h1>What's up with these config files?</h1>
+
+<p>Some of our tools get their wisdom by reading config files.
+These files reside in ~/.exiflow and will be created an the
+fly, but you should edit them to contain information that
+matches your real circumstances. For example, your initials
+are unlikely to be "xy". We strongly advise you to fiddle
+with these settings using some test data until you are
+satisfied with the results. To quickly check the EXIF data
+of an image you may use tools like exiftool or exiv2.</p>
+
+
+
+<h1>Which tools are provided by ExiFlow?</h1>
+
+<dl>
+<dt><h3>exigui</h3></dt>
+<dd>This is the GTK frontend for all other tools but exiimport.
+If the mouse is your best friend you will like this one.</dd>
+
+<dt><h3>exiimport</h3></dt>
+<dd>Import files from given directories to your photo folder.
+Optionally unmounts source media after successfull import.</dd>
+
+<dt><h3>exirename</h3></dt>
+<dd>Rename a bunch of image files according to our holy file
+naming schema.</dd>
+
+<dt><h3>exiperson</h3></dt>
+<dd>Personalize images by setting EXIF fields to values
+spezified in exif.cfg or on command line. Any arbitrary
+field name may be configured or given. This is normally
+used for artist and copyright information.</dd>
+
+<dt><h3>exiassign</h3></dt>
+<dd>Find groups of derived images and exchange EXIF information
+between them. That way, a freshly edited derivate can
+automatically inherit it's mothers EXIF information.</dd>
+
+<dt><h3>exigate</h3></dt>
+<dd>Automatically gate information between gthumb metadata and
+the image's EXIF information. This let's you describe and
+tag your photos whith gthumb and transfer everything to the
+according EXIF tags afterwards. The other direction is also
+possible, so you are never bound to using one specific
+piece of software.</dd>
+
+
+
+<h1>What does a typical workflow look like?</h1>
+
+<ol>
+<li> Take some photos. :-)</li>
+<li> Import them with exiimport. You may want to configure
+   your system to automatically run exiimport once you
+   insert a media containing images.</li>
+<li> Make a backup copy of the whole directory. Do this until
+   you are sure that there are no bugs in this or other
+   software you are using that could cause data loss.</li>
+<li> exirename the images.</li>
+<li> exiperson the images.</li>
+
+<br/>
+<i>Only if you shoot raw images:</i>
+<br/><br/>
+<li> Convert raw files to jpegs, maybe using ufraw or dcraw.</li>
+<li> exiassign to get the EXIF tags into the JPG files.</li>
+<br/><br/>
+<li> View, sort, tag and describe your photos with gthumb.</li>
+<li> exigate all information from gthumb to EXIF.</li>
+
+<li> you made derivates by converting or editing manually:</li>
+<li> exiassign to have the derivates tagged like the
+    originals.</li>
+</ol>
+
+<p>Your images are now prepared to be archived, sent out to
+other people, published on the web by hand or automatically
+with software like Gallery which can make use of the EXIF
+fields to generate descriptions, titles and more.
+We promised you: You may change your software at any time.
+The resulting images are fully selfcontained, making use
+of existing and well established standards. You can
+continue to use ExiFlow to manage them, but if you decide
+to drop ExiFlow you won't loose anything but our good will.
+ExiFlow is here to help you, not to bind you.</p>
+
+
+
+<h1>And then?</h1>
+
+<p>Have fun using our tools! If you find bugs, please report
+them at our bug tracker:</p>
+
+<a href="http://sf.net/tracker/?group_id=151136&atid=780011">http://sf.net/tracker/?group_id=151136&atid=780011</a>
+
+<p>Thanks in advance,</p>
+
+<p>Ulf Rompe, developer<br/>
+Sebastian Berthold, developer</p>
+
+<a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=151136&amp;type=5" width="210" height="62" border="0" alt="SourceForge.net Logo" /></a>
+</body></html>
