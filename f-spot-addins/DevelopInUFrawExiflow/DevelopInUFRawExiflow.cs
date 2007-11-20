@@ -78,7 +78,7 @@ namespace DevelopInUFRawExiflowExtension
 			return versionname;
 		}
 
-		private System.Uri GetUriForVersionFileName (Photo p, string version_name)
+		private static System.Uri GetUriForVersionFileName (Photo p, string version_name)
 		{
 			return new System.Uri (System.IO.Path.Combine (DirectoryPath (p),  version_name ));
 		}
