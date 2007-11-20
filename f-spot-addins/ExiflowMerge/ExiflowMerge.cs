@@ -78,14 +78,14 @@ namespace ExiflowMergeExtension
 			// 20071231-135959-n005678-xy000.jpg
 			// See http://exiflow.sf.net/ for an explanation.
 			String exiflowpat = "^\\d{8}(-\\d{6})?-.{3}\\d{4}-.{5}\\.[^.]*$";
-			return System.Text.RegularExpressions.Regex.IsMatch (p1.Name, exiflowpat) &&
-				System.Text.RegularExpressions.Regex.IsMatch (p2.Name, exiflowpat) &&
+			return Regex.IsMatch (p1.Name, exiflowpat) &&
+				Regex.IsMatch (p2.Name, exiflowpat) &&
 				p1.Name.Substring (0, 19) == p2.Name.Substring (0, 19);
 		}
 
 
 		/* IComparer to sort photos by name. */
-		class CompareName : System.Collections.IComparer
+		class CompareName : IComparer
 		{
 			public int Compare (object obj1, object obj2)
 			{
@@ -97,7 +97,7 @@ namespace ExiflowMergeExtension
 
 		/* IComparer to sort photos by type and then by name.
 		 * Raw images are always ordered before other formats. */
-		class CompareNameWithRaw : System.Collections.IComparer
+		class CompareNameWithRaw : IComparer
 		{
 			public int Compare (object obj1, object obj2)
 			{
