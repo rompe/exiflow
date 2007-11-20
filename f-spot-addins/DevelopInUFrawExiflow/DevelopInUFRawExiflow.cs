@@ -13,6 +13,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 
 using FSpot;
@@ -34,8 +35,8 @@ namespace DevelopInUFRawExiflowExtension
 					continue;
 				}
 
-				string name = GetVersionName (p);
-				System.Uri developed = GetUriForVersionName (p, name);
+				string filename = GetVersionFileName (p);
+				System.Uri developed = GetUriForVersionFileName (p, filename);
 				string args = String.Format("--exif --overwrite --compression=95 --out-type=jpeg --output={0} {1}", 
 					CheapEscape (developed.LocalPath),
 					CheapEscape (raw.Uri.ToString()));
@@ -48,27 +49,36 @@ namespace DevelopInUFRawExiflowExtension
 					continue;
 				}
 
-				p.DefaultVersionId = p.AddVersion (developed, name, true);
+				p.DefaultVersionId = p.AddVersion (developed, GetVersionName(filename), true);
 				Core.Database.Photos.Commit (p);
 			}	
 		}
 
-		private static string GetVersionName (Photo p)
+		private static string GetVersionFileName (Photo p)
 		{
-			return GetVersionName (p, 0);
+			return GetVersionFileName (p, 0);
 		}
 
-		private static string GetVersionName (Photo p, int i)
+		private static string GetVersionFileName (Photo p, int i)
 		{
-			Regex exiflowpat = new Regex(@"^(\d{8}-.{3}\d{4}-.{2})(\d)(.{2}\.[^.]*$)");
+			Regex exiflowpat = new Regex(@"^(\d{8}(-\d{6})?-.{3}\d{4}-.{2})(\d)(.{2}\.[^.]*$)");
 			Match exiflowpatmatch = exiflowpat.Match(p.Name);
-			string name = String.Format("{0}{1}00.jpg", exiflowpatmatch.Groups[1], i);
-			if (p.VersionNameExists (name))
-				return GetVersionName (p, i + 1);
-			return name;
+			string filename = String.Format("{0}{1}00.jpg", exiflowpatmatch.Groups[1], i);
+			System.Uri developed = GetUriForVersionFileName (p, filename);
+			if (p.VersionNameExists (GetVersionName(filename)) || File.Exists(CheapEscape(developed.LocalPath)))
+				return GetVersionFileName (p, i + 1);
+			return filename;
 		}
 
-		private System.Uri GetUriForVersionName (Photo p, string version_name)
+		private static string GetVersionName (string filename)
+		{
+			Regex exiflowpat = new Regex(@"^(\d{8}(-\d{6})?-.{3}\d{4}-)(.{5})\.[^.]*$");
+			Match exiflowpatmatch = exiflowpat.Match(filename);
+			string versionname = String.Format("{0}", exiflowpatmatch.Groups[3]);
+			return versionname;
+		}
+
+		private System.Uri GetUriForVersionFileName (Photo p, string version_name)
 		{
 			return new System.Uri (System.IO.Path.Combine (DirectoryPath (p),  version_name ));
 		}
