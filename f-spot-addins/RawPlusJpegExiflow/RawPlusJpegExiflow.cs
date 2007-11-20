@@ -1,5 +1,5 @@
 /*
- * RawPlusJpegExiflow.cs
+ * ExiflowMerge.cs
  *
  * Author(s)
  * 	Ulf Rompe <f-spot.org@rompe.org>
@@ -20,20 +20,20 @@ using Gtk;
 using FSpot;
 using FSpot.Extensions;
 
-namespace RawPlusJpegExiflowExtension
+namespace ExiflowMergeExtension
 {
-	public class RawPlusJpegExiflow : ICommand
+	public class ExiflowMerge : ICommand
 	{
 		public void Run (object o, EventArgs e)
 		{
-			Console.WriteLine ("EXECUTING RAW PLUS JPEG EXIFLOW EXTENSION");
+			Console.WriteLine ("EXECUTING EXIFLOW MERGE EXTENSION");
 
 			if (ResponseType.Ok != HigMessageDialog.RunHigConfirmation (
 				MainWindow.Toplevel.Window,
 				DialogFlags.DestroyWithParent,
 				MessageType.Warning,
 				"Merge exiflow revisions",
-				"This operation will merge Raw and Jpegs versions, including exiflow ( http://exiflow.sf.net/ ) revisions, of the same image as one unique image. The Raw image or the jpeg with the lowest revision will be the Original version, all other versions will get the revision number and extension as their version name.\n\nNote: only enabled for some formats right now.",
+				"This operation will merge exiflow ( http://exiflow.sf.net/ ) revisions of the same image as one unique image. The Raw image or the jpeg with the lowest revision will be the Original version, all other versions will get the revision number and extension as their version name.\n\nNote: only enabled for some formats right now.",
 				"Do it now"))
 				return;
 
