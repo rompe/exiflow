@@ -1,4 +1,4 @@
-ADDIN = RawPlusJpegExiflow
+ADDIN = ExiflowMerge
 FSPOTDIR = ~/local/opt/f-spot
 
 all: $(ADDIN).dll
