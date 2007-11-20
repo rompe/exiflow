@@ -26,14 +26,14 @@ namespace RawPlusJpegExiflowExtension
 	{
 		public void Run (object o, EventArgs e)
 		{
-			Console.WriteLine ("EXECUTING RAW PLUS JPEG EXTENSION");
+			Console.WriteLine ("EXECUTING RAW PLUS JPEG EXIFLOW EXTENSION");
 
 			if (ResponseType.Ok != HigMessageDialog.RunHigConfirmation (
 				MainWindow.Toplevel.Window,
 				DialogFlags.DestroyWithParent,
 				MessageType.Warning,
-				"Merge Raw+Jpegs, exiflow style",
-				"This operation will merge Raw and Jpegs versions, including exiflow ( http://exiflow.sf.net/ ) revisions, of the same image as one unique image. The Raw image will be the Original version, the jpeg will be named 'Jpeg' and all subsequent versions will keep their original names (if possible).\n\nNote: only enabled for some formats right now.",
+				"Merge exiflow revisions",
+				"This operation will merge Raw and Jpegs versions, including exiflow ( http://exiflow.sf.net/ ) revisions, of the same image as one unique image. The Raw image or the jpeg with the lowest revision will be the Original version, all other versions will get the revision number and extension as their version name.\n\nNote: only enabled for some formats right now.",
 				"Do it now"))
 				return;
 
@@ -72,7 +72,12 @@ namespace RawPlusJpegExiflowExtension
 
 		private static bool ExiflowMatch (Photo p1, Photo p2)
 		{
-			String exiflowpat = "^\\d{8}-.{3}\\d{4}-.{5}\\.[^.]*$";
+			// Filename example without time:
+			// 20071231-n005678-xy000.jpg
+			// Example with time:
+			// 20071231-135959-n005678-xy000.jpg
+			// See http://exiflow.sf.net/ for an explanation.
+			String exiflowpat = "^\\d{8}(-\\d{6})?-.{3}\\d{4}-.{5}\\.[^.]*$";
 			return System.Text.RegularExpressions.Regex.IsMatch (p1.Name, exiflowpat) &&
 				System.Text.RegularExpressions.Regex.IsMatch (p2.Name, exiflowpat) &&
 				p1.Name.Substring (0, 19) == p2.Name.Substring (0, 19);
