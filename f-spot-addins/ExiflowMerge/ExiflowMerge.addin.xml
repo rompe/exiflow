@@ -1,11 +1,11 @@
 <Addin namespace="FSpot"
 	id="ExiflowMerge"
-	version="1.04"
+	version="1.06"
 	description="Merge RAW+Jpeg as multiple versions of the same photo, supporting revision numbers of the exiflow project ( http://exiflow.sf.net )."
 	author="Ulf Rompe"
 	category="Tools">
 	<Dependencies>
-		<Addin id="Core" version="0.4.0.3437"/>
+		<Addin id="Core" version="0.4.0.3456"/>
 	</Dependencies>
 	<Extension path = "/FSpot/Menus/Tools">
 		<Command id = "MergeExiflow" _label = "Merge exiflow revisions" command_type = "ExiflowMergeExtension.ExiflowMerge" />
