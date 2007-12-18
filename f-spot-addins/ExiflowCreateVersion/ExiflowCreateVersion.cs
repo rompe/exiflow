@@ -32,6 +32,8 @@ namespace ExiflowCreateVersionExtension
 		//[Glade.Widget] Gtk.HBox chooser_hbox;
 		[Glade.Widget] Gtk.Entry new_version_entry;
 		[Glade.Widget] Gtk.Label new_filename_label;
+		[Glade.Widget] Gtk.Button gtk_ok;
+		[Glade.Widget] Gtk.Button test_button;
 		//[Glade.Widget] Gtk.CheckButton open_check;
 		//Gtk.FileChooserButton uri_chooser;
 
@@ -42,8 +44,9 @@ namespace ExiflowCreateVersionExtension
 		string new_version;
 		string new_filename;
 		bool open;
-		
+		Photo currentphoto;
 		string control_file;
+		Regex exiflowpat = new Regex(@"^(\d{8}(-\d{6})?-.{3}\d{4}-)(.{5}\.[^.]*)$");
 
 		//public void Run (IBrowsableCollection selection)
 		public void Run (object o, EventArgs e)
@@ -55,8 +58,9 @@ namespace ExiflowCreateVersionExtension
 			xml = new Glade.XML (null,"ExiflowCreateVersion.glade", dialog_name, "f-spot");
 			xml.Autoconnect (this);
 			dialog = (Gtk.Dialog) xml.GetWidget(dialog_name);
-				
 		foreach (Photo p in MainWindow.Toplevel.SelectedPhotos ()) {
+			this.currentphoto = p;
+				
 				PhotoVersion raw = p.GetVersion (Photo.OriginalVersionId) as PhotoVersion;
 				//if (!ImageFile.IsRaw (raw.Uri.AbsolutePath)) {
 				//	Console.WriteLine ("The Original version of this image is not a (supported) RAW file");
@@ -132,14 +136,22 @@ namespace ExiflowCreateVersionExtension
 		private void on_new_version_entry_changed(object o, EventArgs args)
 		{
 			Console.WriteLine ("changed filename mit: " + new_version_entry.Text);
-			new_filename_label.Text = new_version_entry.Text;
+			//new_filename_label.Text = new_version_entry.Text;
+			new_filename_label.Text = GetFilenameDateAndNumberPart(this.currentphoto.Name) + new_version_entry.Text;
+			if (FileExist(this.currentphoto, new_filename_label.Text))
+			{
+				Console.WriteLine ("filename exists " + new_filename_label.Text);
+				new_version_entry.Sensitive=false;
+				//gtk_ok.Sensitive=false;
+				test_button.Sensitive=false;
+			}
 		}
 
 		//private void CreateExiflowFilenameForVersion(string filenamesrc, string version)
-		private void CreateExiflowFilenameForVersion(Photo p , string newversion)
+		private string CreateExiflowFilenameForVersion(Photo p , string newversion)
 		{
 				Console.WriteLine ("exiflow");
-				return ;
+				return p.Name;
 			
 		}
       	
@@ -210,6 +222,14 @@ namespace ExiflowCreateVersionExtension
 			Match exiflowpatmatch = exiflowpat.Match(filename);
 			string versionname = String.Format("{0}", exiflowpatmatch.Groups[3]);
 			return versionname;
+		}
+
+		private string GetFilenameDateAndNumberPart (string filename)
+		{
+			//Regex exiflowpat = new Regex(@"^(\d{8}(-\d{6})?-.{3}\d{4}-)(.{5}\.[^.]*)$");
+			Match exiflowpatmatch = this.exiflowpat.Match(filename);
+			string datenumber = String.Format("{0}", exiflowpatmatch.Groups[1]);
+			return datenumber;
 		}
 
 		private static System.Uri GetUriForVersionFileName (Photo p, string version_name)

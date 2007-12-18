@@ -26,7 +26,7 @@ install: all
 mpack: ExiflowCreateVersion.dll
 	mautil p ExiflowCreateVersion.dll
 
-%.dll: $(SOURCES) ExiflowCreateVersion.addin.xml
+%.dll: $(SOURCES) ExiflowCreateVersion.addin.xml ExiflowCreateVersion.glade
 	PKG_CONFIG_PATH=$(FSPOTDIR)/lib/pkgconfig gmcs -target:library $(SOURCES) $(PACKAGES) $(ASSEMBLIES) $(RESOURCES)
 
 clean:
