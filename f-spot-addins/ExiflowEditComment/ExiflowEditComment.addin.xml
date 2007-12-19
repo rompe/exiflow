@@ -1,7 +1,7 @@
 <Addin namespace="FSpot"
 	id="ExiflowEditComment"
 	version="1.05"
-	description="Create a new Version, supporting revision numbers of the exiflow project ( http://exiflow.sf.net )."
+	description="Edit EXIF comment of selected photos."
 	author="Ulf Rompe"
 	category="Tools">
 	<Dependencies>

@@ -28,12 +28,7 @@ namespace ExiflowEditCommentExtension
 		protected Glade.XML xml;
 		private Gtk.Dialog dialog;
 
-		[Glade.Widget] Gtk.ScrolledWindow thumb_scrolledwindow;
-		//[Glade.Widget] Gtk.HBox chooser_hbox;
-		[Glade.Widget] Gtk.Entry new_version_entry;
-		[Glade.Widget] Gtk.Label new_filename_label;
-		//[Glade.Widget] Gtk.CheckButton open_check;
-		//Gtk.FileChooserButton uri_chooser;
+		[Glade.Widget] Gtk.TextView comment;
 
 		FSpot.ThreadProgressDialog progress_dialog;
 		System.Threading.Thread command_thread;
