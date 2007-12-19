@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.0 on Wed Dec 19 00:23:36 2007 -->
+<!--Generated with glade3 3.4.0 on Wed Dec 19 01:19:23 2007 -->
 <glade-interface>
   <widget class="GtkDialog" id="exiflow_create_version_dialog">
     <property name="title" translatable="yes">Create new version in exiflow style</property>
@@ -231,14 +231,15 @@
                               </widget>
                             </child>
                             <child>
-                              <widget class="GtkCheckButton" id="open_check">
+                              <widget class="GtkCheckButton" id="overwrite_file_ok">
                                 <property name="visible">True</property>
+                                <property name="sensitive">False</property>
                                 <property name="can_focus">True</property>
-                                <property name="label" translatable="yes">Open _destination when done exporting</property>
+                                <property name="label" translatable="yes">_Overwrite existing file</property>
                                 <property name="use_underline">True</property>
                                 <property name="response_id">0</property>
-                                <property name="active">True</property>
                                 <property name="draw_indicator">True</property>
+                                <signal name="toggled" handler="on_overwrite_file_ok_toggled"/>
                               </widget>
                               <packing>
                                 <property name="expand">False</property>
@@ -247,16 +248,7 @@
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkLabel" id="label89">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">
-</property>
-                              </widget>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">False</property>
-                                <property name="position">2</property>
-                              </packing>
+                              <placeholder/>
                             </child>
                           </widget>
                         </child>
@@ -322,17 +314,7 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkButton" id="button1">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="label" translatable="yes">button</property>
-                <property name="response_id">0</property>
-              </widget>
-              <packing>
-                <property name="position">2</property>
-              </packing>
+              <placeholder/>
             </child>
           </widget>
           <packing>

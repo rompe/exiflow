@@ -33,8 +33,7 @@ namespace ExiflowCreateVersionExtension
 		[Glade.Widget] Gtk.Entry new_version_entry;
 		[Glade.Widget] Gtk.Label new_filename_label;
 		[Glade.Widget] Gtk.Button gtk_ok;
-		[Glade.Widget] Gtk.Button test_button;
-		//[Glade.Widget] Gtk.CheckButton open_check;
+		[Glade.Widget] Gtk.CheckButton overwrite_file_ok;
 		//Gtk.FileChooserButton uri_chooser;
 
 		FSpot.ThreadProgressDialog progress_dialog;
@@ -141,13 +140,31 @@ namespace ExiflowCreateVersionExtension
 			if (FileExist(this.currentphoto, new_filename_label.Text))
 			{
 				Console.WriteLine ("filename exists " + new_filename_label.Text);
-				new_version_entry.Sensitive=false;
-				//gtk_ok.Sensitive=false;
-				test_button.Sensitive=false;
+				gtk_ok.Sensitive=false;
+				overwrite_file_ok.Sensitive=true;
+			}
+			else
+			{
+				gtk_ok.Sensitive=true;
+				overwrite_file_ok.Sensitive=false;
+				overwrite_file_ok.Active=false;
 			}
 		}
 
-		//private void CreateExiflowFilenameForVersion(string filenamesrc, string version)
+		private void on_overwrite_file_ok_toggled(object o , EventArgs args)
+		{
+			if (overwrite_file_ok.Active == true )
+			{
+				gtk_ok.Sensitive=true;
+			}
+			else
+			{
+				overwrite_file_ok.Sensitive=false;
+				on_new_version_entry_changed(null,null);
+			}
+				
+		}
+
 		private string CreateExiflowFilenameForVersion(Photo p , string newversion)
 		{
 				Console.WriteLine ("exiflow");
