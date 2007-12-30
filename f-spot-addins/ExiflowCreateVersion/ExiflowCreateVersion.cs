@@ -28,23 +28,25 @@ namespace ExiflowCreateVersionExtension
 		protected Glade.XML xml;
 		private Gtk.Dialog dialog;
 
-		[Glade.Widget] Gtk.ScrolledWindow thumb_scrolledwindow;
+		//[Glade.Widget] Gtk.ScrolledWindow thumb_scrolledwindow;
 		//[Glade.Widget] Gtk.HBox chooser_hbox;
 		[Glade.Widget] Gtk.Entry new_version_entry;
 		[Glade.Widget] Gtk.Label new_filename_label;
+		[Glade.Widget] Gtk.Label overwrite_warning_label;
+		[Glade.Widget] Gtk.Label exiflow_schema_warning_label;
 		[Glade.Widget] Gtk.Button gtk_ok;
 		[Glade.Widget] Gtk.CheckButton overwrite_file_ok;
 		//Gtk.FileChooserButton uri_chooser;
 
-		FSpot.ThreadProgressDialog progress_dialog;
-		System.Threading.Thread command_thread;
+		//FSpot.ThreadProgressDialog progress_dialog;
+		//System.Threading.Thread command_thread;
 		
 		string new_path;
 		string new_version;
 		string new_filename;
-		bool open;
+		//bool open;
 		Photo currentphoto;
-		string control_file;
+		//string control_file;
 		Regex exiflowpat = new Regex(@"^(\d{8}(-\d{6})?-.{3}\d{4}-)(.{5}\.[^.]*)$");
 
 		//public void Run (IBrowsableCollection selection)
@@ -135,19 +137,41 @@ namespace ExiflowCreateVersionExtension
 		private void on_new_version_entry_changed(object o, EventArgs args)
 		{
 			Console.WriteLine ("changed filename mit: " + new_version_entry.Text);
-			//new_filename_label.Text = new_version_entry.Text;
 			new_filename_label.Text = GetFilenameDateAndNumberPart(this.currentphoto.Name) + new_version_entry.Text;
-			if (FileExist(this.currentphoto, new_filename_label.Text))
+			if ((FileExist(this.currentphoto, new_filename_label.Text)) || (! IsExiflowSchema(new_filename_label.Text)))
 			{
-				Console.WriteLine ("filename exists " + new_filename_label.Text);
 				gtk_ok.Sensitive=false;
-				overwrite_file_ok.Sensitive=true;
 			}
 			else
 			{
+				overwrite_warning_label.Text = "";
+				exiflow_schema_warning_label.Text = "";
 				gtk_ok.Sensitive=true;
 				overwrite_file_ok.Sensitive=false;
 				overwrite_file_ok.Active=false;
+			}		
+
+			if (FileExist(this.currentphoto, new_filename_label.Text))
+			{
+				Console.WriteLine ("filename exists " + new_filename_label.Text);
+				overwrite_warning_label.Text = "Warning: this version already exists!";
+				overwrite_file_ok.Sensitive=true;
+			}
+			else 
+			{
+				overwrite_warning_label.Text = "";
+				overwrite_file_ok.Sensitive=false;
+				overwrite_file_ok.Active=false;
+			}
+
+			if (! IsExiflowSchema(new_filename_label.Text))
+			{
+				Console.WriteLine ("not in exiflow schema " + new_filename_label.Text);
+				exiflow_schema_warning_label.Text = "Warning: new filename is not in the exiflow schema!";
+			}
+			else 
+			{
+				exiflow_schema_warning_label.Text = "";
 			}
 		}
 
