@@ -22,24 +22,16 @@ namespace ExiflowCreateVersionExtension
 {
 	public class ExiflowCreateVersion: ICommand
 	{	
-		//IBrowsableCollection selection;
-
 		protected string dialog_name = "exiflow_create_version_dialog";
 		protected Glade.XML xml;
 		private Gtk.Dialog dialog;
 
-		//[Glade.Widget] Gtk.ScrolledWindow thumb_scrolledwindow;
-		//[Glade.Widget] Gtk.HBox chooser_hbox;
 		[Glade.Widget] Gtk.Entry new_version_entry;
 		[Glade.Widget] Gtk.Label new_filename_label;
 		[Glade.Widget] Gtk.Label overwrite_warning_label;
 		[Glade.Widget] Gtk.Label exiflow_schema_warning_label;
 		[Glade.Widget] Gtk.Button gtk_ok;
 		[Glade.Widget] Gtk.CheckButton overwrite_file_ok;
-		//Gtk.FileChooserButton uri_chooser;
-
-		//FSpot.ThreadProgressDialog progress_dialog;
-		//System.Threading.Thread command_thread;
 		
 		string new_path;
 		string new_version;
@@ -49,7 +41,6 @@ namespace ExiflowCreateVersionExtension
 		//string control_file;
 		Regex exiflowpat = new Regex(@"^(\d{8}(-\d{6})?-.{3}\d{4}-)(.{5}\.[^.]*)$");
 
-		//public void Run (IBrowsableCollection selection)
 		public void Run (object o, EventArgs e)
 		{
 			Console.WriteLine ("EXECUTING DEVELOP IN UFRawExiflow EXTENSION");
@@ -92,7 +83,6 @@ namespace ExiflowCreateVersionExtension
 			
 			dialog.Response += HandleResponse;
 
-			//thumb_scrolledwindow.Add (view);
 			}	
 		dialog.ShowAll();
 		}
