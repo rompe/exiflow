@@ -35,7 +35,7 @@ namespace DevelopInUFRawExiflowExtension
 					continue;
 				}
 
-				string filename = GetVersionFileName (p);
+				string filename = GetNextVersionFileName (p);
 				System.Uri developed = GetUriForVersionFileName (p, filename);
 				string args = String.Format("--exif --overwrite --compression=95 --out-type=jpeg --output={0} {1}", 
 					CheapEscape (developed.LocalPath),
@@ -54,25 +54,25 @@ namespace DevelopInUFRawExiflowExtension
 			}	
 		}
 
-		private static string GetVersionFileName (Photo p)
+		private static string GetNextVersionFileName (Photo p)
 		{
-			return GetVersionFileName (p, 0);
+			return GetNextVersionFileName (p, 0);
 		}
 
-		private static string GetVersionFileName (Photo p, int i)
+		private static string GetNextVersionFileName (Photo p, int i)
 		{
-			Regex exiflowpat = new Regex(@"^(\d{8}(-\d{6})?-.{3}\d{4}-.{2})(\d)(.{2}\.[^.]*$)");
+			Regex exiflowpat = new Regex(@"^(\d{8}(-\d{6})?-.{3}\d{4}-.{2})(\d)(.{2})\.([^.]*$)");
 			Match exiflowpatmatch = exiflowpat.Match(p.Name);
-			string filename = String.Format("{0}{1}00.jpg", exiflowpatmatch.Groups[1], i);
+			string filename = String.Format("{0}{1}00.jpg", exiflowpatmatch.Groups[1], i, exiflowpatmatch.Groups[5]);
 			System.Uri developed = GetUriForVersionFileName (p, filename);
-			if (p.VersionNameExists (GetVersionName(filename)) || File.Exists(CheapEscape(developed.LocalPath)))
-				return GetVersionFileName (p, i + 1);
+			if (p.VersionNameExists (GetVersionName(filename)) || System.IO.File.Exists(CheapEscape(developed.LocalPath)))
+				return GetNextVersionFileName (p, i + 1);
 			return filename;
 		}
 
 		private static string GetVersionName (string filename)
 		{
-			Regex exiflowpat = new Regex(@"^(\d{8}(-\d{6})?-.{3}\d{4}-)(.{5})\.[^.]*$");
+			Regex exiflowpat = new Regex(@"^(\d{8}(-\d{6})?-.{3}\d{4}-)(.{5}\.[^.]*)$");
 			Match exiflowpatmatch = exiflowpat.Match(filename);
 			string versionname = String.Format("{0}", exiflowpatmatch.Groups[3]);
 			return versionname;
