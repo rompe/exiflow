@@ -7,10 +7,12 @@
  * This is free software. See COPYING for details
  */
 
-using System;
+using Gnome;
+using Gnome.Vfs;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System;
 using System.Text.RegularExpressions;
 
 using FSpot;
@@ -58,8 +60,9 @@ namespace ExiflowCreateVersionExtension
 				//	Console.WriteLine ("The Original version of this image is not a (supported) RAW file");
 				//	continue;
 				//}
-
-				string filename = GetVersionFileName (p);
+				uint default_id = p.DefaultVersionId;
+				Console.WriteLine ("DefaultVersionId: "+default_id);
+				string filename = GetNextVersionFileName (p);
 				System.Uri developed = GetUriForVersionFileName (p, filename);
 			//new_filename_entry.Text = filename;
 			new_version_entry.Text = GetVersionName(filename);
@@ -118,7 +121,19 @@ namespace ExiflowCreateVersionExtension
 		protected void CreateNewVersion()
 		{
 			try {
-				Console.WriteLine ("ok pressed: filename: " + new_filename);
+				System.Uri original_uri = GetUriForVersionFileName (this.currentphoto, this.currentphoto.DefaultVersionUri.LocalPath);
+				System.Uri new_uri = GetUriForVersionFileName (this.currentphoto, new_filename);
+				Console.WriteLine ("ok pressed: old: " + this.currentphoto.DefaultVersionUri.LocalPath + "; " + original_uri.ToString() + " new: " + new_filename + "; " + new_uri.ToString());
+				Xfer.XferUri (
+					new Gnome.Vfs.Uri (original_uri.ToString ()), 
+					new Gnome.Vfs.Uri (new_uri.ToString ()),
+					XferOptions.Default, XferErrorMode.Abort, 
+					XferOverwriteMode.Abort, 
+					delegate (Gnome.Vfs.XferProgressInfo info) {return 1;});
+				FSpot.ThumbnailGenerator.Create (new_uri).Dispose ();
+				this.currentphoto.DefaultVersionId = this.currentphoto.AddVersion (new_uri, new_version_entry.Text, true);
+				Core.Database.Photos.Commit (this.currentphoto);
+
 			} finally {
 				Gtk.Application.Invoke (delegate { dialog.Destroy(); });
 			}
@@ -126,7 +141,7 @@ namespace ExiflowCreateVersionExtension
 		
 		private void on_new_version_entry_changed(object o, EventArgs args)
 		{
-			Console.WriteLine ("changed filename mit: " + new_version_entry.Text);
+			Console.WriteLine ("changed filename with: " + new_version_entry.Text);
 			new_filename_label.Text = GetFilenameDateAndNumberPart(this.currentphoto.Name) + new_version_entry.Text;
 			if ((FileExist(this.currentphoto, new_filename_label.Text)) || (! IsExiflowSchema(new_filename_label.Text)))
 			{
@@ -149,19 +164,21 @@ namespace ExiflowCreateVersionExtension
 			}
 			else 
 			{
-				overwrite_warning_label.Text = "";
-				overwrite_file_ok.Sensitive=false;
-				overwrite_file_ok.Active=false;
+				//overwrite_warning_label.Text = "";
+				//overwrite_file_ok.Sensitive=false;
+				//overwrite_file_ok.Active=false;
 			}
 
 			if (! IsExiflowSchema(new_filename_label.Text))
 			{
 				Console.WriteLine ("not in exiflow schema " + new_filename_label.Text);
-				exiflow_schema_warning_label.Text = "Warning: new filename is not in the exiflow schema!";
+				//exiflow_schema_warning_label.Text = "Warning: new filename is not in the exiflow schema!";
+				overwrite_warning_label.Text = "Error: new filename is not in the exiflow schema!";
 			}
 			else 
 			{
-				exiflow_schema_warning_label.Text = "";
+				//exiflow_schema_warning_label.Text = "";
+				//overwrite_warning_label.Text = "";
 			}
 		}
 
@@ -213,7 +230,7 @@ namespace ExiflowCreateVersionExtension
 		private bool FileExist(Photo p, string newfilename)
 		{
 			System.Uri filenameuri = GetUriForVersionFileName (p, newfilename);
-			if (File.Exists(CheapEscape(filenameuri.LocalPath)))
+			if (System.IO.File.Exists(CheapEscape(filenameuri.LocalPath)))
 				return true;
 			return false;
 			
@@ -226,24 +243,25 @@ namespace ExiflowCreateVersionExtension
 //			string filename = String.Format("{0}{1}00.jpg", exiflowpatmatch.Groups[1], i);
 //			System.Uri developed = GetUriForVersionFileName (p, filename);
 //			if (p.VersionNameExists (GetVersionName(filename)) || File.Exists(CheapEscape(developed.LocalPath)))
-//				return GetVersionFileName (p, i + 1);
+//				return GetNextVersionFileName (p, i + 1);
 //			return filename;
 //			
 //		}
 
-		private static string GetVersionFileName (Photo p)
+		private static string GetNextVersionFileName (Photo p)
 		{
-			return GetVersionFileName (p, 0);
+			return GetNextVersionFileName (p, 0);
 		}
 
-		private static string GetVersionFileName (Photo p, int i)
+		private static string GetNextVersionFileName (Photo p, int i)
 		{
-			Regex exiflowpat = new Regex(@"^(\d{8}(-\d{6})?-.{3}\d{4}-.{2})(\d)(.{2}\.[^.]*$)");
-			Match exiflowpatmatch = exiflowpat.Match(p.Name);
-			string filename = String.Format("{0}{1}00.jpg", exiflowpatmatch.Groups[1], i);
+			Regex exiflowpat = new Regex(@"^(\d{8}(-\d{6})?-.{3}\d{4}-.{2})(\d)(.{2})\.([^.]*)$");
+			Match exiflowpatmatch = exiflowpat.Match(System.IO.Path.GetFileName(p.VersionUri(p.DefaultVersionId).LocalPath));
+// besser mit UnixPath.GetFileName()
+			string filename = String.Format("{0}{1}00.{2}", exiflowpatmatch.Groups[1], i, exiflowpatmatch.Groups[5]);
 			System.Uri developed = GetUriForVersionFileName (p, filename);
-			if (p.VersionNameExists (GetVersionName(filename)) || File.Exists(CheapEscape(developed.LocalPath)))
-				return GetVersionFileName (p, i + 1);
+			if (p.VersionNameExists (GetVersionName(filename)) || System.IO.File.Exists(CheapEscape(developed.LocalPath)))
+				return GetNextVersionFileName (p, i + 1);
 			return filename;
 		}
 
