@@ -1,6 +1,8 @@
 /*
  * ExiflowEditComment.cs
  *
+ * An extension for mass commenting your photos.
+ *
  * Author(s)
  * 	Ulf Rompe <f-spot.org@rompe.org>
  *
