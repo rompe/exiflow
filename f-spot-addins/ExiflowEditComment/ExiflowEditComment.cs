@@ -39,16 +39,16 @@ namespace ExiflowEditCommentExtension
 			xml.Autoconnect (this);
 			dialog = (Gtk.Dialog) xml.GetWidget(dialog_name);
 			
+			// collect comments of selected photos in current_comments
 			ArrayList current_comments = new ArrayList ();
-
 			foreach (Photo p in MainWindow.Toplevel.SelectedPhotos ()) {
-				// Todo: get existing comment and append to current_comments
-				current_comments.Add(p.Name + p.Description);
+				if (p.Description.Length > 0 && ! current_comments.Contains(p.Description)) {
+					current_comments.Add(p.Description);
+				}
 			}
 			
-			// Todo: show dialog filled with joined current_comments
-			//comment.Buffer.Text = "blafasel";
-			comment.Buffer.Text = String.Join(" und ", (String[]) current_comments.ToArray(typeof(string)));
+			// fill text buffer with all current comments
+			comment.Buffer.Text = String.Join("\n---\n", (String[]) current_comments.ToArray(typeof(string)));
 
 			dialog.Modal = false;
 			dialog.TransientFor = null;
@@ -79,24 +79,6 @@ namespace ExiflowEditCommentExtension
 			dialog.Destroy ();
 		}
 
-		private static System.Uri GetUriForVersionFileName (Photo p, string version_name)
-		{
-			return new System.Uri (System.IO.Path.Combine (DirectoryPath (p),  version_name ));
-		}
-
-		private static string CheapEscape (string input)
-		{
-			string escaped = input;
-			escaped = escaped.Replace (" ", "\\ ");
-			escaped = escaped.Replace ("(", "\\(");
-			escaped = escaped.Replace (")", "\\)");
-			return escaped;
-		}
 		
-		private static string DirectoryPath (Photo p)
-		{
-			System.Uri uri = p.VersionUri (Photo.OriginalVersionId);
-			return uri.Scheme + "://" + uri.Host + System.IO.Path.GetDirectoryName (uri.AbsolutePath);
-		}
 	}
 }
