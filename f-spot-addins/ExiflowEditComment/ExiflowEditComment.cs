@@ -43,7 +43,7 @@ namespace ExiflowEditCommentExtension
 
 			foreach (Photo p in MainWindow.Toplevel.SelectedPhotos ()) {
 				// Todo: get existing comment and append to current_comments
-				current_comments.Add(p.Name);
+				current_comments.Add(p.Name + p.Description);
 			}
 			
 			// Todo: show dialog filled with joined current_comments
@@ -71,6 +71,11 @@ namespace ExiflowEditCommentExtension
 			}
 			Console.WriteLine ("ok pressed in ExiflowEditComments EXTENSION");
 			Console.WriteLine ("New comment is: " + comment.Buffer.Text);
+			foreach (Photo p in MainWindow.Toplevel.SelectedPhotos ()) {
+				p.Description = comment.Buffer.Text;
+				MainWindow.Toplevel.Query.MarkChanged(MainWindow.Toplevel.Query.IndexOf(p));
+				Core.Database.Photos.Commit (p);
+			}
 			dialog.Destroy ();
 		}
 
