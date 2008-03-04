@@ -6,19 +6,23 @@
  *
  * This is free software. See COPYING for details
  */
-
-using Gnome;
-using Gnome.Vfs;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.IO;
 using System;
 using System.Text.RegularExpressions;
+using Gtk;
+using Gdk;
+using Gnome;
+using Gnome.Vfs;
 
 using FSpot;
 using FSpot.Extensions;
 using Glade;
 using Mono.Unix;
+
+//using ExiflowCreateVersionExtension.Extensions;
 
 namespace ExiflowCreateVersionExtension
 {
@@ -32,6 +36,8 @@ namespace ExiflowCreateVersionExtension
 		[Glade.Widget] Gtk.Label new_filename_label;
 		[Glade.Widget] Gtk.Label overwrite_warning_label;
 		[Glade.Widget] Gtk.Label exiflow_schema_warning_label;
+		[Glade.Widget] Gtk.VBox vbox_combo;
+		[Glade.Widget] Gtk.ComboBox open_with_box;
 		[Glade.Widget] Gtk.Button gtk_ok;
 		[Glade.Widget] Gtk.CheckButton overwrite_file_ok;
 		
@@ -54,6 +60,8 @@ namespace ExiflowCreateVersionExtension
 			dialog = (Gtk.Dialog) xml.GetWidget(dialog_name);
 		foreach (Photo p in MainWindow.Toplevel.SelectedPhotos ()) {
 			this.currentphoto = p;
+				//Console.WriteLine ("MimeType: "+ MainWindow.Toplevel.SelectedMimeTypes);
+				Console.WriteLine ("MimeType: "+ Gnome.Vfs.MimeType.GetMimeTypeForUri (p.DefaultVersionUri.ToString ()));
 				
 				PhotoVersion raw = p.GetVersion (Photo.OriginalVersionId) as PhotoVersion;
 				//if (!ImageFile.IsRaw (raw.Uri.AbsolutePath)) {
@@ -66,6 +74,13 @@ namespace ExiflowCreateVersionExtension
 				System.Uri developed = GetUriForVersionFileName (p, filename);
 			//new_filename_entry.Text = filename;
 			new_version_entry.Text = GetVersionName(filename);
+			open_with_box.AppendText("gimp-remote");
+			ComboBox owcbb;
+			owcbb = GetComboBox ();
+			//if (owcbb != null)
+			//	owcbb.Populate(o, e);
+			vbox_combo.PackStart (owcbb, false, true, 0);
+			//PopulateOpenWithComboBox();
 				string args = String.Format("--exif --overwrite --compression=95 --out-type=jpeg --output={0} {1}", 
 					CheapEscape (developed.LocalPath),
 					CheapEscape (raw.Uri.ToString()));
@@ -90,6 +105,152 @@ namespace ExiflowCreateVersionExtension
 		dialog.ShowAll();
 		}
 
+		private OpenWithComboBox owcb;
+
+		public Gtk.ComboBox GetComboBox ()
+		{
+			System.Console.WriteLine ("Hallo 1");
+			owcb = new OpenWithComboBox (MainWindow.Toplevel.SelectedMimeTypes);
+			owcb.IgnoreApp = "f-spot";
+			owcb.ApplicationActivated += delegate (Gnome.Vfs.MimeApplication app) { MainWindow.Toplevel.HandleOpenWith (this, app); };
+			//return (Gtk.ComboBox) owcb;
+			return owcb;
+		}
+
+
+
+
+//		public delegate string [] MimeFetcher ();
+//		private MimeFetcher mime_fetcher;
+//	
+//		private string [] mime_types;
+//		private bool populated = false;
+//		
+//		private string ignore_app = null;
+//		public string IgnoreApp {
+//			get { return ignore_app; }
+//			set { ignore_app = value; }
+//		}
+//	
+//		private bool show_icons = false;
+//		public bool ShowIcons {
+//			get { return show_icons; }
+//			set { show_icons = value; }
+//		}
+//	
+//		private bool hide_invalid = true;
+//		public bool HideInvalid {
+//			get { return hide_invalid; }
+//			set { hide_invalid = value; }
+//		}
+//	
+//		//static OpenWithComboBox () {
+//		//	Gnome.Vfs.Vfs.Initialize ();
+//		//}
+//	
+//		//public OpenWithComboBox (MimeFetcher mime_fetcher)
+//		//{
+//		//	this.mime_fetcher = mime_fetcher;
+//		//}
+//		
+//
+//		public void PopulateOpenWithComboBox ()
+//		{
+//			System.Console.WriteLine ("Hallo 1");
+//			string [] mime_types = mime_fetcher ();
+//			System.Console.WriteLine ("Hallo 2");
+//
+//			//bool populated = false;
+//
+//			foreach (string mime in mime_types)
+//				System.Console.WriteLine ("Populating open with combobox for {0}", mime);
+//			
+//			//if (this.mime_types != mime_types && populated) {
+//			//	populated = false;
+//	
+//			//	Widget [] dead_pool = Children;
+//			//	for (int i = 0; i < dead_pool.Length; i++)
+//			//		dead_pool [i].Destroy ();
+//			//}
+//	
+//			if (populated)
+//				return;
+//	
+//			ArrayList union, intersection;
+//			ApplicationsFor (mime_types, out union, out intersection);
+//	
+//			ArrayList list = (HideInvalid) ? intersection : union;
+//	
+//			foreach (MimeApplication app in list) {
+//				System.Console.WriteLine ("Adding app {0} to open with menu (binary name = {1})", app.Name, app.BinaryName);
+//				//System.Console.WriteLine ("Desktop file path: {0}, id : {1}", app.DesktopFilePath);
+//				open_with_box.AppendText(app.BinaryName);
+//				//AppMenuItem i = new AppMenuItem (this, app);
+//				//i.Activated += HandleItemActivated;
+//				// Make it not sensitive it we're showing everything
+//				//i.Sensitive = (HideInvalid || intersection.Contains (app));
+//				//Append (i);
+//			}
+//			
+//			//if (Children.Length == 0) {
+//			//	MenuItem none = new Gtk.MenuItem (Catalog.GetString ("No applications available"));
+//			//	none.Sensitive = false;
+//			//	Append (none);
+//			//}
+//	
+//			populated = true;
+//		}
+//
+//		private static void ApplicationsFor (string [] mime_types, out ArrayList union, out ArrayList intersection)
+//		{
+//			Console.WriteLine ("Getting applications");
+//			union = new ArrayList ();
+//			intersection = new ArrayList ();
+//			
+//			if (mime_types == null || mime_types.Length < 1)
+//				return;
+//	
+//			bool first = true;
+//			foreach (string mime_type in mime_types) {
+//				if (mime_type == null)
+//					continue;
+//	
+//				MimeApplication [] apps = Gnome.Vfs.Mime.GetAllApplications (mime_type);
+//				for (int i = 0; i < apps.Length; i++) {
+//					apps [i] = apps [i].Copy ();
+//				}
+//	
+//				foreach (MimeApplication app in apps) {
+//					// Skip apps that don't take URIs
+//					if (! app.SupportsUris ())
+//						continue;
+//					
+//					// Skip apps that we were told to ignore
+//					//if (menu.IgnoreApp != null)
+//					//	if (app.BinaryName.IndexOf (menu.IgnoreApp) != -1)
+//					//		continue;
+//	
+//					if (! union.Contains (app))
+//						union.Add (app);
+//					
+//					if (first)
+//						intersection.Add (app);
+//				}
+//	
+//				if (! first) {
+//					for (int i = 0; i < intersection.Count; i++) {
+//						MimeApplication app = intersection [i] as MimeApplication;
+//						if (System.Array.IndexOf (apps, app) == -1) {
+//							intersection.Remove (app);
+//							i--;
+//						}
+//					}
+//				}
+//	
+//				first = false;
+//			}
+//		}
+		
 		private void HandleResponse (object sender, Gtk.ResponseArgs args)
 		{
 			if (args.ResponseId != Gtk.ResponseType.Ok) {
@@ -123,7 +284,7 @@ namespace ExiflowCreateVersionExtension
 			try {
 				System.Uri original_uri = GetUriForVersionFileName (this.currentphoto, this.currentphoto.DefaultVersionUri.LocalPath);
 				System.Uri new_uri = GetUriForVersionFileName (this.currentphoto, new_filename);
-				Console.WriteLine ("ok pressed: old: " + this.currentphoto.DefaultVersionUri.LocalPath + "; " + original_uri.ToString() + " new: " + new_filename + "; " + new_uri.ToString());
+				Console.WriteLine ("ok pressed: old: " + this.currentphoto.DefaultVersionUri.LocalPath + "; " + original_uri.ToString() + " new: " + new_filename + "; " + new_uri.ToString() + "to open with: " );
 				Xfer.XferUri (
 					new Gnome.Vfs.Uri (original_uri.ToString ()), 
 					new Gnome.Vfs.Uri (new_uri.ToString ()),
@@ -133,6 +294,14 @@ namespace ExiflowCreateVersionExtension
 				FSpot.ThumbnailGenerator.Create (new_uri).Dispose ();
 				this.currentphoto.DefaultVersionId = this.currentphoto.AddVersion (new_uri, new_version_entry.Text, true);
 				Core.Database.Photos.Commit (this.currentphoto);
+
+				Gtk.TreeIter iter;
+			        if (open_with_box.GetActiveIter (out iter))
+			               Console.WriteLine ((string) open_with_box.Model.GetValue (iter, 0));
+					
+				//FSpot.PhotoQuery.MarkChanged (FSpot.PhotoQuery.IndexOf (this.currentphoto));
+				//FSpot.PhotoQuery.MarkChanged((object)this );
+				//MainWindow.MainSelection.MarkChanged (icon_view.Selection.Ids[0]);
 
 			} finally {
 				Gtk.Application.Invoke (delegate { dialog.Destroy(); });
@@ -149,8 +318,8 @@ namespace ExiflowCreateVersionExtension
 			}
 			else
 			{
-				overwrite_warning_label.Text = "";
-				exiflow_schema_warning_label.Text = "";
+				overwrite_warning_label.Text = String.Empty;
+				exiflow_schema_warning_label.Text = String.Empty;
 				gtk_ok.Sensitive=true;
 				overwrite_file_ok.Sensitive=false;
 				overwrite_file_ok.Active=false;
@@ -159,7 +328,7 @@ namespace ExiflowCreateVersionExtension
 			if (FileExist(this.currentphoto, new_filename_label.Text))
 			{
 				Console.WriteLine ("filename exists " + new_filename_label.Text);
-				overwrite_warning_label.Text = "Warning: this version already exists!";
+				overwrite_warning_label.Markup = "<small>Warning: this version already exists!</small>";
 				overwrite_file_ok.Sensitive=true;
 			}
 			else 
@@ -299,6 +468,191 @@ namespace ExiflowCreateVersionExtension
 		{
 			System.Uri uri = p.VersionUri (Photo.OriginalVersionId);
 			return uri.Scheme + "://" + uri.Host + System.IO.Path.GetDirectoryName (uri.AbsolutePath);
+		}
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public class OpenWithComboBox: Gtk.ComboBox {
+		public delegate void OpenWithHandler (MimeApplication app);
+		public event OpenWithHandler ApplicationActivated;
+	
+		public delegate string [] MimeFetcher ();
+		private MimeFetcher mime_fetcher;
+	
+		private string [] mime_types;
+		private bool populated = false;
+		
+		private string ignore_app = null;
+		public string IgnoreApp {
+			get { return ignore_app; }
+			set { ignore_app = value; }
+		}
+	
+		private bool show_icons = false;
+		public bool ShowIcons {
+			get { return show_icons; }
+			set { show_icons = value; }
+		}
+	
+		private bool hide_invalid = true;
+		public bool HideInvalid {
+			get { return hide_invalid; }
+			set { hide_invalid = value; }
+		}
+	
+		static OpenWithComboBox () {
+			Gnome.Vfs.Vfs.Initialize ();
+		}
+	
+		public OpenWithComboBox (MimeFetcher mime_fetcher)
+		{
+			this.mime_fetcher = mime_fetcher;
+			this.Populate();
+		}
+		
+		public void Populate ()
+		{
+			string [] mime_types = mime_fetcher ();
+	
+			foreach (string mime in mime_types)
+				System.Console.WriteLine ("Populating open with menu for {0}", mime);
+			
+			if (this.mime_types != mime_types && populated) {
+				populated = false;
+	
+				Widget [] dead_pool = Children;
+				for (int i = 0; i < dead_pool.Length; i++)
+					dead_pool [i].Destroy ();
+			}
+	
+			if (populated)
+				return;
+	
+			ArrayList union, intersection;
+			ApplicationsFor (this, mime_types, out union, out intersection);
+	
+			ArrayList list = (HideInvalid) ? intersection : union;
+	
+			foreach (MimeApplication app in list) {
+				System.Console.WriteLine ("Adding app {0} to open with menu (binary name = {1})", app.Name, app.BinaryName);
+				//System.Console.WriteLine ("Desktop file path: {0}, id : {1}", app.DesktopFilePath);
+				AppendText(app.BinaryName);
+				//AppMenuItem i = new AppMenuItem (this, app);
+				//i.Activated += HandleItemActivated;
+				// Make it not sensitive it we're showing everything
+				//i.Sensitive = (HideInvalid || intersection.Contains (app));
+				//Append (i);
+			}
+			
+			//if (Children.Length == 0) {
+			//	MenuItem none = new Gtk.MenuItem (Catalog.GetString ("No applications available"));
+			//	none.Sensitive = false;
+			//	Append (none);
+			//}
+	
+			//ShowAll ();
+	
+			populated = true;
+		}
+	
+		private static void ApplicationsFor (OpenWithComboBox menu, string [] mime_types, out ArrayList union, out ArrayList intersection)
+		{
+			Console.WriteLine ("Getting applications");
+			union = new ArrayList ();
+			intersection = new ArrayList ();
+			
+			if (mime_types == null || mime_types.Length < 1)
+				return;
+	
+			bool first = true;
+			foreach (string mime_type in mime_types) {
+				if (mime_type == null)
+					continue;
+	
+				MimeApplication [] apps = Gnome.Vfs.Mime.GetAllApplications (mime_type);
+				for (int i = 0; i < apps.Length; i++) {
+					apps [i] = apps [i].Copy ();
+				}
+	
+				foreach (MimeApplication app in apps) {
+					// Skip apps that don't take URIs
+					if (! app.SupportsUris ())
+						continue;
+					
+					// Skip apps that we were told to ignore
+					if (menu.IgnoreApp != null)
+						if (app.BinaryName.IndexOf (menu.IgnoreApp) != -1)
+							continue;
+	
+					if (! union.Contains (app))
+						union.Add (app);
+					
+					if (first)
+						intersection.Add (app);
+				}
+	
+				if (! first) {
+					for (int i = 0; i < intersection.Count; i++) {
+						MimeApplication app = intersection [i] as MimeApplication;
+						if (System.Array.IndexOf (apps, app) == -1) {
+							intersection.Remove (app);
+							i--;
+						}
+					}
+				}
+	
+				first = false;
+			}
+		}
+		
+		private void HandleItemActivated (object sender, EventArgs args)
+		{
+			AppMenuItem app = (sender as AppMenuItem);
+	
+			if (ApplicationActivated != null)
+				ApplicationActivated (app.App);
+		}
+		
+		private class AppMenuItem : ImageMenuItem {
+			public MimeApplication App;
+	
+			public AppMenuItem (OpenWithComboBox menu, MimeApplication mime_application) : base (mime_application.Name)
+			{
+				App = mime_application;
+				
+				if (menu.ShowIcons) {
+					if (mime_application.Icon != null) {
+						Gdk.Pixbuf pixbuf = null; 
+	
+						try {
+							if (mime_application.Icon.StartsWith ("/"))
+								pixbuf = new Gdk.Pixbuf (mime_application.Icon, 16, 16);
+							else 
+								pixbuf = IconTheme.Default.LoadIcon (mime_application.Icon,
+												     16, (IconLookupFlags)0);
+						} catch (System.Exception) {
+							pixbuf = null;
+						}
+	
+						if (pixbuf != null)
+							Image = new Gtk.Image (pixbuf);
+					}
+				}
+			}
 		}
 	}
 }

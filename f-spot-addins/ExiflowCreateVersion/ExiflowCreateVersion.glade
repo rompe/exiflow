@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.0 on Sun Dec 30 18:20:32 2007 -->
+<!--Generated with glade3 3.4.0 on Tue Feb 26 23:43:57 2008 -->
 <glade-interface>
   <widget class="GtkDialog" id="exiflow_create_version_dialog">
     <property name="title" translatable="yes">Create new version in exiflow style</property>
@@ -17,50 +17,87 @@
             <property name="n_columns">3</property>
             <property name="row_spacing">2</property>
             <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <widget class="GtkLabel" id="overwrite_warning_label">
+              <widget class="GtkVBox" id="vbox_combo">
                 <property name="visible">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="yalign">0.47999998927116394</property>
-                <property name="wrap_mode">PANGO_WRAP_WORD_CHAR</property>
+                <child>
+                  <placeholder/>
+                </child>
               </widget>
               <packing>
+                <property name="top_attach">2</property>
+                <property name="bottom_attach">3</property>
+              </packing>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <widget class="GtkLabel" id="label4">
+                <property name="visible">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="label" translatable="yes">Open With</property>
+              </widget>
+              <packing>
+                <property name="top_attach">5</property>
+                <property name="bottom_attach">6</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkLabel" id="label1">
+                <property name="visible">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="label" translatable="yes">new version: </property>
+              </widget>
+            </child>
+            <child>
+              <widget class="GtkEntry" id="new_version_entry">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <signal name="changed" handler="on_new_version_entry_changed"/>
+              </widget>
+              <packing>
+                <property name="left_attach">2</property>
                 <property name="right_attach">3</property>
-                <property name="top_attach">4</property>
-                <property name="bottom_attach">5</property>
                 <property name="x_options">GTK_EXPAND | GTK_SHRINK | GTK_FILL</property>
                 <property name="y_options">GTK_EXPAND | GTK_SHRINK | GTK_FILL</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkLabel" id="exiflow_schema_warning_label">
+              <widget class="GtkLabel" id="label2">
                 <property name="visible">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="label" translatable="yes">resulting filename:  </property>
               </widget>
               <packing>
+                <property name="top_attach">1</property>
+                <property name="bottom_attach">2</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkLabel" id="new_filename_label">
+                <property name="visible">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="label" translatable="yes">resulting filename</property>
+                <property name="wrap_mode">PANGO_WRAP_WORD_CHAR</property>
+              </widget>
+              <packing>
+                <property name="left_attach">2</property>
                 <property name="right_attach">3</property>
-                <property name="top_attach">3</property>
-                <property name="bottom_attach">4</property>
+                <property name="top_attach">1</property>
+                <property name="bottom_attach">2</property>
+                <property name="x_options">GTK_EXPAND | GTK_SHRINK | GTK_FILL</property>
+                <property name="y_options">GTK_EXPAND | GTK_SHRINK | GTK_FILL</property>
               </packing>
             </child>
             <child>
@@ -82,52 +119,44 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkLabel" id="new_filename_label">
+              <widget class="GtkLabel" id="exiflow_schema_warning_label">
                 <property name="visible">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="label" translatable="yes">resulting filename</property>
+              </widget>
+              <packing>
+                <property name="right_attach">3</property>
+                <property name="top_attach">3</property>
+                <property name="bottom_attach">4</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkLabel" id="overwrite_warning_label">
+                <property name="visible">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="yalign">0.47999998927116394</property>
                 <property name="wrap_mode">PANGO_WRAP_WORD_CHAR</property>
               </widget>
               <packing>
-                <property name="left_attach">2</property>
                 <property name="right_attach">3</property>
-                <property name="top_attach">1</property>
-                <property name="bottom_attach">2</property>
+                <property name="top_attach">4</property>
+                <property name="bottom_attach">5</property>
                 <property name="x_options">GTK_EXPAND | GTK_SHRINK | GTK_FILL</property>
                 <property name="y_options">GTK_EXPAND | GTK_SHRINK | GTK_FILL</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkLabel" id="label2">
+              <widget class="GtkComboBox" id="open_with_box">
                 <property name="visible">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="label" translatable="yes">resulting filename:  </property>
-              </widget>
-              <packing>
-                <property name="top_attach">1</property>
-                <property name="bottom_attach">2</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkEntry" id="new_version_entry">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <signal name="changed" handler="on_new_version_entry_changed"/>
+                <property name="items" translatable="yes">test1
+test2</property>
               </widget>
               <packing>
                 <property name="left_attach">2</property>
                 <property name="right_attach">3</property>
-                <property name="x_options">GTK_EXPAND | GTK_SHRINK | GTK_FILL</property>
-                <property name="y_options">GTK_EXPAND | GTK_SHRINK | GTK_FILL</property>
+                <property name="top_attach">5</property>
+                <property name="bottom_attach">6</property>
               </packing>
-            </child>
-            <child>
-              <widget class="GtkLabel" id="label1">
-                <property name="visible">True</property>
-                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="label" translatable="yes">new version: </property>
-              </widget>
             </child>
           </widget>
           <packing>
@@ -169,5 +198,17 @@
         </child>
       </widget>
     </child>
+  </widget>
+  <widget class="GtkMenu" id="menu1">
+    <property name="visible">True</property>
+    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+  </widget>
+  <widget class="GtkMenu" id="menu2">
+    <property name="visible">True</property>
+    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+  </widget>
+  <widget class="GtkMenu" id="menu3">
+    <property name="visible">True</property>
+    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
   </widget>
 </glade-interface>
