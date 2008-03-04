@@ -299,6 +299,7 @@ namespace ExiflowCreateVersionExtension
 			        if (open_with_box.GetActiveIter (out iter))
 			               Console.WriteLine ((string) open_with_box.Model.GetValue (iter, 0));
 					
+				MainWindow.Toplevel.Query.MarkChanged(MainWindow.Toplevel.Query.IndexOf(this.currentphoto));
 				//FSpot.PhotoQuery.MarkChanged (FSpot.PhotoQuery.IndexOf (this.currentphoto));
 				//FSpot.PhotoQuery.MarkChanged((object)this );
 				//MainWindow.MainSelection.MarkChanged (icon_view.Selection.Ids[0]);
