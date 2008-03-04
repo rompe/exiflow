@@ -50,6 +50,7 @@ namespace DevelopInUFRawExiflowExtension
 				}
 
 				p.DefaultVersionId = p.AddVersion (developed, GetVersionName(filename), true);
+				MainWindow.Toplevel.Query.MarkChanged(MainWindow.Toplevel.Query.IndexOf(p));
 				Core.Database.Photos.Commit (p);
 			}	
 		}
