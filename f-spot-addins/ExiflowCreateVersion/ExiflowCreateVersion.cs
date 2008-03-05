@@ -76,9 +76,9 @@ namespace ExiflowCreateVersionExtension
 				new_version_entry.Text = GetVersionName(filename);
 				open_with_box.AppendText("gimp-remoteyyy");
 				ComboBox owcb = GetComboBox ();
-				Console.WriteLine ("\n\n\nAppending gimp-remotexxx\n");
-				owcb.AppendText("gimp-remotexxx");
-				Console.WriteLine ("Appended gimp-remotexxx\n\n\n");
+				//Console.WriteLine ("\n\n\nAppending gimp-remotexxx\n");
+				//owcb.AppendText("gimp-remotexxx");
+				//Console.WriteLine ("Appended gimp-remotexxx\n\n\n");
 				vbox_combo.PackStart (owcb, false, true, 0);
 				string args = String.Format("--exif --overwrite --compression=95 --out-type=jpeg --output={0} {1}", 
 					CheapEscape (developed.LocalPath),
@@ -418,7 +418,7 @@ namespace ExiflowCreateVersionExtension
 			foreach (MimeApplication app in list) {
 				System.Console.WriteLine ("Adding app {0} to open with menu (binary name = {1})", app.Name, app.BinaryName);
 				//System.Console.WriteLine ("Desktop file path: {0}, id : {1}", app.DesktopFilePath);
-				this.AppendText(app.BinaryName.ToString());
+				//this.AppendText(app.BinaryName.ToString());
 				store.AppendValues(app.BinaryName.ToString());
 				//AppMenuItem i = new AppMenuItem (this, app);
 				//i.Activated += HandleItemActivated;
