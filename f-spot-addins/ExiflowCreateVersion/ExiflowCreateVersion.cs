@@ -35,15 +35,18 @@ namespace ExiflowCreateVersionExtension
 		[Glade.Widget] Gtk.Entry new_version_entry;
 		[Glade.Widget] Gtk.Label new_filename_label;
 		[Glade.Widget] Gtk.Label overwrite_warning_label;
-		[Glade.Widget] Gtk.Label exiflow_schema_warning_label;
 		[Glade.Widget] Gtk.VBox vbox_combo;
-		[Glade.Widget] Gtk.ComboBox open_with_box;
+		//[Glade.Widget] Gtk.ComboBox open_with_box;
 		[Glade.Widget] Gtk.Button gtk_ok;
 		[Glade.Widget] Gtk.CheckButton overwrite_file_ok;
 		
-		string new_path;
-		string new_version;
+		//string new_path;
+		//string new_version;
+
+
+		bool overwrite_file_flag=false;
 		string new_filename;
+		MimeApplication map = null;
 		//bool open;
 		Photo currentphoto;
 		//string control_file;
@@ -74,7 +77,7 @@ namespace ExiflowCreateVersionExtension
 				System.Uri developed = GetUriForVersionFileName (p, filename);
 			//new_filename_entry.Text = filename;
 				new_version_entry.Text = GetVersionName(filename);
-				open_with_box.AppendText("gimp-remoteyyy");
+				//open_with_box.AppendText("gimp-remoteyyy");
 				ComboBox owcb = GetComboBox ();
 				//Console.WriteLine ("\n\n\nAppending gimp-remotexxx\n");
 				//owcb.AppendText("gimp-remotexxx");
@@ -101,7 +104,7 @@ namespace ExiflowCreateVersionExtension
 			System.Console.WriteLine ("Hallo 1");
 			owcb = new OpenWithComboBox (MainWindow.Toplevel.SelectedMimeTypes);
 			owcb.IgnoreApp = "f-spot";
-			owcb.ApplicationActivated += delegate (Gnome.Vfs.MimeApplication app) { MainWindow.Toplevel.HandleOpenWith (this, app); };
+			//owcb.ApplicationActivated += delegate (Gnome.Vfs.MimeApplication app) { MainWindow.Toplevel.HandleOpenWith (this, app); };
                         if (owcb != null)
                         	owcb.Populate ();
 
@@ -123,7 +126,7 @@ namespace ExiflowCreateVersionExtension
 			}
 			
 			Console.WriteLine ("ok pressed in DEVELOP IN UFRawExiflow EXTENSION");
-			new_version = new_version_entry.Text;
+			//new_version = new_version_entry.Text;
 			new_filename = new_filename_label.Text;
 			//open = open_check.Active;
 			
@@ -152,17 +155,34 @@ namespace ExiflowCreateVersionExtension
 				this.currentphoto.DefaultVersionId = this.currentphoto.AddVersion (new_uri, new_version_entry.Text, true);
 				Core.Database.Photos.Commit (this.currentphoto);
 
-				Gtk.TreeIter iter;
-			        if (open_with_box.GetActiveIter (out iter))
-			               Console.WriteLine ((string) open_with_box.Model.GetValue (iter, 0));
-                        	//if (owcb != null)
-                                //	owcb.Populate ();
-					
 				MainWindow.Toplevel.Query.MarkChanged(MainWindow.Toplevel.Query.IndexOf(this.currentphoto));
-				//FSpot.PhotoQuery.MarkChanged (FSpot.PhotoQuery.IndexOf (this.currentphoto));
-				//FSpot.PhotoQuery.MarkChanged((object)this );
-				//MainWindow.MainSelection.MarkChanged (icon_view.Selection.Ids[0]);
 
+				Gtk.TreeIter iter;
+			        if (owcb.GetActiveIter (out iter)){
+			                //Console.WriteLine ((string) owcb.Model.GetValue (iter, 0));
+			                //Console.WriteLine ((string) owcb.Model.GetValue (iter, 1));
+					//Console.WriteLine ("Getting applications again");
+			
+					ArrayList union = new ArrayList();	
+					foreach (string mime_type in (string []) owcb.Model.GetValue (iter, 2)) {
+						if (mime_type == null)
+							continue;
+						MimeApplication [] apps = Gnome.Vfs.Mime.GetAllApplications (mime_type);
+						foreach (MimeApplication app in apps) {
+							if (! union.Contains (app))
+								union.Add (app);
+						}
+					}
+					foreach (MimeApplication app in union) {
+						if (app.BinaryName.ToString() == (string) owcb.Model.GetValue (iter, 1)){
+			                		//Console.WriteLine ("Winner is "+ (string) owcb.Model.GetValue (iter, 1));
+							// is there a better way to get a GLib.List???
+							GLib.List uri_list = new GLib.List (typeof (string));
+							uri_list.Append(new_uri.ToString());
+							app.Launch (uri_list);
+						}
+					}	
+				}
 			} finally {
 				Gtk.Application.Invoke (delegate { dialog.Destroy(); });
 			}
@@ -172,23 +192,31 @@ namespace ExiflowCreateVersionExtension
 		{
 			Console.WriteLine ("changed filename with: " + new_version_entry.Text);
 			new_filename_label.Text = GetFilenameDateAndNumberPart(this.currentphoto.Name) + new_version_entry.Text;
-			if ((FileExist(this.currentphoto, new_filename_label.Text)) || (! IsExiflowSchema(new_filename_label.Text)))
+			if ((FileExist(this.currentphoto, new_filename_label.Text)) || 
+				(! IsExiflowSchema(new_filename_label.Text)) ||
+				(VersionExist(this.currentphoto, new_version_entry.Text))
+				)
 			{
 				gtk_ok.Sensitive=false;
 			}
 			else
 			{
 				overwrite_warning_label.Text = String.Empty;
-				exiflow_schema_warning_label.Text = String.Empty;
 				gtk_ok.Sensitive=true;
 				overwrite_file_ok.Sensitive=false;
 				overwrite_file_ok.Active=false;
 			}		
 
+			if (VersionExist(this.currentphoto, new_version_entry.Text))
+			{
+				Console.WriteLine ("version exists " + new_version_entry.Text);
+				overwrite_warning_label.Markup = "<span foreground='blue'><small>Warning: resulting version already exists!</small></span>";
+				overwrite_file_ok.Sensitive=true;
+			}
 			if (FileExist(this.currentphoto, new_filename_label.Text))
 			{
 				Console.WriteLine ("filename exists " + new_filename_label.Text);
-				overwrite_warning_label.Markup = "<small>Warning: this version already exists!</small>";
+				overwrite_warning_label.Markup = "<span foreground='blue'><small>Warning: resulting file already exists!</small></span>";
 				overwrite_file_ok.Sensitive=true;
 			}
 			else 
@@ -197,20 +225,28 @@ namespace ExiflowCreateVersionExtension
 				//overwrite_file_ok.Sensitive=false;
 				//overwrite_file_ok.Active=false;
 			}
+			if ((FileExist(this.currentphoto, new_filename_label.Text)) &&
+				(VersionExist(this.currentphoto, new_version_entry.Text))
+				)
+			{
+				Console.WriteLine ("file and version exists " + new_version_entry.Text);
+				overwrite_warning_label.Markup = "<span foreground='blue'><small>Warning: resulting file and version already exists!</small></span>";
+				overwrite_file_ok.Sensitive=true;
+			}
+
 
 			if (! IsExiflowSchema(new_filename_label.Text))
 			{
 				Console.WriteLine ("not in exiflow schema " + new_filename_label.Text);
-				//exiflow_schema_warning_label.Text = "Warning: new filename is not in the exiflow schema!";
-				overwrite_warning_label.Text = "Error: new filename is not in the exiflow schema!";
+				overwrite_warning_label.Markup = "<span foreground='red'>Error: resulting filename is not in the exiflow schema!</span>";
+//				overwrite_warning_label.Text = "Error: new filename is not in the exiflow schema!";
+				overwrite_file_ok.Sensitive=false;
+				overwrite_file_ok.Active=false;
 			}
 			else 
 			{
-				//exiflow_schema_warning_label.Text = "";
 				//overwrite_warning_label.Text = "";
 			}
-                        //if (owcb != null)
-                        //	owcb.Populate ();
 
 		}
 
@@ -219,21 +255,23 @@ namespace ExiflowCreateVersionExtension
 			if (overwrite_file_ok.Active == true )
 			{
 				gtk_ok.Sensitive=true;
+				overwrite_file_flag=true;
 			}
 			else
 			{
 				overwrite_file_ok.Sensitive=false;
 				on_new_version_entry_changed(null,null);
+				overwrite_file_flag=false;
 			}
 				
 		}
 
-		private string CreateExiflowFilenameForVersion(Photo p , string newversion)
-		{
-				Console.WriteLine ("exiflow");
-				return p.Name;
-			
-		}
+		//private string CreateExiflowFilenameForVersion(Photo p , string newversion)
+		//{
+		//		Console.WriteLine ("exiflow");
+		//		return p.Name;
+		//	
+		//}
       	
 
 		private bool IsExiflowSchema(string filename)
@@ -251,12 +289,11 @@ namespace ExiflowCreateVersionExtension
 			}
 		}
 
-		private bool VersionExist(Photo p, string newfilename)
+		private bool VersionExist(Photo p, string newversionname)
 		{
-			if (p.VersionNameExists(GetVersionName(newfilename)))
+			if (p.VersionNameExists(newversionname))
 				return true;
 			return false;
-			
 		}
 
 		private bool FileExist(Photo p, string newfilename)
@@ -348,9 +385,10 @@ namespace ExiflowCreateVersionExtension
 
 
 	public class OpenWithComboBox: Gtk.ComboBox {
-		public delegate void OpenWithHandler (MimeApplication app);
-		public event OpenWithHandler ApplicationActivated;
+		//public delegate void OpenWithHandler (MimeApplication app);
+		//public event OpenWithHandler ApplicationActivated;
 	
+
 		public delegate string [] MimeFetcher ();
 		private MimeFetcher mime_fetcher;
 	
@@ -375,14 +413,13 @@ namespace ExiflowCreateVersionExtension
 			set { hide_invalid = value; }
 		}
 	
-		static OpenWithComboBox () {
-			Gnome.Vfs.Vfs.Initialize ();
-		}
+		//static OpenWithComboBox () {
+		//	Gnome.Vfs.Vfs.Initialize ();
+		//}
 	
 		public OpenWithComboBox (MimeFetcher mime_fetcher)
 		{
 			this.mime_fetcher = mime_fetcher;
-			//this.Populate();
 		}
 		
 		public void Populate ()
@@ -391,7 +428,7 @@ namespace ExiflowCreateVersionExtension
 			CellRendererText cell = new CellRendererText();
 			this.PackStart(cell, false);
 			this.AddAttribute(cell, "text", 0);
-			ListStore store = new ListStore(typeof (string));
+			TreeStore store = new Gtk.TreeStore(typeof (string), typeof (string), typeof (string[]));
 			this.Model = store;
 
 			string [] mime_types = mime_fetcher ();
@@ -414,26 +451,21 @@ namespace ExiflowCreateVersionExtension
 			ApplicationsFor (this, mime_types, out union, out intersection);
 	
 			ArrayList list = (HideInvalid) ? intersection : union;
-	
+
+			//ExiflowCreateVersionExtension.ExiflowCreateVersion.map = list[2];	
+			//System.Console.WriteLine ("Adding mmmmmmapp {0} to open with combo box (binary name = {1})", ExiflowCreateVersionExtension.ExiflowCreateVersion.map.Name, ExiflowCreateVersionExtension.ExiflowCreateVersion.map.BinaryName);
+			store.AppendValues("", "", mime_types);
 			foreach (MimeApplication app in list) {
-				System.Console.WriteLine ("Adding app {0} to open with menu (binary name = {1})", app.Name, app.BinaryName);
+				System.Console.WriteLine ("Adding app {0} to open with combo box (binary name = {1})", app.Name, app.BinaryName);
 				//System.Console.WriteLine ("Desktop file path: {0}, id : {1}", app.DesktopFilePath);
 				//this.AppendText(app.BinaryName.ToString());
-				store.AppendValues(app.BinaryName.ToString());
-				//AppMenuItem i = new AppMenuItem (this, app);
-				//i.Activated += HandleItemActivated;
-				// Make it not sensitive it we're showing everything
-				//i.Sensitive = (HideInvalid || intersection.Contains (app));
-				//Append (i);
+				//store.AppendValues(app.BinaryName.ToString());
+				//store.AppendValues(app.BinaryName.ToString(), ExiflowCreateVersionExtension.ExiflowCreateVersion.map);
+				store.AppendValues(app.Name.ToString(), app.BinaryName.ToString(), mime_types);
+				//this.InsertText(2, "ggimp");
 			}
-			
-			//if (Children.Length == 0) {
-			//	MenuItem none = new Gtk.MenuItem (Catalog.GetString ("No applications available"));
-			//	none.Sensitive = false;
-			//	Append (none);
-			//}
-	
-			//ShowAll ();
+			// empty field to reset combo box
+			//store.AppendValues("");
 	
 			populated = true;
 		}
@@ -457,7 +489,7 @@ namespace ExiflowCreateVersionExtension
 					apps [i] = apps [i].Copy ();
 				}
 	
-			Console.WriteLine ("disable" + owcb.IgnoreApp);
+			Console.WriteLine ("Disable " + owcb.IgnoreApp);
 				foreach (MimeApplication app in apps) {
 					// Skip apps that don't take URIs
 					if (! app.SupportsUris ())
@@ -489,40 +521,13 @@ namespace ExiflowCreateVersionExtension
 			}
 		}
 		
-		private void HandleItemActivated (object sender, EventArgs args)
-		{
-			AppMenuItem app = (sender as AppMenuItem);
-	
-			if (ApplicationActivated != null)
-				ApplicationActivated (app.App);
-		}
+		//private void HandleItemActivated (object sender, EventArgs args)
+		//{
+		//	AppMenuItem app = (sender as AppMenuItem);
+		//
+		//	if (ApplicationActivated != null)
+		//		ApplicationActivated (app.App);
+		//}
 		
-		private class AppMenuItem : ImageMenuItem {
-			public MimeApplication App;
-	
-			public AppMenuItem (OpenWithComboBox menu, MimeApplication mime_application) : base (mime_application.Name)
-			{
-				App = mime_application;
-				
-				if (menu.ShowIcons) {
-					if (mime_application.Icon != null) {
-						Gdk.Pixbuf pixbuf = null; 
-	
-						try {
-							if (mime_application.Icon.StartsWith ("/"))
-								pixbuf = new Gdk.Pixbuf (mime_application.Icon, 16, 16);
-							else 
-								pixbuf = IconTheme.Default.LoadIcon (mime_application.Icon,
-												     16, (IconLookupFlags)0);
-						} catch (System.Exception) {
-							pixbuf = null;
-						}
-	
-						if (pixbuf != null)
-							Image = new Gtk.Image (pixbuf);
-					}
-				}
-			}
-		}
 	}
 }
