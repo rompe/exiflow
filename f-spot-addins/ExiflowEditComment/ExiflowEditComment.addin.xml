@@ -11,5 +11,3 @@
 		<Command id = "ExiflowEditComment" _label = "Edit Comment" command_type = "ExiflowEditCommentExtension.ExiflowEditComment" insertbefore="OpenWith"/>
 	</Extension>
 </Addin>
-
-
