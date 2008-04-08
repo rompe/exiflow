@@ -1,6 +1,6 @@
 <Addin namespace="FSpot"
 	id="ExiflowCreateVersion"
-	version="1.05"
+	version="1.06"
 	description="Create a new Version, supporting revision numbers of the exiflow project ( http://exiflow.sf.net )."
 	author="Sebastian Berthold"
 	category="Tools">
