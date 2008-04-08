@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.4
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
 Handle reading and writing gthumb comment files.

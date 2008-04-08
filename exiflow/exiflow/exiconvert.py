@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.4
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Allow relative exiflow module imports.
 # Once the package is installed they are absolute.

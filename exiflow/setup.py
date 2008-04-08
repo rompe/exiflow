@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.4
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
 Install the exiflow collection on your computer.

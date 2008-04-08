@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.4
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
 A module for reading and writing EXIF information.
