@@ -185,12 +185,14 @@ namespace ExiflowCreateVersionExtension
 			{
 				//Console.WriteLine ("version exists " + new_version_entry.Text);
 				overwrite_warning_label.Markup = "<span foreground='blue'><small>Warning: resulting version already exists!</small></span>";
+				overwrite_file_ok.Label = "Overwrite existing version!";
 				overwrite_file_ok.Sensitive=true;
 			}
 			if (FileExist(this.currentphoto, new_filename_label.Text))
 			{
 				//Console.WriteLine ("filename exists " + new_filename_label.Text);
 				overwrite_warning_label.Markup = "<span foreground='blue'><small>Warning: resulting file already exists!</small></span>";
+				overwrite_file_ok.Label = "Overwrite existing file!";
 				overwrite_file_ok.Sensitive=true;
 			}
 
@@ -200,11 +202,13 @@ namespace ExiflowCreateVersionExtension
 			{
 				//Console.WriteLine ("file and version exists " + new_version_entry.Text);
 				overwrite_warning_label.Markup = "<span foreground='blue'><small>Warning: resulting file and version already exists!</small></span>";
+				overwrite_file_ok.Label = "Overwrite existing file and version!";
 				overwrite_file_ok.Sensitive=true;
 			}
 
 			if ( currentphoto.GetVersion (currentphoto.DefaultVersionId).Name == new_version_entry.Text ) {
 				overwrite_warning_label.Markup = "<span foreground='red'>Error: New version name must be different from original!</span>";
+				overwrite_file_ok.Label = "Overwriting not allowed!";
 				overwrite_file_ok.Sensitive=false;
 				overwrite_file_ok.Active=false;
 			}
@@ -213,6 +217,7 @@ namespace ExiflowCreateVersionExtension
 			{
 				//Console.WriteLine ("not in exiflow schema " + new_filename_label.Text);
 				overwrite_warning_label.Markup = "<span foreground='red'>Error: resulting filename is not in the exiflow schema!</span>";
+				overwrite_file_ok.Label = "New version must fit the exiflow schema!";
 				overwrite_file_ok.Sensitive=false;
 				overwrite_file_ok.Active=false;
 			}
