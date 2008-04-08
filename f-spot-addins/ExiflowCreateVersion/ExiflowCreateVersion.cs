@@ -145,6 +145,13 @@ namespace ExiflowCreateVersionExtension
 				System.Uri original_uri = GetUriForVersionFileName (this.currentphoto, this.currentphoto.DefaultVersionUri.LocalPath);
 				System.Uri new_uri = GetUriForVersionFileName (this.currentphoto, new_filename);
 				Console.WriteLine ("ok pressed: old: " + this.currentphoto.DefaultVersionUri.LocalPath + "; " + original_uri.ToString() + " new: " + new_filename + "; " + new_uri.ToString() + "to open with: " );
+
+                                // check if new version exist and remove
+                                foreach (uint id in currentphoto.VersionIds) {
+					if ( currentphoto.GetVersion (id).Name == new_version_entry.Text ) {
+						this.currentphoto.DeleteVersion ( id );
+					}
+				}
 				Xfer.XferUri (
 					new Gnome.Vfs.Uri (original_uri.ToString ()), 
 					new Gnome.Vfs.Uri (new_uri.ToString ()),
@@ -156,7 +163,7 @@ namespace ExiflowCreateVersionExtension
 				Core.Database.Photos.Commit (this.currentphoto);
 
 				MainWindow.Toplevel.Query.MarkChanged(MainWindow.Toplevel.Query.IndexOf(this.currentphoto));
-
+                                // run new version with selected application
 				Gtk.TreeIter iter;
 			        if (owcb.GetActiveIter (out iter)){
 			                //Console.WriteLine ((string) owcb.Model.GetValue (iter, 0));
@@ -194,7 +201,7 @@ namespace ExiflowCreateVersionExtension
 			new_filename_label.Text = GetFilenameDateAndNumberPart(this.currentphoto.Name) + new_version_entry.Text;
 			if ((FileExist(this.currentphoto, new_filename_label.Text)) || 
 				(! IsExiflowSchema(new_filename_label.Text)) ||
-				(VersionExist(this.currentphoto, new_version_entry.Text))
+				(this.currentphoto.VersionNameExists( new_version_entry.Text ))
 				)
 			{
 				gtk_ok.Sensitive=false;
@@ -207,7 +214,7 @@ namespace ExiflowCreateVersionExtension
 				overwrite_file_ok.Active=false;
 			}		
 
-			if (VersionExist(this.currentphoto, new_version_entry.Text))
+			if (this.currentphoto.VersionNameExists( new_version_entry.Text ))
 			{
 				Console.WriteLine ("version exists " + new_version_entry.Text);
 				overwrite_warning_label.Markup = "<span foreground='blue'><small>Warning: resulting version already exists!</small></span>";
@@ -226,7 +233,7 @@ namespace ExiflowCreateVersionExtension
 				//overwrite_file_ok.Active=false;
 			}
 			if ((FileExist(this.currentphoto, new_filename_label.Text)) &&
-				(VersionExist(this.currentphoto, new_version_entry.Text))
+				(this.currentphoto.VersionNameExists(new_version_entry.Text))
 				)
 			{
 				Console.WriteLine ("file and version exists " + new_version_entry.Text);
@@ -287,13 +294,6 @@ namespace ExiflowCreateVersionExtension
 				Console.WriteLine ("exiflow not ok " + filename);
 				return false;
 			}
-		}
-
-		private bool VersionExist(Photo p, string newversionname)
-		{
-			if (p.VersionNameExists(newversionname))
-				return true;
-			return false;
 		}
 
 		private bool FileExist(Photo p, string newfilename)
