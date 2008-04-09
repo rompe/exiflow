@@ -3,7 +3,7 @@ Section: python
 Priority: optional
 Maintainer: Ulf Rompe <debian@rompe.org>
 Uploaders: Ulf Rompe <debian@rompe.org>
-Build-Depends-Indep: debhelper (>> 4.1.65), python2.4-dev
+Build-Depends-Indep: debhelper (>> 4.1.65), python-dev
 Standards-Version: 3.6.1.1
 
 Package: exiflow

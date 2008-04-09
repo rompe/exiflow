@@ -4,10 +4,12 @@
 Install the exiflow collection on your computer.
 """
 
-import distutils.core
+#import distutils.core
+import setuptools
 
-distutils.core.setup(name='exiflow',
-                     version='0.3.0',
+#distutils.core.setup(name='exiflow',
+setuptools.setup(name='exiflow',
+                     version='0.4.0',
                      scripts=['exigui',
                               'exiassign',
                               'exiconvert',
