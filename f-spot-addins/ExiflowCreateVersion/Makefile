@@ -5,7 +5,6 @@ all: ExiflowCreateVersion.dll
 
 PACKAGES = \
 	-pkg:gtk-sharp-2.0	\
-	-pkg:glade-sharp-2.0	\
 	-pkg:glib-sharp-2.0	\
 	-pkg:f-spot \
 	-pkg:gnome-vfs-sharp-2.0
@@ -14,7 +13,6 @@ ASSEMBLIES = \
 	-r:Mono.Posix
 
 RESOURCES = \
-	-resource:ExiflowCreateVersion.glade \
 	-resource:ExiflowCreateVersion.addin.xml
 
 SOURCES = \
@@ -26,7 +24,7 @@ install: all
 mpack: ExiflowCreateVersion.dll
 	mautil p ExiflowCreateVersion.dll
 
-%.dll: $(SOURCES) ExiflowCreateVersion.addin.xml ExiflowCreateVersion.glade
+%.dll: $(SOURCES) ExiflowCreateVersion.addin.xml 
 	PKG_CONFIG_PATH=$(FSPOTDIR)/lib/pkgconfig gmcs -target:library $(SOURCES) $(PACKAGES) $(ASSEMBLIES) $(RESOURCES)
 
 clean:

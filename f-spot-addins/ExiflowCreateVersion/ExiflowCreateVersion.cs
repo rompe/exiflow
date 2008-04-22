@@ -16,13 +16,11 @@ using System.IO;
 using System;
 using System.Text.RegularExpressions;
 using Gtk;
-using Gdk;
 using Gnome;
 using Gnome.Vfs;
 
 using FSpot;
 using FSpot.Extensions;
-using Glade;
 using Mono.Unix;
 
 namespace ExiflowCreateVersionExtension
@@ -30,19 +28,17 @@ namespace ExiflowCreateVersionExtension
 	public class ExiflowCreateVersion: ICommand
 	{	
 		protected string dialog_name = "exiflow_create_version_dialog";
-		protected Glade.XML xml;
 		private Gtk.Dialog dialog;
 
-		[Glade.Widget] Gtk.Entry new_version_entry;
-		[Glade.Widget] Gtk.Label new_filename_label;
-		[Glade.Widget] Gtk.Label overwrite_warning_label;
-		[Glade.Widget] Gtk.VBox vbox_combo;
-		[Glade.Widget] Gtk.Button gtk_ok;
-		[Glade.Widget] Gtk.CheckButton overwrite_file_ok;
-		
-		bool overwrite_file_flag=false;
+		Gtk.RadioButton versionrb = new Gtk.RadioButton("");
+		Gtk.Label new_filename_label = new Gtk.Label("");
+		Gtk.Label overwrite_warning_label = new Gtk.Label("");
+		Gtk.Entry new_version_entry = new Gtk.Entry("");
+		Gtk.CheckButton overwrite_file_ok = new Gtk.CheckButton("_Overwrite existing file");
+		Gtk.Button gtk_cancel = new Gtk.Button("gtk-cancel");
+		Gtk.Button gtk_ok = new Gtk.Button("gtk-ok");
+
 		string new_filename;
-		//MimeApplication map = null;
 		Photo currentphoto;
 		Regex exiflowpat = new Regex(@"^(\d{8}(-\d{6})?-.{3}\d{4}-)(.{5}\.[^.]*)$");
 
@@ -50,27 +46,78 @@ namespace ExiflowCreateVersionExtension
 		{
 			Console.WriteLine ("EXECUTING ExiflowCreateVersion EXTENSION");
 			
-			xml = new Glade.XML (null,"ExiflowCreateVersion.glade", dialog_name, "f-spot");
-			xml.Autoconnect (this);
-			dialog = (Gtk.Dialog) xml.GetWidget(dialog_name);
+			Window win = new Window ("window");
+			dialog = new Dialog (dialog_name, win, Gtk.DialogFlags.DestroyWithParent);
+
+			Frame frame_versions = new Frame ("new version");
+			HBox hbox_versions = new HBox();
+			frame_versions.Child = hbox_versions;
+
+				// RadioButtons left
+				VBox vbox_versions_left = new VBox ();
+				hbox_versions.PackStart (vbox_versions_left, true, false, 0);
+				// EntryBox right
+				VBox vbox_versions_right = new VBox ();
+				hbox_versions.PackStart (vbox_versions_right, true, false, 0);
+				vbox_versions_right.PackStart (new_version_entry, true, false, 0);
+				vbox_versions_right.PackStart (overwrite_file_ok, true, false, 0);
+
+			Frame frame_resulting_filename = new Frame ("resulting filename");
+			VBox vbox_resulting_filename = new VBox ();
+			frame_resulting_filename.Child = vbox_resulting_filename;
+				vbox_resulting_filename.PackStart (new_filename_label, true, false, 0);
+				vbox_resulting_filename.PackStart (overwrite_warning_label, true, false, 0);
+			
+			Frame frame_open_with = new Frame ("open with");
+			VBox vbox_open_with = new VBox ();
+			frame_open_with.Child = vbox_open_with;
+				vbox_open_with.PackStart (new_filename_label, true, false, 0);
+			
+			
+			new_version_entry.Changed += new EventHandler (on_new_version_entry_changed);
+			overwrite_file_ok.Toggled += new EventHandler (on_overwrite_file_ok_toggled);
+
+			gtk_cancel.UseStock = true;
+			gtk_cancel.Clicked += CancelClicked;
+			gtk_ok.UseStock = true;
+			gtk_ok.Clicked += OkClicked;
+
 			foreach (Photo p in MainWindow.Toplevel.SelectedPhotos ()) {
 				this.currentphoto = p;
 				//Console.WriteLine ("MimeType: "+ Gnome.Vfs.MimeType.GetMimeTypeForUri (p.DefaultVersionUri.ToString ()));
 				
 				//uint default_id = p.DefaultVersionId;
 				//Console.WriteLine ("DefaultVersionId: "+default_id);
-				string filename = GetNextVersionFileName (p);
-				new_version_entry.Text = GetVersionName(filename);
+				//string filename = GetNextIntelligentVersionFileNames (p)[0];
+
+				string [] possiblefilenames = GetNextIntelligentVersionFileNames(p);
+				new_version_entry.Text = GetVersionName(possiblefilenames[0].ToString());
+
+				for (int i=0; i < possiblefilenames.Length; i++ ){
+					Gtk.RadioButton rb = new Gtk.RadioButton (versionrb,GetVersionName(possiblefilenames[i].ToString()));
+					rb.Clicked += new EventHandler(on_versionrb_changed);
+					vbox_versions_left.PackStart (rb, true, false, 0);
+					
+				}
 
 				ComboBox owcb = GetComboBox ();
-				vbox_combo.PackStart (owcb, false, true, 0);
+				vbox_open_with.PackStart (owcb, false, true, 0);
 
 				dialog.Modal = false;
 				dialog.TransientFor = null;
-			
-				dialog.Response += HandleResponse;
-
 			}	
+
+			VBox vbox_main = new VBox ();
+				vbox_main.PackStart (frame_versions);
+				vbox_main.PackStart (frame_resulting_filename);
+				vbox_main.PackStart (frame_open_with);
+
+			HButtonBox hbb_ok_cancel = new HButtonBox ();
+				hbb_ok_cancel.PackStart (gtk_cancel, true, false, 0);
+				hbb_ok_cancel.PackStart (gtk_ok, true, false, 0);
+
+			dialog.VBox.PackStart(vbox_main, false, true,0);
+			dialog.ActionArea.PackStart (hbb_ok_cancel, false,true,0);
 			dialog.ShowAll();
 		}
 
@@ -86,24 +133,18 @@ namespace ExiflowCreateVersionExtension
 			return owcb;
 		}
 
-		private void HandleResponse (object sender, Gtk.ResponseArgs args)
+		private void CancelClicked (object sender, EventArgs args)
 		{
-			if (args.ResponseId != Gtk.ResponseType.Ok) {
-				// FIXME this is to work around a bug in gtk+ where
-				// the filesystem events are still listened to when
-				// a FileChooserButton is destroyed but not finalized
-				// and an event comes in that wants to update the child widgets.
-				dialog.Destroy ();
+			dialog.Destroy ();
 			//Console.WriteLine ("cancel pressed");
-				//uri_chooser.Dispose ();
-				//uri_chooser = null;
-				return;
-			}
-			
-			//Console.WriteLine ("ok pressed in DEVELOP IN UFRawExiflow EXTENSION");
+			return;
+		}
+
+		private void OkClicked (object sender, EventArgs args)
+		{
+			//Console.WriteLine ("ok pressed");
 			new_filename = new_filename_label.Text;
 			CreateNewVersion();
-
 		}
 
 		protected void CreateNewVersion()
@@ -162,6 +203,12 @@ namespace ExiflowCreateVersionExtension
 			}
 		}
 		
+		private void on_versionrb_changed(object o, EventArgs args)
+		{
+			foreach (RadioButton rb in versionrb.Group) {
+				if (rb.Active) new_version_entry.Text = rb.Label;
+			}
+		}
 		private void on_new_version_entry_changed(object o, EventArgs args)
 		{
 			//Console.WriteLine ("changed filename with: " + new_version_entry.Text);
@@ -185,14 +232,14 @@ namespace ExiflowCreateVersionExtension
 			{
 				//Console.WriteLine ("version exists " + new_version_entry.Text);
 				overwrite_warning_label.Markup = "<span foreground='blue'><small>Warning: resulting version already exists!</small></span>";
-				overwrite_file_ok.Label = "Overwrite existing version!";
+				overwrite_file_ok.Label = "_Overwrite existing version!";
 				overwrite_file_ok.Sensitive=true;
 			}
 			if (FileExist(this.currentphoto, new_filename_label.Text))
 			{
 				//Console.WriteLine ("filename exists " + new_filename_label.Text);
 				overwrite_warning_label.Markup = "<span foreground='blue'><small>Warning: resulting file already exists!</small></span>";
-				overwrite_file_ok.Label = "Overwrite existing file!";
+				overwrite_file_ok.Label = "_Overwrite existing file!";
 				overwrite_file_ok.Sensitive=true;
 			}
 
@@ -202,13 +249,13 @@ namespace ExiflowCreateVersionExtension
 			{
 				//Console.WriteLine ("file and version exists " + new_version_entry.Text);
 				overwrite_warning_label.Markup = "<span foreground='blue'><small>Warning: resulting file and version already exists!</small></span>";
-				overwrite_file_ok.Label = "Overwrite existing file and version!";
+				overwrite_file_ok.Label = "_Overwrite existing file and version!";
 				overwrite_file_ok.Sensitive=true;
 			}
 
 			if ( currentphoto.GetVersion (currentphoto.DefaultVersionId).Name == new_version_entry.Text ) {
 				overwrite_warning_label.Markup = "<span foreground='red'>Error: New version name must be different from original!</span>";
-				overwrite_file_ok.Label = "Overwriting not allowed!";
+				overwrite_file_ok.Label = "_Overwriting not allowed!";
 				overwrite_file_ok.Sensitive=false;
 				overwrite_file_ok.Active=false;
 			}
@@ -228,13 +275,11 @@ namespace ExiflowCreateVersionExtension
 			if (overwrite_file_ok.Active == true )
 			{
 				gtk_ok.Sensitive=true;
-				overwrite_file_flag=true;
 			}
 			else
 			{
 				overwrite_file_ok.Sensitive=false;
 				on_new_version_entry_changed(null,null);
-				overwrite_file_flag=false;
 			}
 				
 		}
@@ -263,13 +308,14 @@ namespace ExiflowCreateVersionExtension
 			
 		}
 
-		private static string GetNextVersionFileName (Photo p)
-		{
-			return GetNextVersionFileName (p, 0);
-		}
+//		private static string GetNextVersionFileName (Photo p)
+//		{
+//			return GetNextVersionFileName (p, 0);
+//		}
 
 		private static string GetNextVersionFileName (Photo p, int i)
 		{
+				Console.WriteLine ("New New "+ GetNextIntelligentVersionFileNames(p)[0].ToString());
 			Regex exiflowpat = new Regex(@"^(\d{8}(-\d{6})?-.{3}\d{4}-.{2})(\d)(.{2})\.([^.]*)$");
 			Match exiflowpatmatch = exiflowpat.Match(System.IO.Path.GetFileName(p.VersionUri(p.DefaultVersionId).LocalPath));
 // besser mit UnixPath.GetFileName()
@@ -279,6 +325,87 @@ namespace ExiflowCreateVersionExtension
 				return GetNextVersionFileName (p, i + 1);
 			return filename;
 		}
+
+		private static string [] GetNextIntelligentVersionFileNames (Photo p)
+		{
+			Regex exiflowpat = new Regex(@"^(\d{8}(-\d{6})?-.{3}\d{4}-.{2})(\d)(.)(.)\.([^.]*)$");
+			Match exiflowpatmatch = exiflowpat.Match(System.IO.Path.GetFileName(p.VersionUri(p.DefaultVersionId).LocalPath));
+			if ( (exiflowpatmatch.Groups[3].ToString() == "0") && 
+			      (exiflowpatmatch.Groups[4].ToString() == "0") && 
+			      (exiflowpatmatch.Groups[5].ToString() == "0" )) {
+				string [] possibleversions = { GetNextIntelligentVersionFileNames (p, 1, 0 , 0)};
+				return possibleversions;
+			}
+			else if ( (exiflowpatmatch.Groups[3].ToString() != "0") && 
+			      (exiflowpatmatch.Groups[4].ToString() == "0") && 
+			      (exiflowpatmatch.Groups[5].ToString() == "0" )) {
+				string [] possibleversions = { 
+				  GetNextIntelligentVersionFileNames (p, 0, 1, 0),
+				  GetNextIntelligentVersionFileNames (p, 1, 0, 0)
+				};
+				return possibleversions;
+			}
+			else
+			{
+				string [] possibleversions = { 
+				  GetNextIntelligentVersionFileNames (p, 0, 0, 1),
+				  GetNextIntelligentVersionFileNames (p, 0, 1, 0),
+				  GetNextIntelligentVersionFileNames (p, 1, 0, 0)
+				};
+				return possibleversions;
+			}
+		}
+
+		private static string GetNextIntelligentVersionFileNames (Photo p, int x, int y, int z)
+		{
+			Regex exiflowpat = new Regex(@"^(\d{8}(-\d{6})?-.{3}\d{4}-.{2})(.)(.)(.)\.([^.]*)$");
+			Match exiflowpatmatch = exiflowpat.Match(System.IO.Path.GetFileName(p.VersionUri(p.DefaultVersionId).LocalPath));
+			string filename = null;	
+			if (x > 0)
+				filename = String.Format("{0}{1}{2}{3}.{4}",
+				 exiflowpatmatch.Groups[1], 
+				 GetNextValidChar(exiflowpatmatch.Groups[3].ToString(),x),
+				 0,
+				 0,
+				 exiflowpatmatch.Groups[6]);
+			if (y > 0)
+				filename = String.Format("{0}{1}{2}{3}.{4}",
+				 exiflowpatmatch.Groups[1], 
+				 exiflowpatmatch.Groups[3],
+				 GetNextValidChar(exiflowpatmatch.Groups[4].ToString(),y),
+				 0,
+				 exiflowpatmatch.Groups[6]);
+			if (z > 0)
+				filename = String.Format("{0}{1}{2}{3}.{4}",
+				 exiflowpatmatch.Groups[1], 
+				 exiflowpatmatch.Groups[3], 
+				 exiflowpatmatch.Groups[4], 
+				 GetNextValidChar(exiflowpatmatch.Groups[5].ToString(),z),
+				 exiflowpatmatch.Groups[6]);
+			System.Uri developed = GetUriForVersionFileName (p, filename);
+				Console.WriteLine (developed);
+			if (p.VersionNameExists (GetVersionName(filename)) || System.IO.File.Exists(CheapEscape(developed.LocalPath))){
+				if (x > 0)
+					return GetNextIntelligentVersionFileNames (p, x+1, y, z);
+				if (y > 0)
+					return GetNextIntelligentVersionFileNames (p, x, y+1, z);
+				if (z > 0)
+					return GetNextIntelligentVersionFileNames (p, x, y, z+1);
+			}
+			return filename;
+		}
+		
+		private static string GetNextValidChar (string s, int i)
+		{
+			string validchars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+			if (validchars.IndexOf(s[0]) + i < validchars.Length){
+				return validchars[validchars.IndexOf(s[0]) + i].ToString();
+			}
+			else {
+				return null;
+			}
+		}
+			
 
 		private static string GetVersionName (string filename)
 		{
