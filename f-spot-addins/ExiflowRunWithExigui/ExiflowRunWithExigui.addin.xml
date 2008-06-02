@@ -1,7 +1,7 @@
 <Addin namespace="FSpot"
 	id="ExiflowRunWithExigui"
-	version="0.09"
-	description="Create a new Version, supporting revision numbers of the exiflow project ( http://exiflow.sf.net )."
+	version="0.20"
+	description="Open Exigui with all version from selected photos( http://exiflow.sf.net )."
 	author="Sebastian Berthold"
 	category="Tools">
 	<Dependencies>
