@@ -5,7 +5,7 @@
 	author="Ulf Rompe"
 	category="Tools">
 	<Dependencies>
-		<Addin id="Core" version="0.4.0.3456"/>
+		<Addin id="Core" version="0.4.4.0"/>
 	</Dependencies>
 	<Extension path = "/FSpot/Menus/Tools">
 		<Command id = "MergeExiflow" _label = "Merge exiflow revisions" command_type = "ExiflowMergeExtension.ExiflowMerge" />

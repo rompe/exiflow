@@ -5,7 +5,7 @@
 	author="Ulf Rompe"
 	category="Tools">
 	<Dependencies>
-		<Addin id="Core" version="0.4.0.3457"/>
+		<Addin id="Core" version="0.4.4.0"/>
 	</Dependencies>
 	<Extension path = "/FSpot/Menus/PhotoPopup">
 		<Command id = "ExiflowEditComment" _label = "Edit Comment" command_type = "ExiflowEditCommentExtension.ExiflowEditComment" insertbefore="OpenWith"/>
