@@ -1,0 +1,15 @@
+<Addin namespace="FSpot"
+	id="ExiflowRunWithExigui"
+	version="0.09"
+	description="Create a new Version, supporting revision numbers of the exiflow project ( http://exiflow.sf.net )."
+	author="Sebastian Berthold"
+	category="Tools">
+	<Dependencies>
+		<Addin id="Core" version="0.4.4.0"/>
+	</Dependencies>
+	<Extension path = "/FSpot/Menus/PhotoPopup">
+		<Command id = "ExiflowRunWithExigui" _label = "ExiflowRunWithExigui" command_type = "ExiflowRunWithExiguiExtension.ExiflowRunWithExigui" insertbefore="OpenWith"/>
+	</Extension>
+</Addin>
+
+
