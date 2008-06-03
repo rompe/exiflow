@@ -1,6 +1,6 @@
 <Addin namespace="FSpot"
 	id="DevelopInUFrawExiflow"
-	version="0.97"
+	version="0.4.4.0"
 	description="Develop the image in UFRaw, saves the result as a new version, supporting revision numbers of the exiflow project ( http://exiflow.sf.net )\n\nNote: Require ufraw 0.13 or CVS version newer than 2007-09-06 !!!"
 	author="Sebastian Berthold"
 	category="Tools">

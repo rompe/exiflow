@@ -1,6 +1,6 @@
 <Addin namespace="FSpot"
 	id="ExiflowEditComment"
-	version="1.06"
+	version="0.4.4.0"
 	description="Edit EXIF comment of selected photos."
 	author="Ulf Rompe"
 	category="Tools">

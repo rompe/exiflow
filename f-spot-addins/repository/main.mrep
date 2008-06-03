@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Repository xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Repository>
+    <Url>root.mrep</Url>
+    <LastModified>2008-06-04T00:27:00.0000000+02:00</LastModified>
+  </Repository>
+  <Repository>
+    <Url>.svn/main.mrep</Url>
+    <LastModified>0001-01-01T00:00:00.0000000+01:00</LastModified>
+  </Repository>
+  <Repository>
+    <Url>.svn/prop-base/main.mrep</Url>
+    <LastModified>0001-01-01T00:00:00.0000000+01:00</LastModified>
+  </Repository>
+  <Repository>
+    <Url>.svn/props/main.mrep</Url>
+    <LastModified>0001-01-01T00:00:00.0000000+01:00</LastModified>
+  </Repository>
+  <Repository>
+    <Url>.svn/text-base/main.mrep</Url>
+    <LastModified>0001-01-01T00:00:00.0000000+01:00</LastModified>
+  </Repository>
+  <Repository>
+    <Url>.svn/tmp/main.mrep</Url>
+    <LastModified>0001-01-01T00:00:00.0000000+01:00</LastModified>
+  </Repository>
+  <Repository>
+    <Url>.svn/tmp/prop-base/main.mrep</Url>
+    <LastModified>0001-01-01T00:00:00.0000000+01:00</LastModified>
+  </Repository>
+  <Repository>
+    <Url>.svn/tmp/props/main.mrep</Url>
+    <LastModified>0001-01-01T00:00:00.0000000+01:00</LastModified>
+  </Repository>
+  <Repository>
+    <Url>.svn/tmp/text-base/main.mrep</Url>
+    <LastModified>0001-01-01T00:00:00.0000000+01:00</LastModified>
+  </Repository>
+</Repository>
