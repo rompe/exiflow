@@ -31,14 +31,24 @@ namespace ExiflowRunWithExiguiExtension
 			foreach (Photo p in MainWindow.Toplevel.SelectedPhotos ()) {
 				foreach (uint version_id in p.VersionIds) {
 					PhotoVersion pv = p.GetVersion (version_id) as PhotoVersion;
-					filelist = filelist + " " + pv.Uri.AbsolutePath;
+					filelist = filelist + " " + CheapEscape(pv.Uri.AbsolutePath);
 				}
 			Console.WriteLine (filelist);
 			}
+
 			System.Diagnostics.Process exigui = System.Diagnostics.Process.Start ("exigui", filelist); 
 				exigui.WaitForExit ();
 
 		}
+		private static string CheapEscape (string input)
+		{
+			string escaped = input;
+			escaped = escaped.Replace (" ", "\\ ");
+			escaped = escaped.Replace ("(", "\\(");
+			escaped = escaped.Replace (")", "\\)");
+			return escaped;
+		}
+
 	}
 }
 
