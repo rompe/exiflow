@@ -1,34 +1,31 @@
+ADDIN = ExiflowRunWithExigui
 FSPOTDIR = ~/local/opt/f-spot
-GCONFTOOL = /usr/bin/gconftool-2
 
-all: ExiflowRunWithExigui.dll
+all: $(ADDIN).dll
 
 PACKAGES = \
 	-pkg:gtk-sharp-2.0	\
-	-pkg:glib-sharp-2.0	\
-	-pkg:f-spot \
-	-pkg:gnome-vfs-sharp-2.0
+	-pkg:f-spot
 
-ASSEMBLIES = \
-	-r:Mono.Posix
+ASSEMBLIES =
 
 RESOURCES = \
-	-resource:ExiflowRunWithExigui.addin.xml
+	-resource:$(ADDIN).addin.xml
 
 SOURCES = \
-	ExiflowRunWithExigui.cs
+	$(ADDIN).cs
 
-install: all
-	cp *.dll ~/.gnome2/f-spot/addins/
-
-mpack: ExiflowRunWithExigui.dll
-	mautil p ExiflowRunWithExigui.dll
-
-%.dll: $(SOURCES) ExiflowRunWithExigui.addin.xml 
+$(ADDIN).dll: $(SOURCES) $(ADDIN).addin.xml
 	PKG_CONFIG_PATH=$(FSPOTDIR)/lib/pkgconfig gmcs -target:library $(SOURCES) $(PACKAGES) $(ASSEMBLIES) $(RESOURCES)
 
 clean:
-	rm -f *.dll *~ *.bak .mpack
+	rm -f *.dll *~ *.bak *.mpack
+
+install: all
+	cp $(ADDIN).dll ~/.gnome2/f-spot/addins/
+
+mpack: $(ADDIN).dll
+	mautil p $(ADDIN).dll
 
 PHONY:
 	install clean all mpack
