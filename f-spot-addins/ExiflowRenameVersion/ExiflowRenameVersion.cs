@@ -65,12 +65,6 @@ namespace ExiflowRenameVersionExtension
 				vbox_resulting_filename.PackStart (new_filename_label, true, false, 0);
 				vbox_resulting_filename.PackStart (overwrite_warning_label, true, false, 0);
 			
-			Frame frame_open_with = new Frame ("open with");
-			VBox vbox_open_with = new VBox ();
-			frame_open_with.Child = vbox_open_with;
-				vbox_open_with.PackStart (new_filename_label, true, false, 0);
-			
-			
 			new_version_entry.Changed += new EventHandler (on_new_version_entry_changed);
 			overwrite_file_ok.Toggled += new EventHandler (on_overwrite_file_ok_toggled);
 
@@ -97,9 +91,6 @@ namespace ExiflowRenameVersionExtension
 					
 				}
 
-				ComboBox owcb = GetComboBox ();
-				vbox_open_with.PackStart (owcb, false, true, 0);
-
 				dialog.Modal = false;
 				dialog.TransientFor = null;
 			}	
@@ -107,7 +98,6 @@ namespace ExiflowRenameVersionExtension
 			VBox vbox_main = new VBox ();
 				vbox_main.PackStart (frame_versions);
 				vbox_main.PackStart (frame_resulting_filename);
-				vbox_main.PackStart (frame_open_with);
 
 			HButtonBox hbb_ok_cancel = new HButtonBox ();
 				hbb_ok_cancel.PackStart (gtk_cancel, true, false, 0);
@@ -116,18 +106,6 @@ namespace ExiflowRenameVersionExtension
 			dialog.VBox.PackStart(vbox_main, false, true,0);
 			dialog.ActionArea.PackStart (hbb_ok_cancel, false,true,0);
 			dialog.ShowAll();
-		}
-
-		private OpenWithComboBox owcb;
-
-		public Gtk.ComboBox GetComboBox ()
-		{
-			owcb = new OpenWithComboBox (MainWindow.Toplevel.SelectedMimeTypes);
-			owcb.IgnoreApp = "f-spot";
-                        if (owcb != null)
-                        	owcb.Populate ();
-
-			return owcb;
 		}
 
 		private void CancelClicked (object sender, EventArgs args)
@@ -175,33 +153,6 @@ namespace ExiflowRenameVersionExtension
 				Core.Database.Photos.Commit (this.currentphoto);
 
 				MainWindow.Toplevel.Query.MarkChanged(MainWindow.Toplevel.Query.IndexOf(this.currentphoto));
-                                // run new version with selected application
-				Gtk.TreeIter iter;
-			        if (owcb.GetActiveIter (out iter)){
-			                //Console.WriteLine ((string) owcb.Model.GetValue (iter, 0));
-			                //Console.WriteLine ((string) owcb.Model.GetValue (iter, 1));
-					//Console.WriteLine ("Getting applications again");
-			
-					ArrayList union = new ArrayList();	
-					foreach (string mime_type in (string []) owcb.Model.GetValue (iter, 2)) {
-						if (mime_type == null)
-							continue;
-						MimeApplication [] apps = Gnome.Vfs.Mime.GetAllApplications (mime_type);
-						foreach (MimeApplication app in apps) {
-							if (! union.Contains (app))
-								union.Add (app);
-						}
-					}
-					foreach (MimeApplication app in union) {
-						if (app.BinaryName.ToString() == (string) owcb.Model.GetValue (iter, 1)){
-			                		//Console.WriteLine ("Winner is "+ (string) owcb.Model.GetValue (iter, 1));
-							// is there a better way to get a GLib.List???
-							GLib.List uri_list = new GLib.List (typeof (string));
-							uri_list.Append(new_uri.ToString());
-							app.Launch (uri_list);
-						}
-					}	
-				}
 			} finally {
 				Gtk.Application.Invoke (delegate { dialog.Destroy(); });
 			}
@@ -439,127 +390,6 @@ namespace ExiflowRenameVersionExtension
 		{
 			System.Uri uri = p.VersionUri (Photo.OriginalVersionId);
 			return uri.Scheme + "://" + uri.Host + System.IO.Path.GetDirectoryName (uri.AbsolutePath);
-		}
-	}
-
-	public class OpenWithComboBox: Gtk.ComboBox {
-
-		public delegate string [] MimeFetcher ();
-		private MimeFetcher mime_fetcher;
-	
-		private string [] mime_types;
-		private bool populated = false;
-		
-		private string ignore_app = null;
-		public string IgnoreApp {
-			get { return ignore_app; }
-			set { ignore_app = value; }
-		}
-	
-		private bool show_icons = false;
-		public bool ShowIcons {
-			get { return show_icons; }
-			set { show_icons = value; }
-		}
-	
-		private bool hide_invalid = true;
-		public bool HideInvalid {
-			get { return hide_invalid; }
-			set { hide_invalid = value; }
-		}
-	
-		public OpenWithComboBox (MimeFetcher mime_fetcher)
-		{
-			this.mime_fetcher = mime_fetcher;
-		}
-		
-		public void Populate ()
-		{
-			this.Clear();
-			CellRendererText cell = new CellRendererText();
-			this.PackStart(cell, false);
-			this.AddAttribute(cell, "text", 0);
-			TreeStore store = new Gtk.TreeStore(typeof (string), typeof (string), typeof (string[]));
-			this.Model = store;
-
-			string [] mime_types = mime_fetcher ();
-	
-			//foreach (string mime in mime_types)
-			//	System.Console.WriteLine ("Populating open with menu for {0}", mime);
-			
-			if (this.mime_types != mime_types && populated) {
-				populated = false;
-	
-				Widget [] dead_pool = Children;
-				for (int i = 0; i < dead_pool.Length; i++)
-					dead_pool [i].Destroy ();
-			}
-	
-			if (populated)
-				return;
-	
-			ArrayList union, intersection;
-			ApplicationsFor (this, mime_types, out union, out intersection);
-	
-			ArrayList list = (HideInvalid) ? intersection : union;
-
-			store.AppendValues("", "", mime_types);
-			foreach (MimeApplication app in list) {
-				//System.Console.WriteLine ("Adding app {0} to open with combo box (binary name = {1})", app.Name, app.BinaryName);
-				store.AppendValues(app.Name.ToString(), app.BinaryName.ToString(), mime_types);
-			}
-			populated = true;
-		}
-	
-		private static void ApplicationsFor (OpenWithComboBox owcb, string [] mime_types, out ArrayList union, out ArrayList intersection)
-		{
-			//Console.WriteLine ("Getting applications");
-			union = new ArrayList ();
-			intersection = new ArrayList ();
-			
-			if (mime_types == null || mime_types.Length < 1)
-				return;
-	
-			bool first = true;
-			foreach (string mime_type in mime_types) {
-				if (mime_type == null)
-					continue;
-	
-				MimeApplication [] apps = Gnome.Vfs.Mime.GetAllApplications (mime_type);
-				for (int i = 0; i < apps.Length; i++) {
-					apps [i] = apps [i].Copy ();
-				}
-	
-			//Console.WriteLine ("Disable " + owcb.IgnoreApp);
-				foreach (MimeApplication app in apps) {
-					// Skip apps that don't take URIs
-					if (! app.SupportsUris ())
-						continue;
-					
-					// Skip apps that we were told to ignore
-					if (owcb.IgnoreApp != null)
-						if (app.BinaryName.IndexOf (owcb.IgnoreApp) != -1)
-							continue;
-	
-					if (! union.Contains (app))
-						union.Add (app);
-					
-					if (first)
-						intersection.Add (app);
-				}
-	
-				if (! first) {
-					for (int i = 0; i < intersection.Count; i++) {
-						MimeApplication app = intersection [i] as MimeApplication;
-						if (System.Array.IndexOf (apps, app) == -1) {
-							intersection.Remove (app);
-							i--;
-						}
-					}
-				}
-	
-				first = false;
-			}
 		}
 	}
 }
