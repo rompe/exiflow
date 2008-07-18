@@ -22,16 +22,16 @@ __default_contents = {"settings": """# settings.cfg
 # we want to process and which files and dirs we always want to skip.
 # The only valid section here is [all].
 
-   [all]
-   image_extensions = .jpg .nef .raw .crw .tif
-   unwantend_files = nikon001.dsc
-   unwantend_dirs = .comments
+[all]
+image_extensions = .jpg .nef .raw .crw .tif
+unwantend_files = nikon001.dsc
+unwantend_dirs = .comments
 """,
                       "cameras": """# cameras.cfg
 # This file defines values to be used as filename parts and converters to be
 # used for conversion of RAW file formats to JPEG.. An example filename:
 #
-# 20050807-n005965-sb000.jpg
+# 20080718-n005966-sb000.jpg
 #
 # In this case cam_id was "n00" and artist_initials was "sb".
 #
@@ -43,11 +43,11 @@ __default_contents = {"settings": """# settings.cfg
 #cam_id = 000
 #artist_initials = xy
 
-#[NIKON D70]
+#[NIKON Dxx]
 #cam_id = n00
 #artist_initials = yz
 #raw_extension = .nef
-#raw_converter = ufraw-batch --gamma=0.45 --saturation=1.0 --exposure=0.0 --black-point=0 --interpolation=ahd --compression=85 --noexif --wb=camera --curve=linear --linearity=0.06 --clip --out-type=jpeg
+#raw_converter = LANG=C ufraw-batch --gamma=0.45 --saturation=1.0 --exposure=0.0 --black-point=0 --interpolation=ahd --compression=90 --noexif --wb=camera --curve=linear --linearity=0.02 --clip=film --restore=lch --out-type=jpeg
 
 #[HP PhotoSmart 715]
 #cam_id = hp0
@@ -64,7 +64,7 @@ __default_contents = {"settings": """# settings.cfg
 #[all]
 #Artist = Arthur Dent
 #Contact = adent@example.com
-#Copyright = (c)2006 adent@example.com
+#Copyright = (c)2008 adent@example.com
 #CopyrightNotice = All rights reserved, no redistribution without written permission.
 #Credit = adent@example.com
 # ATTENTION: You will want to set UserComment to an empty string even if you
@@ -74,13 +74,22 @@ __default_contents = {"settings": """# settings.cfg
 #[custom]
 #artist = I. M. Weasel
 
-#[NIKON D70]
+#[NIKON Dxx]
 #artist = I. R. Baboon
 """}
 
 # ConfigParser Caches
 __cache = {}
+__stats = {}
 
+def __stat(filename):
+   """
+   Return a stat object or None if "filename" doesn't exist.
+   """
+   try:
+      return os.stat(filename)
+   except OSError:
+      return None
 
 def parse(configname):
    """
@@ -88,14 +97,18 @@ def parse(configname):
    Return a configparser object and a list of processed files.
    """
    logger = logging.getLogger("configfile.parse")
-   if not __cache.has_key(configname):
-      local_config = os.path.join(__local_config_dir, configname + ".cfg")
-      global_config = os.path.join(__global_config_dir, configname + ".cfg")
+   local_config = os.path.join(__local_config_dir, configname + ".cfg")
+   global_config = os.path.join(__global_config_dir, configname + ".cfg")
+   if not __cache.has_key(configname) \
+      or __stats.get(local_config, None) != __stat(local_config) \
+      or __stats.get(global_config, None) != __stat(global_config):
       if not os.path.exists(local_config):
          if not os.path.isdir(__local_config_dir):
             os.makedirs(__local_config_dir)
          file(local_config, "w").write(__default_contents[configname])
          logger.warning("Created example %s.", local_config)
+      __stats[local_config] = __stat(local_config)
+      __stats[global_config] = __stat(global_config)
       config = ConfigParser.ConfigParser()
       read_files = config.read([global_config, local_config])
       logger.info("Read %s config files: %s", configname, " ".join(read_files))
@@ -112,14 +125,17 @@ def get_options(configname, section, options):
    """
    config = parse(configname)
    values = []
+   must_append = False
    for option in options:
       if config.has_section(section) and config.has_option(section, option):
          values.append(config.get(section, option))
       elif config.has_section("all") and config.has_option("all", option):
          values.append(config.get("all", option))
       else:
-         append(configname, section, options)
+         must_append = True
          values.append("")
+   if must_append:
+      append(configname, section, options)
    return values
 
 

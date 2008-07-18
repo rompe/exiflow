@@ -9,7 +9,7 @@ import setuptools
 
 #distutils.core.setup(name='exiflow',
 setuptools.setup(name='exiflow',
-                     version='0.4.0',
+                     version='0.4.1',
                      scripts=['exigui',
                               'exiassign',
                               'exiconvert',
@@ -24,7 +24,7 @@ setuptools.setup(name='exiflow',
                      author='Ulf Rompe, Sebastian Berthold',
                      author_email='exiflow-devel@lists.sourceforge.net',
                      license='GNU General Public License (GPL)',
-                     url='http://sourceforge.net/projects/exiflow/',
+                     url='http://exiflow.org/',
                      description='A set of tools including a little GUI to '
                                  'provide a complete digital photo workflow '
                                  'for Unixes, using EXIF headers as the '
@@ -38,7 +38,7 @@ setuptools.setup(name='exiflow',
                                       'any data. The tools may be used '
                                       'individually or combined.',
                      download_url='http://sourceforge.net/project/showfiles.php?group_id=151136',
-                     classifiers=['Development Status :: 3 - Alpha',
+                     classifiers=['Development Status :: 4 - Beta',
                                   'Environment :: Console',
                                   'Environment :: X11 Applications :: GTK',
                                   'Intended Audience :: End Users/Desktop',
