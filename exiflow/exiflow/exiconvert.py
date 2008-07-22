@@ -35,6 +35,7 @@ import sys
 import logging
 import optparse
 import subprocess
+sys.path.insert(1, "/usr/share/exiflow") 
 import exiflow.exif
 import exiflow.filelist
 import exiflow.configfile

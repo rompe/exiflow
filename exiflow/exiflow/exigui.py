@@ -18,6 +18,7 @@ pygtk.require("2.0")
 import gtk
 import gtk.glade
 
+sys.path.insert(1, "/usr/share/exiflow") 
 import exiflow.filelist
 import exiflow.exiassign
 import exiflow.exiconvert

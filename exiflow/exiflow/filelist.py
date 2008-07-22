@@ -10,8 +10,10 @@ provide an iterable interface to them.
 __revision__ = "$Id$"
 
 import os
+import sys
 import time
 import logging
+sys.path.insert(1, "/usr/share/exiflow") 
 import exiflow.configfile
 
 class Filelist:

@@ -13,6 +13,7 @@ import os
 import sys
 import logging
 import optparse
+sys.path.insert(1, "/usr/share/exiflow") 
 import exiflow.exif
 import exiflow.gthumb
 import exiflow.filelist

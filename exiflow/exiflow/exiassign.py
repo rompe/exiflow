@@ -24,6 +24,7 @@ import sys
 import glob
 import logging
 import optparse
+sys.path.insert(1, "/usr/share/exiflow") 
 import exiflow.exif
 import exiflow.filelist
 

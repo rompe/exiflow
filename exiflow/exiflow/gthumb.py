@@ -8,6 +8,7 @@ __revision__ = "$Id$"
 import os
 import re
 import gzip
+import sys
 import xml.dom.minidom
 
 class Gthumb:

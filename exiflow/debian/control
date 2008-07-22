@@ -1,14 +1,13 @@
 Source: exiflow
 Section: python
 Priority: optional
-Maintainer: Ulf Rompe <debian@rompe.org>
-Uploaders: Ulf Rompe <debian@rompe.org>
-Build-Depends-Indep: debhelper (>> 4.1.65), python-dev
-Standards-Version: 3.6.1.1
+Maintainer: Sebastian Berthold <exiflow@sleif.de>
+Build-Depends: debhelper (>= 5), python-dev
+Standards-Version: 3.7.2
 
 Package: exiflow
-Architecture: all
-Depends: libimage-exiftool-perl, ${python:Depends}, ${python:Depends}-glade2, ${python:Depends}-gtk2
+Architecture: any
+Depends: python (>= 2.4), libimage-exiftool-perl, python-glade2, python-gtk2
 Suggests: f-spot, gthumb
 Description: A set of tools to provide a complete digital photo workflow
  exiflow is a set of tools to provide a complete digital photo workflow for
@@ -17,4 +16,4 @@ Description: A set of tools to provide a complete digital photo workflow
  The tools may be used individually or combined.
  Special support is included for F-Spot and Gthumb.
  .
- Homepage: http://sf.net/projects/exiflow/
+ Homepage: http://exiflow.org/
