@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 5), python-dev
 Standards-Version: 3.7.2
 
 Package: exiflow
-Architecture: any
+Architecture: all
 Depends: python (>= 2.4), libimage-exiftool-perl, python-glade2, python-gtk2
 Suggests: f-spot, gthumb
 Description: A set of tools to provide a complete digital photo workflow
