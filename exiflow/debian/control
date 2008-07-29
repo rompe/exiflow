@@ -4,8 +4,10 @@ Priority: optional
 Maintainer: Sebastian Berthold <exiflow@sleif.de>
 Build-Depends: debhelper (>= 5), python-dev
 Standards-Version: 3.7.2
+Homepage: http://exiflow.org/
 
 Package: exiflow
+Section: python
 Architecture: all
 Depends: python (>= 2.4), libimage-exiftool-perl, python-glade2, python-gtk2
 Suggests: f-spot, gthumb
