@@ -1,5 +1,7 @@
 exiflow (0.4.1-1) UNRELEASED; urgency=low
 
+  * fixes #2017186 - wrong indentation in the default settings.cfg file
+  
   * Some bug fixes.
 
  -- Sebastian Berthold <exiflow@sleif.de>  Tue, 22 Jul 2008 23:07:15 +0100
