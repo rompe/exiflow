@@ -43,25 +43,6 @@ Your options are:
     --  (Recommended.)  Install from a pre-packaged exiflow package that
         does not require distutils:
 
-            Red Hat Linux / SuSE  exiflow-x.x.x-1.noarch.rpm
+            Red Hat Linux / SuSE  exiflow-x.x.x-y.noarch.rpm
 
-            Debian GNU/Linux    exiflow_x.x.x-1_all.deb
-
-    --  (Optional.)  Install from this source package.
-    
-        Assuming your system satisfies the installation requirements in the
-        previous section, install exiflow from this package simply by 
-	running the provided Python-standard setup script as follows:
-
-        # python2.4 setup.py install
-
-        By default, the above command will do the following:
-
-	--  Install the "exiflow" scripts in the default system script 
-	    directory (/usr/bin for example). 
-	
-	--  Install the "exiflow" python module in the standard Python
-	    library directory (/usr/lib/python2.4/site-packages for example).
-	
-
-
+            Debian GNU/Linux    exiflow_x.x.x-y_all.deb
