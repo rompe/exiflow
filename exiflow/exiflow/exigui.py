@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+# vim: tabstop=3 expandtab shiftwidth=3
 """
 A nice PyGTK GUI for the exiflow tool collection.
 """

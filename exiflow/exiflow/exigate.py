@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# vim: tabstop=3 expandtab shiftwidth=3
 """
 Automatically gate image meta information between EXIF
 headers and Gthumb comment files.

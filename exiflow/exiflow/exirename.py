@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# vim: tabstop=3 expandtab shiftwidth=3
 """
 Rename a bunch of image files according to our holy file naming schema.
 

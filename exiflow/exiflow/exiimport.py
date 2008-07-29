@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# vim: tabstop=3 expandtab shiftwidth=3
 """
 Import files from given directories to your photo folder.
 Optionally unmounts source media after successfull import.

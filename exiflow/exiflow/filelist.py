@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# vim: tabstop=3 expandtab shiftwidth=3
 """
 Generate lists of files given as names or searched in directories and
 provide an iterable interface to them.

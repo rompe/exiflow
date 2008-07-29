@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# vim: tabstop=3 expandtab shiftwidth=3
 """
 Personalize images by setting EXIF fields to values spezified in exif.cfg or
 on command line. Any arbitrary field name may be configured or given.

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# vim: tabstop=3 expandtab shiftwidth=3
 """
 A set of functions to handle config files.
 They look for existance of ~/.exiflow/<classname>.cfg and will create it if
@@ -152,4 +153,5 @@ def append(configname, section, options):
       sys.stderr.write("Adding commented section [%s] to %s\nPlease edit!\n" %
                        (section, configfile))
       file(configfile, "a").write(string_to_append)
+
 
