@@ -1,9 +1,5 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-# Allow relative exiflow module imports.
-# Once the package is installed they are absolute.
-# Disable E0611 to supress false "No name 'xxx' in module gtk." pylint messages.
-# pylint: disable-msg=E0611, W0403
 """
 A nice PyGTK GUI for the exiflow tool collection.
 """
@@ -76,14 +72,14 @@ class Directorychooser1(object):
    """
    Create a window that allows the user to select a directory.
    """
-   def __init__(self, parent = None, callback=None):
+   def __init__(self, parent=None, callback=None):
       """ Instantiate the chooser. """
-      self.wTree = gtk.glade.XML(gladefile, "directorychooserdialog1")
-      self.window = self.wTree.get_widget("directorychooserdialog1")
+      self.wtree = gtk.glade.XML(gladefile, "directorychooserdialog1")
+      self.window = self.wtree.get_widget("directorychooserdialog1")
       dic = {}
       for key in dir(self.__class__):
          dic[key] = getattr(self, key)
-      self.wTree.signal_autoconnect(dic)
+      self.wtree.signal_autoconnect(dic)
       if parent:
          self.window.set_transient_for(parent)
       self.callback = callback
@@ -99,14 +95,14 @@ class Filechooser1(object):
    """
    Create a window that allows the user to select files.
    """
-   def __init__(self, parent = None, callback=None):
+   def __init__(self, parent=None, callback=None):
       """ Instantiate the chooser. """
-      self.wTree = gtk.glade.XML(gladefile, "filechooserdialog1")
-      self.window = self.wTree.get_widget("filechooserdialog1")
+      self.wtree = gtk.glade.XML(gladefile, "filechooserdialog1")
+      self.window = self.wtree.get_widget("filechooserdialog1")
       dic = {}
       for key in dir(self.__class__):
          dic[key] = getattr(self, key)
-      self.wTree.signal_autoconnect(dic)
+      self.wtree.signal_autoconnect(dic)
       if parent:
          self.window.set_transient_for(parent)
       self.callback = callback
@@ -119,23 +115,6 @@ class Filechooser1(object):
       self.window.destroy()
 
 
-class Aboutdialog1(object):
-   """
-   Pop up a window that gives some basic information about the program.
-   """
-   def __init__(self, parent = None):
-      """ Instantiate the dialog. """
-      self.wTree = gtk.glade.XML(gladefile, "aboutdialog1")
-      self.window = self.wTree.get_widget("aboutdialog1")
-      dic = {}
-      for key in dir(self.__class__):
-         dic[key] = getattr(self, key)
-      self.wTree.signal_autoconnect(dic)
-      if parent:
-         self.window.set_transient_for(parent)
-      self.window.show()
-
-
 class Window1(object):
    """
    The program's main window.
@@ -143,10 +122,10 @@ class Window1(object):
    def __init__(self):
       """ Instantiate the main window. """
       self._cancelled = False
-      self.wTree = gtk.glade.XML(gladefile, "mainwindow")
-      self.window = self.wTree.get_widget("mainwindow")
+      self.wtree = gtk.glade.XML(gladefile, "mainwindow")
+      self.window = self.wtree.get_widget("mainwindow")
 # Initialize treeview
-      treeview = self.wTree.get_widget("treeview1")
+      treeview = self.wtree.get_widget("treeview1")
       self.liststore = gtk.ListStore(str)
       treeview.set_model(self.liststore)
       text_cell = gtk.CellRendererText()
@@ -159,12 +138,12 @@ class Window1(object):
       dic = {}
       for key in dir(self.__class__):
          dic[key] = getattr(self, key)
-      self.wTree.signal_autoconnect(dic)
+      self.wtree.signal_autoconnect(dic)
       self.window.show()
 # Create TextView and use it
-      sys.stdout = WritableTextView(self.wTree.get_widget("textview1"))
-      sys.stderr = WritableTextView(self.wTree.get_widget("textview1"), "blue")
-      stdlog = WritableTextView(self.wTree.get_widget("textview1"), "red")
+      sys.stdout = WritableTextView(self.wtree.get_widget("textview1"))
+      sys.stderr = WritableTextView(self.wtree.get_widget("textview1"), "blue")
+      stdlog = WritableTextView(self.wtree.get_widget("textview1"), "red")
       logging.basicConfig(format="%(module)s: %(message)s", stream=stdlog,
                           level=logging.INFO)
       self.batch_scripts = []
@@ -172,19 +151,19 @@ class Window1(object):
 
    def _make_sensitive(self, name):
       """ Set widget called name sensitive. """
-      self.wTree.get_widget(name).set_sensitive(True)
+      self.wtree.get_widget(name).set_sensitive(True)
 
    def _make_insensitive(self, name):
       """ Set widget called name insensitive. """
-      self.wTree.get_widget(name).set_sensitive(False)
+      self.wtree.get_widget(name).set_sensitive(False)
 
    def _is_active(self, name):
       """ Retrun True if widget "name" is activated, False otherwise. """
-      return self.wTree.get_widget(name).get_active()
+      return self.wtree.get_widget(name).get_active()
 
    def set_text(self, name, text):
       """ Set text of widget "name" to text. """
-      self.wTree.get_widget(name).set_text(text)
+      self.wtree.get_widget(name).set_text(text)
 
    def on_button_open_clicked(self, *dummy):
       """ Callback for the "open" button. """
@@ -193,18 +172,24 @@ class Window1(object):
    def on_button_exiimport_browse_importdir_clicked(self, *dummy):
       """ Callback for the exiimport's "browse importdir" button. """
       dummy = Directorychooser1(self.window,
-               self.wTree.get_widget("exiimport_importdir_entry").set_text)
+               self.wtree.get_widget("exiimport_importdir_entry").set_text)
 
    def on_button_exiimport_browse_targetdir_clicked(self, *dummy):
       """ Callback for the exiimport's "browse targetdir" button. """
       dummy = Directorychooser1(self.window,
-               self.wTree.get_widget("exiimport_targetdir_entry").set_text)
+               self.wtree.get_widget("exiimport_targetdir_entry").set_text)
 
-   def on_info1_activate(self, *dummy):
+   @staticmethod
+   def on_info1_activate(*dummy):
       """ Callback for the "about" menu entry. """
-      dummy = Aboutdialog1(self.window)
+      wtree = gtk.glade.XML(gladefile, "aboutdialog1")
+      window = wtree.get_widget("aboutdialog1")
+      window.show_all()
+      window.run()
+      window.hide()
 
-   def on_mainwindow_destroy(self, *dummy):
+   @staticmethod
+   def on_mainwindow_destroy(*dummy):
       """ Callback for the window's close button. """
       gtk.main_quit()
 
@@ -262,10 +247,10 @@ class Window1(object):
             for rownum in range(0, len(self.liststore)):
                if self.liststore[rownum][0] == filename:
                   self.liststore[rownum][0] = newname
-      nbook = self.wTree.get_widget("notebook1")
+      nbook = self.wtree.get_widget("notebook1")
       ntab = nbook.get_tab_label(nbook.get_nth_page(nbook.get_current_page()))
       label = ntab.get_text()
-      progressbar = self.wTree.get_widget("progressbar1")
+      progressbar = self.wtree.get_widget("progressbar1")
       progressbar.set_fraction(float(percentage) / 100)
       progressbar.set_text(u"%s:   %s %%" % (label, percentage))
       while gtk.events_pending():
@@ -286,9 +271,9 @@ class Window1(object):
       Called from the run button.
       """
       logger = logging.getLogger("exigui.on_run_activate")
-      cancel_button = self.wTree.get_widget("cancel_button")
+      cancel_button = self.wtree.get_widget("cancel_button")
       cancel_button.set_sensitive(True)
-      nbook = self.wTree.get_widget("notebook1")
+      nbook = self.wtree.get_widget("notebook1")
       nbook.set_sensitive(False)
       widget.set_sensitive(False)
       self._cancelled = False
@@ -299,7 +284,7 @@ class Window1(object):
       method = getattr(self, "_run_" + label.replace(" ", "_"))
       method()
       
-      progressbar = self.wTree.get_widget("progressbar1")
+      progressbar = self.wtree.get_widget("progressbar1")
       progressbar.set_fraction(0 / 100)
       progressbar.set_text(u"")
       nbook.set_sensitive(True)
@@ -310,9 +295,9 @@ class Window1(object):
       """ Run exiimport. """
       logger = logging.getLogger("exigui.run_exiimport")
       args = ["-v"]
-      import_dir = self.wTree.get_widget("exiimport_importdir_entry")
-      device = self.wTree.get_widget("exiimport_device_entry")
-      target_dir = self.wTree.get_widget("exiimport_targetdir_entry")
+      import_dir = self.wtree.get_widget("exiimport_importdir_entry")
+      device = self.wtree.get_widget("exiimport_device_entry")
+      target_dir = self.wtree.get_widget("exiimport_targetdir_entry")
       if import_dir.get_text():
          args.append("--mount=" + import_dir.get_text())
       if device.get_text():
@@ -328,8 +313,8 @@ class Window1(object):
       """ Run exirename. """
       logger = logging.getLogger("exigui.run_exirename")
       args = ["-v"]
-      artist_initials = self.wTree.get_widget("exirename_artist_initials_entry")
-      cam_id = self.wTree.get_widget("exirename_cam_id_entry")
+      artist_initials = self.wtree.get_widget("exirename_artist_initials_entry")
+      cam_id = self.wtree.get_widget("exirename_cam_id_entry")
       if self._is_active("exirename_artist_initials_entry_button_custom"):
          args.append("--artist_initials=" + artist_initials.get_text())
       if self._is_active("exirename_cam_id_entry_button_custom"):
@@ -346,7 +331,7 @@ class Window1(object):
       """ Run exiperson. """
       logger = logging.getLogger("exigui.run_exiperson")
       args = ["-v"]
-      exif_section = self.wTree.get_widget("exiperson_section_entry")
+      exif_section = self.wtree.get_widget("exiperson_section_entry")
       if self._is_active("exiperson_section_entry_button_custom"):
          args.append("--section=" + exif_section.get_text())
       args += [entry[0] for entry in self.liststore]
@@ -401,7 +386,7 @@ class Window1(object):
       """ Run "scripts" in a batch without user interaction. """
       if len(self.batch_scripts) > 0:
          logger = logging.getLogger("exigui.batch_run")
-         nbook = self.wTree.get_widget("notebook1")
+         nbook = self.wtree.get_widget("notebook1")
          tabs = []
          for tabnum in range(0, nbook.get_n_pages()):
             tab_label = nbook.get_tab_label(nbook.get_nth_page(tabnum))
@@ -410,7 +395,7 @@ class Window1(object):
             if script not in tabs:
                logger.error("There is no %s tab available!", script)
                return 1
-         run_button = self.wTree.get_widget("activate_button")
+         run_button = self.wtree.get_widget("activate_button")
          for script in self.batch_scripts:
             nbook.set_current_page(tabs.index(script))
             self.on_run_activate(run_button)

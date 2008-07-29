@@ -1,8 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Allow relative exiflow module imports.
-# Once the package is installed they are absolute.
-# pylint: disable-msg=W0403
 """
 Rename a bunch of image files according to our holy file naming schema.
 

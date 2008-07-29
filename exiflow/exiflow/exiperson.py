@@ -1,8 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Allow relative exiflow module imports.
-# Once the package is installed they are absolute.
-# pylint: disable-msg=W0403
 """
 Personalize images by setting EXIF fields to values spezified in exif.cfg or
 on command line. Any arbitrary field name may be configured or given.
