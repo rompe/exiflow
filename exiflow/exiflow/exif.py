@@ -32,21 +32,21 @@ class Exif:
          if ": " in line:
             key, value = line.split(": ", 1)
             self.fields[key] = value.strip()
-# TODO: Check if we may rely on exit status or if we have to check stderr like
-# we do in write_exif
+      # TODO: Check if we may rely on exit status or if we have to check stderr
+      # like we do in write_exif
       if exiftool.wait():
          raise IOError, "".join(exiftool.stderr)
       else:
-# We have to read the ImageDescription binary because it may contain
-# things like line breaks.
+         # We have to read the ImageDescription binary because it may contain
+         # things like line breaks.
          self.fields["ImageDescription"] = \
             "".join(subprocess.Popen("exiftool -b -ImageDescription "
                                      + self.filename, shell=True,
                                      stdout=subprocess.PIPE).stdout)
-# We don't need an empty "ImageDescription" for any merge operations.
+         # We don't need an empty "ImageDescription" for any merge operations.
          if self.fields["ImageDescription"] == "":
             del self.fields["ImageDescription"] 
-# Be shure to have proper UTF8 strings
+      # Be shure to have proper UTF8 strings
       for key in self.fields:
          self.fields[key] = unicode(self.fields[key], "utf-8")
 
@@ -62,16 +62,17 @@ class Exif:
             for keyword in self.fields[field].split(","):
                command += " -%s=\"%s\"" % (field, keyword)
          elif field == "DateTimeOriginal":
-# TODO: Writing back DateTimeOriginal seems to be a bad idea since gthumb
-# drops seconds and there is some confusion with time strings and epoch.
+            # TODO: Writing back DateTimeOriginal seems to be a bad idea since
+            # gthumb drops seconds and there is some confusion with time strings
+            # and epoch.
             continue
          else:
             command += " -%s=\"%s\"" % (field, self.fields[field])
       command += " " + self.filename
       exiftool = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE)
-# exiftool doesn't reflect errors in it's return code, so we have to
-# assume an error if something is written to stderr.
+      # exiftool doesn't reflect errors in it's return code, so we have to
+      # assume an error if something is written to stderr.
       errors = exiftool.stderr.readlines()
       if len(errors) > 0:
          raise IOError, "".join(errors + exiftool.stdout.readlines())
@@ -84,7 +85,7 @@ class Exif:
       from myexif. The fields used for merging have to be defined in exiffields.
       Raises IOError on errors.
       """
-# Fields we want to keep
+      # Fields we want to keep
       exiffields = ["Artist", "Credit", "Copyright", "CopyrightNotice", 
                     "ImageDescription", "Keywords", "Location", "UserComment",
                     "XPTitle"]
@@ -99,8 +100,8 @@ class Exif:
       command += " " + self.filename
       exiftool = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE)
-# exiftool doesn't reflect errors in it's return code, so we have to
-# assume an error if something is written to stderr.
+      # exiftool doesn't reflect errors in it's return code, so we have to
+      # assume an error if something is written to stderr.
       errors = exiftool.stderr.readlines()
       if len(errors) > 0:
          raise IOError, "".join(errors + exiftool.stdout.readlines())

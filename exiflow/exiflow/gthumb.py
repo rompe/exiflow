@@ -104,7 +104,7 @@ class Gthumb:
          tmpkeywords.append(keyword.strip())
       mydata["Keywords"] = ",".join(tmpkeywords)
 
-# Add XPTitle to Note if Note doesn't contain it already
+      # Add XPTitle to Note if Note doesn't contain it already
       mytitle = self.fields.get("XPTitle", "")
       if len(mytitle) > 0 and not mytitle in mydata["Note"].splitlines():
          mydata["Note"] = self.fields["XPTitle"] + "\n" + mydata["Note"]

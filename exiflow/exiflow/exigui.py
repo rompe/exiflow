@@ -125,7 +125,7 @@ class Window1(object):
       self._cancelled = False
       self.wtree = gtk.glade.XML(gladefile, "mainwindow")
       self.window = self.wtree.get_widget("mainwindow")
-# Initialize treeview
+      # Initialize treeview
       treeview = self.wtree.get_widget("treeview1")
       self.liststore = gtk.ListStore(str)
       treeview.set_model(self.liststore)
@@ -141,7 +141,7 @@ class Window1(object):
          dic[key] = getattr(self, key)
       self.wtree.signal_autoconnect(dic)
       self.window.show()
-# Create TextView and use it
+      # Create TextView and use it
       sys.stdout = WritableTextView(self.wtree.get_widget("textview1"))
       sys.stderr = WritableTextView(self.wtree.get_widget("textview1"), "blue")
       stdlog = WritableTextView(self.wtree.get_widget("textview1"), "red")

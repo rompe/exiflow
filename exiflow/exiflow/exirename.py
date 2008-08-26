@@ -74,7 +74,7 @@ def get_exif_information(filename):
    If The date isn't contained in EXIF, use the file's mtime.
    """
    exif_file = exiflow.exif.Exif(filename)
-# read_exif may throw IOError. We leave the catching to our caller.
+   # read_exif may throw IOError. We leave the catching to our caller.
    exif_file.read_exif()
    model = exif_file.fields.get("Model", "all")
    date = exif_file.fields.get("DateTimeOriginal", "0")
@@ -99,8 +99,8 @@ def get_new_filename(filename, date, cam_id, artist_initials, filelist):
    extension = extension.lower()
    number = "".join([char for char in leader[-4:] if char.isdigit()])
    revision = "000"
-# Look for high quality versions of this image. This is the case if we are
-# a .jpg and more than one file exists with the same prefix.
+   # Look for high quality versions of this image. This is the case if we are
+   # a .jpg and more than one file exists with the same prefix.
    if extension == ".jpg":
       versions = [vers[0] for vers in filelist if vers[0].startswith(leader)]
       if len(versions) > 1:

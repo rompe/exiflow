@@ -104,7 +104,7 @@ def run(argv, callback=None):
                       options.section)
          sys.exit(1)
 
-# collect EXIF data supplied on command line
+   # collect EXIF data supplied on command line
    forced_personals = {}
    remaining_args = []
    for arg in args:
@@ -119,8 +119,8 @@ def run(argv, callback=None):
       if callable(callback):
          if callback(filename, filename, percentage):
             break
-# Note to programmer:
-# The [:] is needed to get a slice copy instead of a reference.
+      # Note to programmer:
+      # The [:] is needed to get a slice copy instead of a reference.
       personalize_file(filename, defaultpersonals[:], forced_personals)
 
 

@@ -45,13 +45,13 @@ def convert_file(filename):
    """
    logger = logging.getLogger("exiconvert.convert_file")
    basename = os.path.basename(filename)
-# Sanity check - no sense in trying to convert jpeg to jpeg
+   # Sanity check - no sense in trying to convert jpeg to jpeg
    if basename.lower().endswith(".jpg"):
       logger.debug("%s is a Jpeg file, skipping.", basename)
       return basename
 
    exif_file = exiflow.exif.Exif(filename)
-# read_exif may throw IOError. We leave the catching to our caller.
+   # read_exif may throw IOError. We leave the catching to our caller.
    exif_file.read_exif()
    model = exif_file.fields.get("Model", "all")
 

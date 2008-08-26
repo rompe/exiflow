@@ -42,12 +42,12 @@ def autogate_gthumb(filename, myoptions):
       except IOError, msg:
          logger.error("Error writing EXIF data to %s:\n%s", filename, msg)
          return False
-# TODO: Find out why we intruduced this line. Seems odd...
+      # TODO: Find out why we intruduced this line. Seems odd...
       #write_gthumb(filename, gthumb, myoptions.addfields,
       #             myoptions.template)
-# Maybe that way we wanted to update in addfields and template mode even if
-# the file's timestamp is older than the gthumb comment? Check if that is
-# needed and if so, if we can do it conditionally!
+      # Maybe that way we wanted to update in addfields and template mode even if
+      # the file's timestamp is older than the gthumb comment? Check if that is
+      # needed and if so, if we can do it conditionally!
       gthumbfile.set_mtime(filetimestamp)
       os.utime(filename, (filetimestamp, filetimestamp))
    elif filetimestamp > gthumbtimestamp \
@@ -87,10 +87,10 @@ def run(argv, callback=None):
    parser.add_option("--template", "-t", action="store_true", dest="template",
                      help="Like --additional-fields, but also combine empty "
                           "fields as templates into the comment.")
-# TODO: 
-#parser.add_option("--merge", action="store_true", dest="merge",
-#                  help="Merge data instead of just using the newest version "\
-#                       "to overwrite the older one.")
+   # TODO: 
+   #parser.add_option("--merge", action="store_true", dest="merge",
+   #                  help="Merge data instead of just using the newest version "\
+   #                       "to overwrite the older one.")
    parser.add_option("--cleanup", "-c", action="store_true", dest="cleanup",
                      help="The opposite of --additional-fields, that is, "
                           "remove additional fields from gthumb comments.")

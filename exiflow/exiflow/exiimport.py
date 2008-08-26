@@ -24,7 +24,7 @@ def run(argv, callback=None):
    processed file with 3 arguments: filename, newname, percentage.
    If the callable returns True, stop the processing.
    """
-# Parse command line.
+   # Parse command line.
    parser = optparse.OptionParser()
    parser.add_option("-m", "--mount", dest="mount",
                      help="Mountpoint of directory to import. Corresponds"
@@ -49,19 +49,19 @@ def run(argv, callback=None):
       logger.warning(parser.format_help())
       sys.exit(1)
 
-# Build file list whithout skipping unknown files
+   # Build file list whithout skipping unknown files
    filelist = exiflow.filelist.Filelist([])
    filelist.process_unknown_types()
    filelist.add_files([options.mount])
 
-# Cry if we found no images
+   # Cry if we found no images
    if filelist.get_filecount() == 0:
       logger.error("No files to import, sorry.")
       sys.exit(1)
 
-# Create targetdir
+   # Create targetdir
    targetdir = os.path.join(options.target, filelist.get_daterange())
-# TODO: find a better solution than just appendings "+" chars.
+   # TODO: find a better solution than just appendings "+" chars.
    while os.path.exists(targetdir):
       targetdir += "+"
    os.makedirs(targetdir)
@@ -69,7 +69,7 @@ def run(argv, callback=None):
                   filelist.get_fullsize() / 1024 / 1024,
                   filelist.get_filecount(), targetdir)
 
-# Copy files
+   # Copy files
    for filename, percentage in filelist:
       logger.info("%3s%% %s", percentage, filename)
       if callable(callback):
@@ -81,7 +81,7 @@ def run(argv, callback=None):
       os.chmod(os.path.join(targetdir, os.path.basename(filename)),
                stat.S_IMODE(0644))
 
-# Unmount card
+   # Unmount card
    if options.device:
       subprocess.call("pumount " + options.device, shell=True)
 
