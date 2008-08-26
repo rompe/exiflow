@@ -152,7 +152,7 @@ namespace ExiflowRenameVersionExtension
 				this.currentphoto.DefaultVersionId = currentid;
 				Core.Database.Photos.Commit (this.currentphoto);
 
-				MainWindow.Toplevel.Query.MarkChanged(MainWindow.Toplevel.Query.IndexOf(this.currentphoto));
+				this.currentphoto.Changes.DataChanged = true;
 			} finally {
 				Gtk.Application.Invoke (delegate { dialog.Destroy(); });
 			}

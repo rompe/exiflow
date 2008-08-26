@@ -75,7 +75,7 @@ namespace ExiflowEditCommentExtension
 			Console.WriteLine ("New comment is: " + comment.Buffer.Text);
 			foreach (Photo p in MainWindow.Toplevel.SelectedPhotos ()) {
 				p.Description = comment.Buffer.Text;
-				MainWindow.Toplevel.Query.MarkChanged(MainWindow.Toplevel.Query.IndexOf(p));
+				p.Changes.DataChanged = true;
 				Core.Database.Photos.Commit (p);
 			}
 			dialog.Destroy ();

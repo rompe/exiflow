@@ -170,7 +170,7 @@ namespace ExiflowCreateVersionExtension
 				this.currentphoto.DefaultVersionId = this.currentphoto.AddVersion (new_uri, new_version_entry.Text, true);
 				Core.Database.Photos.Commit (this.currentphoto);
 
-				MainWindow.Toplevel.Query.MarkChanged(MainWindow.Toplevel.Query.IndexOf(this.currentphoto));
+				this.currentphoto.Changes.DataChanged = true;;
                                 // run new version with selected application
 				Gtk.TreeIter iter;
 			        if (owcb.GetActiveIter (out iter)){
