@@ -137,9 +137,12 @@ def rename_file(filename, filelist, with_time, cam_id_override=None,
                      filename)
       return os.path.basename(filename)
 
-   newname = get_new_filename(filename, date, cam_id, artist_initials, filelist)
-   os.rename(filename, os.path.join(os.path.dirname(filename), newname))
-   return newname
+   newbasename = get_new_filename(filename, date, cam_id, artist_initials, filelist)
+   newname = os.path.join(os.path.dirname(filename), newbasename)
+   if os.path.exists(newname):
+      raise IOError, "Can't rename %s to %s, it already exists." % (filename, newname)
+   os.rename(filename, newname)
+   return newbasename
 
 
 def run(argv, callback=None):
