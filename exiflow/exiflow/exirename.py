@@ -132,9 +132,12 @@ def rename_file(filename, filelist, with_time, cam_id_override=None,
    if artist_initials_override:
       artist_initials = artist_initials_override
 
-   if cam_id == "" or artist_initials == "":
-      logger.warning("Missing cam_id or artist_initials, skipping %s.",
-                     filename)
+   if len(cam_id) != 3 or len(artist_initials) != 2:
+      logger.warning("Either cam_id or artist_initials is missing or of wrong length. "
+                     "cam_id should be 3 characters and is currently set to '%s', "
+                     "artist_initials should be 2 characters and is set to '%s'. "
+                     "Skipping %s.",
+                     (cam_id, artist_initials, filename))
       return os.path.basename(filename)
 
    newbasename = get_new_filename(filename, date, cam_id, artist_initials, filelist)
