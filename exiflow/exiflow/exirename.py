@@ -90,8 +90,7 @@ def get_exif_information(filename):
       image_time = time.strftime("%H%M%S", time.localtime(float(image_time)))
    return model, date, image_time
 
-
-def get_new_filename(filename, date, cam_id, artist_initials, filelist):
+def get_new_filename_parts(filename, filelist):
    """
    Return a new name for filename according to our holy naming scheme.
    """
@@ -107,8 +106,7 @@ def get_new_filename(filename, date, cam_id, artist_initials, filelist):
          revision = "00l"
    if not number:
       raise IOError, "Can't find a number in " + filename
-   return date + "-" + cam_id + number.zfill(4) + "-" \
-             + artist_initials + revision + extension
+   return number.zfill(4), revision, extension
 
 
 def rename_file(filename, filelist, with_time, cam_id_override=None,
@@ -117,18 +115,34 @@ def rename_file(filename, filelist, with_time, cam_id_override=None,
    Rename filename and return the newly generated name without dir.
    """
    logger = logging.getLogger("exirename.rename_file")
-   filename_re = re.compile("^\d{8}(-\d{6})?-.{3}\d{4}-.{5}\.[^.]*$")
-   if filename_re.match(os.path.basename(filename)):
-      raise IOError, filename + " already seems to be formatted."
+   filename_re = re.compile("^(\d{8})(-(\d{6}))?-(.{3})(\d{4})-((.{2})(.{3}))(\.[^.]*)$")
+   mymatch = filename_re.match(os.path.basename(filename))
+   """differentiate between getting values from existing filenames or getting initial 
+      values from exif and config file
+   """
+   if mymatch:
+      date = mymatch.group(1)
+      image_time = mymatch.group(3)
+      cam_id = mymatch.group(4)
+      number = mymatch.group(5)
+      artist_initials = mymatch.group(7)
+      revision = mymatch.group(8)
+      extension = mymatch.group(9)
+      if with_time:
+         if not image_time:
+            dummymodel, dummydate, image_time = get_exif_information(filename)
+         date += "-" + image_time
+   else:
+      model, date, image_time = get_exif_information(filename)
+      if with_time:
+         date += "-" + image_time
+      cam_id, artist_initials = exiflow.configfile.get_options("cameras", model,
+                                                    ("cam_id", "artist_initials"))
+      number, revision, extension = get_new_filename_parts(filename, filelist)
 
-   model, date, image_time = get_exif_information(filename)
-   if with_time:
-      date += "-" + image_time
-
-   cam_id, artist_initials = exiflow.configfile.get_options("cameras", model,
-                                                 ("cam_id", "artist_initials"))
    if cam_id_override:
       cam_id = cam_id_override
+
    if artist_initials_override:
       artist_initials = artist_initials_override
 
@@ -138,9 +152,12 @@ def rename_file(filename, filelist, with_time, cam_id_override=None,
                      "artist_initials should be 2 characters and is set to '%s'. "
                      "Skipping %s." % (cam_id, artist_initials, filename))
       return os.path.basename(filename)
-
-   newbasename = get_new_filename(filename, date, cam_id, artist_initials, filelist)
+   
+   newbasename = date + "-" + cam_id + number + "-" + artist_initials + revision \
+                 + extension
    newname = os.path.join(os.path.dirname(filename), newbasename)
+   if filename == newname:
+      raise IOError, "Filename does not change."
    if os.path.exists(newname):
       raise IOError, "Can't rename %s to %s, it already exists." % (filename, newname)
    os.rename(filename, newname)
@@ -182,7 +199,7 @@ def run(argv, callback=None):
                                options.cam_id, options.artist_initials)
       except IOError, msg:
          newname = os.path.basename(filename)
-         logger.error("Skipping %s:\n%s", filename, str(msg))
+         logger.error("Skipping %s:\n %s", filename, str(msg))
       logger.info("%3s%% %s -> %s", percentage, filename, newname)
       if callable(callback):
          if callback(filename,
