@@ -41,7 +41,7 @@ def personalize_file(filename, personals, forced_personals):
          personals += exifconfig.items(exif_file.fields["Model"])
       else:
          exiflow.configfile.append("exif", exif_file.fields["Model"],
-                                   ("Artist", "Contact"))
+                                   ("artist", "contact"))
          sys.stderr.write("Get rid of this message by defining at least"
                           " an empty [%s] section.\n" %
                           exif_file.fields["Model"])
