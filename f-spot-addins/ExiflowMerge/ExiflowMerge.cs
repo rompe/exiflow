@@ -78,10 +78,13 @@ namespace ExiflowMergeExtension
 			// Example with time:
 			// 20071231-135959-n005678-xy000.jpg
 			// See http://exiflow.sf.net/ for an explanation.
-			String exiflowpat = "^\\d{8}(-\\d{6})?-.{3}\\d{4}-.{5}\\.[^.]*$";
-			return Regex.IsMatch (p1.Name, exiflowpat) &&
-				Regex.IsMatch (p2.Name, exiflowpat) &&
-				p1.Name.Substring (0, 19) == p2.Name.Substring (0, 19);
+			String exiflowpatstring = "^\\d{8}(-\\d{6})?-.{3}\\d{4}-.{2}.{3}\\.[^.]*$";
+			Regex exiflowpat = new Regex(@"^(\d{8}(-\d{6})?-.{3}\d{4}-.{2}).{3}\.[^.]*$");
+			Match exiflowpatmatch1 = exiflowpat.Match(p1.Name);
+			Match exiflowpatmatch2 = exiflowpat.Match(p2.Name);
+                        return Regex.IsMatch (p1.Name, exiflowpatstring) &&
+				Regex.IsMatch (p2.Name, exiflowpatstring) &&
+				exiflowpatmatch1.Groups[1].ToString() == exiflowpatmatch2.Groups[1].ToString();
 		}
 
 
