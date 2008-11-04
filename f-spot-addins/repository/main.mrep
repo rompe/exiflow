@@ -2,7 +2,7 @@
 <Repository xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Repository>
     <Url>root.mrep</Url>
-    <LastModified>2008-08-26T23:26:41.0000000+02:00</LastModified>
+    <LastModified>2008-08-27T21:36:49.0000000+02:00</LastModified>
   </Repository>
   <Repository>
     <Url>.svn/main.mrep</Url>

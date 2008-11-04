@@ -221,50 +221,6 @@
     </Addin>
   </Addin>
   <Addin>
-    <Url>FSpot.ExiflowRenameVersion_0.4.4.0.mpack</Url>
-    <Addin>
-      <Id>ExiflowRenameVersion</Id>
-      <Namespace>FSpot</Namespace>
-      <Name>FSpot.ExiflowRenameVersion,0.4.4.0</Name>
-      <Version>0.4.4.0</Version>
-      <BaseVersion />
-      <Author>Sebastian Berthold</Author>
-      <Copyright />
-      <Url />
-      <Description>Rename a Version, supporting revision numbers of the exiflow project ( http://exiflow.sf.net ).</Description>
-      <Category>Tools</Category>
-      <Dependencies>
-        <AddinDependency>
-          <AddinId>Core</AddinId>
-          <Version>0.4.4.0</Version>
-        </AddinDependency>
-      </Dependencies>
-      <OptionalDependencies />
-    </Addin>
-  </Addin>
-  <Addin>
-    <Url>FSpot.ExiflowRenameVersion_0.4.3.0.mpack</Url>
-    <Addin>
-      <Id>ExiflowRenameVersion</Id>
-      <Namespace>FSpot</Namespace>
-      <Name>FSpot.ExiflowRenameVersion,0.4.3.0</Name>
-      <Version>0.4.3.0</Version>
-      <BaseVersion />
-      <Author>Sebastian Berthold</Author>
-      <Copyright />
-      <Url />
-      <Description>Rename a Version, supporting revision numbers of the exiflow project ( http://exiflow.sf.net ).</Description>
-      <Category>Tools</Category>
-      <Dependencies>
-        <AddinDependency>
-          <AddinId>Core</AddinId>
-          <Version>0.4.3.0</Version>
-        </AddinDependency>
-      </Dependencies>
-      <OptionalDependencies />
-    </Addin>
-  </Addin>
-  <Addin>
     <Url>FSpot.DevelopInUFrawExiflow_0.4.4.100.mpack</Url>
     <Addin>
       <Id>DevelopInUFrawExiflow</Id>
