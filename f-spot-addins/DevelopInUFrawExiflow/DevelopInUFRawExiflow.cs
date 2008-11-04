@@ -18,42 +18,168 @@ using System.Text.RegularExpressions;
 
 using FSpot;
 using FSpot.Extensions;
+using FSpot.Utils;
 using Mono.Unix;
 
 namespace DevelopInUFRawExiflowExtension
 {
-	public class DevelopInUFRawExiflow: ICommand
-	{
-		public void Run (object o, EventArgs e)
+	// GUI Version
+	public class DevelopInUFRawExiflow : AbstractDevelopInUFRawExiflow {
+		public DevelopInUFRaw() : base("ufraw")
 		{
-			Console.WriteLine ("EXECUTING DEVELOP IN UFRawExiflow EXTENSION");
+		}
+
+		public override void Run (object o, EventArgs e)
+		{
+			Log.Information ("EXECUTING DEVELOP IN UFRAW Exiflow EXTENSION");
 			
 			foreach (Photo p in MainWindow.Toplevel.SelectedPhotos ()) {
-				PhotoVersion raw = p.GetVersion (Photo.OriginalVersionId) as PhotoVersion;
-				if (!ImageFile.IsRaw (raw.Uri.AbsolutePath)) {
-					Console.WriteLine ("The Original version of this image is not a (supported) RAW file");
-					continue;
-				}
-
-				string filename = GetNextVersionFileName (p);
-				System.Uri developed = GetUriForVersionFileName (p, filename);
-				string args = String.Format("--exif --overwrite --compression=95 --out-type=jpeg --output={0} {1}", 
-					CheapEscape (developed.LocalPath),
-					CheapEscape (raw.Uri.ToString()));
-				Console.WriteLine ("ufraw "+args);
-
-				System.Diagnostics.Process ufraw = System.Diagnostics.Process.Start ("ufraw", args); 
-				ufraw.WaitForExit ();
-				if (!(new Gnome.Vfs.Uri (developed.ToString ())).Exists) {
-					Console.WriteLine ("UFraw didn't ended well. Check that you have UFRaw 0.13 (or CVS newer than 2007-09-06). Or did you simply clicked on Cancel ?");
-					continue;
-				}
-
-				p.DefaultVersionId = p.AddVersion (developed, GetVersionName(filename), true);
-				p.Changes.DataChanged = true;
-				Core.Database.Photos.Commit (p);
+				DevelopPhoto (p);
 			}	
 		}
+	}
+
+	// Batch Version
+	public class DevelopInUFRawBatchExiflow : AbstractDevelopInUFRawExiflow {
+		public DevelopInUFRawBatch() : base("ufraw-batch")
+		{
+		}
+
+		public override void Run (object o, EventArgs e)
+		{
+			ProgressDialog pdialog = new ProgressDialog(Catalog.GetString ("Developing photos"),
+														ProgressDialog.CancelButtonType.Cancel,
+														MainWindow.Toplevel.SelectedPhotos ().Length,
+														MainWindow.Toplevel.Window);
+			Log.Information ("EXECUTING DEVELOP IN UFRAW Exiflow EXTENSION");
+			
+			foreach (Photo p in MainWindow.Toplevel.SelectedPhotos ()) {
+				bool cancelled = pdialog.Update(String.Format(Catalog.GetString ("Developing {0}"), p.Name));
+				if (cancelled) {
+					break;
+				}
+
+				DevelopPhoto (p);
+			}	
+			pdialog.Destroy();
+		}
+	}
+
+	// Abstract version, contains shared functionality
+	public abstract class AbstractDevelopInUFRawExiflow : ICommand
+	{
+		// The executable used for developing RAWs
+		private string executable;
+
+		public const string APP_FSPOT_EXTENSION = Preferences.APP_FSPOT + "extension/";
+		// We share the configuration with the original extension:
+		public const string EXTENSION_DEVELOPINUFRAW = "developinufraw/";
+		public const string UFRAW_JPEG_QUALITY_KEY = APP_FSPOT_EXTENSION + EXTENSION_DEVELOPINUFRAW + "ufraw_jpeg_quality";
+		public const string UFRAW_ARGUMENTS_KEY = APP_FSPOT_EXTENSION + EXTENSION_DEVELOPINUFRAW + "ufraw_arguments";
+		public const string UFRAW_BATCH_ARGUMENTS_KEY = APP_FSPOT_EXTENSION + EXTENSION_DEVELOPINUFRAW + "ufraw_batch_arguments";
+			
+		int ufraw_jpeg_quality;
+		string ufraw_args;
+		string ufraw_batch_args;
+
+		public AbstractDevelopInUFRaw(string executable) 
+		{
+			this.executable = executable;
+		}
+
+		public abstract void Run (object o, EventArgs e);
+
+		protected void DevelopPhoto (Photo p)
+		{
+			LoadPreference (UFRAW_JPEG_QUALITY_KEY);
+			LoadPreference (UFRAW_ARGUMENTS_KEY);
+			LoadPreference (UFRAW_BATCH_ARGUMENTS_KEY);
+
+			PhotoVersion raw = p.GetVersion (Photo.OriginalVersionId) as PhotoVersion;
+			if (!ImageFile.IsRaw (raw.Uri.AbsolutePath)) {
+				Log.Warning ("The Original version of this image is not a (supported) RAW file");
+				continue;
+			}
+
+			string filename = GetVersionName (p);
+			System.Uri developed = GetUriForVersionName (p, filename);
+			string idfile = "";
+
+
+			if (ufraw_jpeg_quality < 1 || ufraw_jpeg_quality > 100) {
+				Log.Debug ("Invalid JPEG quality specified, defaulting to quality 98");
+				ufraw_jpeg_quality = 98;
+			}
+
+			string args = "";
+			switch (executable) {
+				case "ufraw":
+					args += ufraw_args;
+					if (new Gnome.Vfs.Uri (Path.ChangeExtension (raw.Uri.ToString (), ".ufraw")).Exists) {
+						// We found an ID file, use that instead of the raw file
+						idfile = "--conf=" + Path.ChangeExtension (raw.Uri.LocalPath, ".ufraw");
+					}
+					break;
+				case "ufraw-batch":
+					args += ufraw_batch_args;
+					if (new Gnome.Vfs.Uri (Path.Combine (FSpot.Global.BaseDirectory, "batch.ufraw")).Exists) {
+						// We found an ID file, use that instead of the raw file
+						idfile = "--conf=" + Path.Combine (FSpot.Global.BaseDirectory, "batch.ufraw");
+					}
+					break;
+			}
+
+			args += String.Format(" --exif --overwrite --create-id=also --compression={0} --out-type=jpeg {1} --output={2} {3}", 
+				ufraw_jpeg_quality,
+				idfile,
+				CheapEscape (developed.LocalPath),
+				CheapEscape (raw.Uri.ToString ()));
+			Log.Debug ("ufraw " + args);
+
+			System.Diagnostics.Process ufraw = System.Diagnostics.Process.Start ("ufraw", args); 
+			ufraw.WaitForExit ();
+			if (!(new Gnome.Vfs.Uri (developed.ToString ())).Exists) {
+				Log.Warning ("UFraw didn't end well. Check that you have UFRaw 0.13 (or CVS newer than 2007-09-06). Or did you simply clicked on Cancel ?");
+				continue;
+			}
+
+			if (new Gnome.Vfs.Uri (Path.ChangeExtension (developed.ToString (), ".ufraw")).Exists) {
+				// We save our own copy of the last ufraw settings, as ufraw can overwrite it's own last used settings outside f-spot
+				File.Delete (Path.Combine (FSpot.Global.BaseDirectory, "batch.ufraw"));
+				File.Copy (Path.ChangeExtension (developed.LocalPath, ".ufraw"), Path.Combine (FSpot.Global.BaseDirectory, "batch.ufraw"));
+
+				// Rename the ufraw file to match the original RAW filename, instead of the (Developed In UFRaw) filename
+				File.Delete (Path.ChangeExtension (raw.Uri.LocalPath, ".ufraw"));
+				File.Move (Path.ChangeExtension (developed.LocalPath, ".ufraw"), Path.ChangeExtension (raw.Uri.LocalPath, ".ufraw"));
+			}
+
+			p.DefaultVersionId = p.AddVersion (developed, GetVersionName(filename), true);
+			p.Changes.DataChanged = true;
+			Core.Database.Photos.Commit (p);
+		}
+
+		void LoadPreference (string key)
+		{
+			object val = Preferences.Get (key);
+
+			if (val == null)
+				return;
+			
+			Log.Debug (String.Format ("Setting {0} to {1}", key, val));
+
+			switch (key) {
+				case UFRAW_JPEG_QUALITY_KEY:
+					ufraw_jpeg_quality = (int) val;
+					break;
+				case UFRAW_ARGUMENTS_KEY:
+					ufraw_args = (string) val;
+					break;
+				case UFRAW_BATCH_ARGUMENTS_KEY:
+					ufraw_batch_args = (string) val;
+					break;
+			}
+		}
+
 
 		private static string GetNextVersionFileName (Photo p)
 		{
