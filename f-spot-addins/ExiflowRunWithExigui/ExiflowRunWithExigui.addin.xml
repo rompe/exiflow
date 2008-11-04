@@ -1,7 +1,8 @@
 <Addin namespace="FSpot"
-	id="ExiflowRunWithExigui"
+	name="ExiflowRunWithExigui"
 	version="0.4.4.100"
-	description="Open Exigui with all versions from selected photos( http://exiflow.sf.net )."
+	description="Open Exigui with all versions from selected photos( http://exiflow.org/ )."
+	url="http://exiflow.org/"
 	author="Sebastian Berthold"
 	category="Tools">
 	<Dependencies>
