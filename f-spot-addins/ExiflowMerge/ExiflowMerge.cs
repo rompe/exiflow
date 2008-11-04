@@ -139,7 +139,7 @@ namespace ExiflowMergeExtension
 					foreach (uint version_id in jpeg.VersionIds) {
 						string name = jpeg.GetVersion (version_id).Name;
 						try {
-							raw.DefaultVersionId = raw.CreateReparentedVersion (jpeg.GetVersion (version_id) as PhotoVersion);
+							raw.DefaultVersionId = raw.CreateReparentedVersion (jpeg.GetVersion (version_id) as PhotoVersion, version_id == Photo.OriginalVersionId);
 							if (version_id == Photo.OriginalVersionId)
 								// Just the filename part that follows the last "-", e.g. "xy100.jpg".
 								raw.RenameVersion (raw.DefaultVersionId, jpeg.Name.Substring(jpeg.Name.LastIndexOf('-') + 1));
@@ -149,6 +149,7 @@ namespace ExiflowMergeExtension
 							Console.WriteLine (e);
 						}
 					}
+					raw.AddTag (jpeg.Tags);
 					uint [] version_ids = jpeg.VersionIds;
 					Array.Reverse (version_ids);
 					foreach (uint version_id in version_ids) {
@@ -158,6 +159,7 @@ namespace ExiflowMergeExtension
 							Console.WriteLine (e);
 						}
 					}	
+					raw.Changes.DataChanged = true;
 					Core.Database.Photos.Commit (raw);
 					Core.Database.Photos.Remove (jpeg);
 				}

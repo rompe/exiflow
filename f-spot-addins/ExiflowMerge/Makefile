@@ -16,7 +16,7 @@ SOURCES = \
 	$(ADDIN).cs
 
 $(ADDIN).dll: $(SOURCES) $(ADDIN).addin.xml
-	PKG_CONFIG_PATH=$(FSPOTDIR)/lib/pkgconfig gmcs -target:library $(SOURCES) $(PACKAGES) $(ASSEMBLIES) $(RESOURCES)
+	PKG_CONFIG_PATH=$(FSPOTDIR)/lib/pkgconfig gmcs -target:library -o:$@ $(SOURCES) $(PACKAGES) $(ASSEMBLIES) $(RESOURCES)
 
 clean:
 	rm -f *.dll *~ *.bak *.mpack
