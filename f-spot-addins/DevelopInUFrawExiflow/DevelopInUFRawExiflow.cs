@@ -25,7 +25,7 @@ namespace DevelopInUFRawExiflowExtension
 {
 	// GUI Version
 	public class DevelopInUFRawExiflow : AbstractDevelopInUFRawExiflow {
-		public DevelopInUFRaw() : base("ufraw")
+		public DevelopInUFRawExiflow() : base("ufraw")
 		{
 		}
 
@@ -41,7 +41,7 @@ namespace DevelopInUFRawExiflowExtension
 
 	// Batch Version
 	public class DevelopInUFRawBatchExiflow : AbstractDevelopInUFRawExiflow {
-		public DevelopInUFRawBatch() : base("ufraw-batch")
+		public DevelopInUFRawBatchExiflow() : base("ufraw-batch")
 		{
 		}
 
@@ -82,7 +82,7 @@ namespace DevelopInUFRawExiflowExtension
 		string ufraw_args;
 		string ufraw_batch_args;
 
-		public AbstractDevelopInUFRaw(string executable) 
+		public AbstractDevelopInUFRawExiflow(string executable) 
 		{
 			this.executable = executable;
 		}
@@ -98,11 +98,11 @@ namespace DevelopInUFRawExiflowExtension
 			PhotoVersion raw = p.GetVersion (Photo.OriginalVersionId) as PhotoVersion;
 			if (!ImageFile.IsRaw (raw.Uri.AbsolutePath)) {
 				Log.Warning ("The Original version of this image is not a (supported) RAW file");
-				continue;
+				return;
 			}
 
-			string filename = GetVersionName (p);
-			System.Uri developed = GetUriForVersionName (p, filename);
+			string name = GetNextVersionFileName (p);
+			System.Uri developed = GetUriForVersionFileName (p, name);
 			string idfile = "";
 
 
@@ -140,7 +140,7 @@ namespace DevelopInUFRawExiflowExtension
 			ufraw.WaitForExit ();
 			if (!(new Gnome.Vfs.Uri (developed.ToString ())).Exists) {
 				Log.Warning ("UFraw didn't end well. Check that you have UFRaw 0.13 (or CVS newer than 2007-09-06). Or did you simply clicked on Cancel ?");
-				continue;
+				return;
 			}
 
 			if (new Gnome.Vfs.Uri (Path.ChangeExtension (developed.ToString (), ".ufraw")).Exists) {
@@ -153,7 +153,7 @@ namespace DevelopInUFRawExiflowExtension
 				File.Move (Path.ChangeExtension (developed.LocalPath, ".ufraw"), Path.ChangeExtension (raw.Uri.LocalPath, ".ufraw"));
 			}
 
-			p.DefaultVersionId = p.AddVersion (developed, GetVersionName(filename), true);
+			p.DefaultVersionId = p.AddVersion (developed, name, true);
 			p.Changes.DataChanged = true;
 			Core.Database.Photos.Commit (p);
 		}
