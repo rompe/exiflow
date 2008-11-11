@@ -16,10 +16,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 
+using Mono.Unix;
+
 using FSpot;
 using FSpot.Extensions;
 using FSpot.Utils;
-using Mono.Unix;
+using FSpot.UI.Dialog;
 
 namespace ExiflowDevelopInUFRawExtension
 {
