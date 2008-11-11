@@ -9,7 +9,7 @@
 		<Addin id="Core" version="0.4.4.100"/>
 	</Dependencies>
 	<Extension path = "/FSpot/Menus/Tools">
-		<Command id = "MergeExiflow" _label = "Merge exiflow revisions" command_type = "ExiflowMergeExtension.ExiflowMerge" />
+		<Command id = "MergeExiflow" _label = "Exiflow: _merge revisions" command_type = "ExiflowMergeExtension.ExiflowMerge" />
 	</Extension>
 </Addin>
 

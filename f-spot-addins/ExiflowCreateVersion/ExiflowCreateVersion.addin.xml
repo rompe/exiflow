@@ -9,7 +9,7 @@
 		<Addin id="Core" version="0.4.4.100"/>
 	</Dependencies>
 	<Extension path = "/FSpot/Menus/PhotoPopup">
-		<Command id = "ExiflowCreateVersion" _label = "ExiflowCreateVersion" command_type = "ExiflowCreateVersionExtension.ExiflowCreateVersion" insertbefore="OpenWith"/>
+		<Command id = "ExiflowCreateVersion" _label = "Exiflow: _Create Version" command_type = "ExiflowCreateVersionExtension.ExiflowCreateVersion" insertbefore="OpenWith" />
 	</Extension>
 </Addin>
 

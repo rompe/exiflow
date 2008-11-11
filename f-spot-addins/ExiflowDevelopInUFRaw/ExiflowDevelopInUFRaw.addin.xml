@@ -1,5 +1,5 @@
 <Addin namespace="FSpot"
-	name="DevelopInUFrawExiflow"
+	name="ExiflowDevelopInUFRaw"
 	version="0.4.4.101"
 	description="Develop the image in UFRaw, saves the result as a new version, supporting revision numbers of the exiflow project ( http://exiflow.org/ )\n\nNote: Requires ufraw 0.13 or CVS version newer than 2007-09-06 !!!"
 	url="http://exiflow.org/"
@@ -9,10 +9,10 @@
 		<Addin id="Core" version="0.4.4.100"/>
 	</Dependencies>
 	<Extension path = "/FSpot/Menus/PhotoPopup">
-		<Command id = "DevelopInUFRawExiflow" _label = "Exiflow: Develop in UFRaw" command_type = "DevelopInUFRawExiflowExtension.DevelopInUFRawExiflow" insertbefore="OpenWith"/>
+		<Command id = "ExiflowDevelopInUFRaw" _label = "Exiflow: _Develop in UFRaw" command_type = "ExiflowDevelopInUFRawExtension.ExiflowDevelopInUFRaw" insertbefore="OpenWith"/>
 		<Condition id="PhotoSelection" selection="multiple">
-+			<Command id = "DevelopInUFRawBatchExiflow" _label = "Exiflow: Batch Develop" command_type = "DevelopInUFRawExiflowExtension.DevelopInUFRawBatchExiflow" insertbefore="OpenWith"/>
-+		</Condition>
+			<Command id = "DevelopInUFRawBatchExiflow" _label = "Exiflow: Batch Develop" command_type = "ExiflowDevelopInUFRawExtension.ExiflowDevelopInUFRaw" insertbefore="OpenWith"/>
+		</Condition>
 
 	</Extension>
 </Addin>

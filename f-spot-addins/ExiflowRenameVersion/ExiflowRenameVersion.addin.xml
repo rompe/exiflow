@@ -8,8 +8,17 @@
 	<Dependencies>
 		<Addin id="Core" version="0.4.4.100"/>
 	</Dependencies>
+<!--
 	<Extension path = "/FSpot/Menus/PhotoPopup">
-		<Command id = "ExiflowRenameVersion" _label = "ExiflowRenameVersion" command_type = "ExiflowRenameVersionExtension.ExiflowRenameVersion" insertbefore="OpenWith"/>
+		<Menu id="Exiflow" _label="_Exiflow" insertbefore="OpenWith" />
+	</Extension>
+-->
+	<Extension path = "/FSpot/Menus/PhotoPopup">
+<!--		<Menu id="Exiflow" _label="_Exiflow" insertbefore="OpenWith">
+-->
+			<Command id = "ExiflowRenameVersion" _label = "Exiflow: _Rename Version" command_type = "ExiflowRenameVersionExtension.ExiflowRenameVersion" insertbefore="OpenWith" />
+<!--		</Menu>
+-->
 	</Extension>
 </Addin>
 

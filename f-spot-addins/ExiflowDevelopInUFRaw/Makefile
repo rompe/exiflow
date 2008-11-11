@@ -1,7 +1,7 @@
 FSPOTDIR = ~/local/opt/f-spot
 GCONFTOOL = /usr/bin/gconftool-2
 
-all: DevelopInUFRawExiflow.dll
+all: ExiflowDevelopInUFRaw.dll
 
 PACKAGES = \
 	-pkg:gtk-sharp-2.0	\
@@ -14,18 +14,18 @@ ASSEMBLIES = \
 	-r:Mono.Posix
 
 RESOURCES = \
-	-resource:DevelopInUFRawExiflow.addin.xml
+	-resource:ExiflowDevelopInUFRaw.addin.xml
 
 SOURCES = \
-	DevelopInUFRawExiflow.cs
+	ExiflowDevelopInUFRaw.cs
 
 install: all
 	cp *.dll ~/.gnome2/f-spot/addins/
 
-mpack: DevelopInUFRawExiflow.dll
-	mautil p DevelopInUFRawExiflow.dll
+mpack: ExiflowDevelopInUFRaw.dll
+	mautil p ExiflowDevelopInUFRaw.dll
 
-%.dll: $(SOURCES) DevelopInUFRawExiflow.addin.xml
+%.dll: $(SOURCES) ExiflowDevelopInUFRaw.addin.xml
 	PKG_CONFIG_PATH=$(FSPOTDIR)/lib/pkgconfig gmcs -target:library $(SOURCES) $(PACKAGES) $(ASSEMBLIES) $(RESOURCES)
 
 clean:

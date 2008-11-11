@@ -9,7 +9,7 @@
 		<Addin id="Core" version="0.4.4.100"/>
 	</Dependencies>
 	<Extension path = "/FSpot/Menus/PhotoPopup">
-		<Command id = "ExiflowRunWithExigui" _label = "ExiflowRunWithExigui" command_type = "ExiflowRunWithExiguiExtension.ExiflowRunWithExigui" insertbefore="OpenWith"/>
+		<Command id = "ExiflowRunWithExigui" _label = "Exiflow: Open with _Exigui" command_type = "ExiflowRunWithExiguiExtension.ExiflowRunWithExigui" insertbefore="OpenWith"/>
 	</Extension>
 </Addin>
 

@@ -1,5 +1,5 @@
 /*
- * DevelopInUFRawExiflow.cs
+ * ExiflowDevelopInUFRaw.cs
  *
  * Author(s)
  * 	Sebastian Berthold <exiflow@sleif.de>
@@ -21,11 +21,11 @@ using FSpot.Extensions;
 using FSpot.Utils;
 using Mono.Unix;
 
-namespace DevelopInUFRawExiflowExtension
+namespace ExiflowDevelopInUFRawExtension
 {
 	// GUI Version
-	public class DevelopInUFRawExiflow : AbstractDevelopInUFRawExiflow {
-		public DevelopInUFRawExiflow() : base("ufraw")
+	public class ExiflowDevelopInUFRaw : AbstractExiflowDevelopInUFRaw {
+		public ExiflowDevelopInUFRaw() : base("ufraw")
 		{
 		}
 
@@ -40,7 +40,7 @@ namespace DevelopInUFRawExiflowExtension
 	}
 
 	// Batch Version
-	public class DevelopInUFRawBatchExiflow : AbstractDevelopInUFRawExiflow {
+	public class DevelopInUFRawBatchExiflow : AbstractExiflowDevelopInUFRaw {
 		public DevelopInUFRawBatchExiflow() : base("ufraw-batch")
 		{
 		}
@@ -66,7 +66,7 @@ namespace DevelopInUFRawExiflowExtension
 	}
 
 	// Abstract version, contains shared functionality
-	public abstract class AbstractDevelopInUFRawExiflow : ICommand
+	public abstract class AbstractExiflowDevelopInUFRaw : ICommand
 	{
 		// The executable used for developing RAWs
 		private string executable;
@@ -82,7 +82,7 @@ namespace DevelopInUFRawExiflowExtension
 		string ufraw_args;
 		string ufraw_batch_args;
 
-		public AbstractDevelopInUFRawExiflow(string executable) 
+		public AbstractExiflowDevelopInUFRaw(string executable) 
 		{
 			this.executable = executable;
 		}
