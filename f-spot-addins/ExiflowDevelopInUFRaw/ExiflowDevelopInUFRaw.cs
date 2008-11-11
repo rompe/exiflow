@@ -134,12 +134,12 @@ namespace ExiflowDevelopInUFRawExtension
 				idfile,
 				CheapEscape (developed.LocalPath),
 				CheapEscape (raw.Uri.ToString ()));
-			Log.Debug ("ufraw " + args);
+			Log.Debug (executable + " " + args);
 
-			System.Diagnostics.Process ufraw = System.Diagnostics.Process.Start ("ufraw", args); 
+			System.Diagnostics.Process ufraw = System.Diagnostics.Process.Start (executable, args); 
 			ufraw.WaitForExit ();
 			if (!(new Gnome.Vfs.Uri (developed.ToString ())).Exists) {
-				Log.Warning ("UFraw didn't end well. Check that you have UFRaw 0.13 (or CVS newer than 2007-09-06). Or did you simply clicked on Cancel ?");
+				Log.Warning ("UFRaw quit with an error. Check that you have UFRaw 0.13 or newer. Or did you simply clicked on Cancel?");
 				return;
 			}
 
