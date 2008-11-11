@@ -154,11 +154,13 @@ namespace ExiflowDevelopInUFRawExtension
 				File.Copy (Path.ChangeExtension (developed.LocalPath, ".ufraw"), Path.Combine (FSpot.Global.BaseDirectory, "batch.ufraw"));
 
 				// Rename the ufraw file to match the original RAW filename, instead of the (Developed In UFRaw) filename
-				File.Delete (Path.ChangeExtension (raw.Uri.LocalPath, ".ufraw"));
-				File.Move (Path.ChangeExtension (developed.LocalPath, ".ufraw"), Path.ChangeExtension (raw.Uri.LocalPath, ".ufraw"));
+				if (!(Path.ChangeExtension (raw.Uri.LocalPath, ".ufraw") == Path.ChangeExtension (developed.LocalPath, ".ufraw"))){
+					File.Delete (Path.ChangeExtension (raw.Uri.LocalPath, ".ufraw"));
+					File.Move (Path.ChangeExtension (developed.LocalPath, ".ufraw"), Path.ChangeExtension (raw.Uri.LocalPath, ".ufraw"));
+				}
 			}
 
-			p.DefaultVersionId = p.AddVersion (developed, name, true);
+			p.DefaultVersionId = p.AddVersion (developed, GetVersionName(name), true);
 			p.Changes.DataChanged = true;
 			Core.Database.Photos.Commit (p);
 		}
