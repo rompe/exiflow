@@ -31,7 +31,7 @@ namespace ExiflowDevelopInUFRawExtension
 
 		public override void Run (object o, EventArgs e)
 		{
-			Log.Information ("EXECUTING DEVELOP IN UFRAW Exiflow EXTENSION");
+			Log.Information ("Executing DevelopInUFRawExiflow extension");
 			
 			foreach (Photo p in MainWindow.Toplevel.SelectedPhotos ()) {
 				DevelopPhoto (p);
@@ -51,7 +51,7 @@ namespace ExiflowDevelopInUFRawExtension
 														ProgressDialog.CancelButtonType.Cancel,
 														MainWindow.Toplevel.SelectedPhotos ().Length,
 														MainWindow.Toplevel.Window);
-			Log.Information ("EXECUTING DEVELOP IN UFRAW Exiflow EXTENSION");
+			Log.Information ("Executing DevelopInUFRawExiflow extension in batch mode");
 			
 			foreach (Photo p in MainWindow.Toplevel.SelectedPhotos ()) {
 				bool cancelled = pdialog.Update(String.Format(Catalog.GetString ("Developing {0}"), p.Name));
