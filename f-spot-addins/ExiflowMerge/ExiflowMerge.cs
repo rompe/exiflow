@@ -7,6 +7,9 @@
  * Heavily based on the original RawPlusJpeg extension written by
  * 	Stephane Delcroix  <stephane@delcroix.org>
  *
+ * Synced with:
+ * http://svn.gnome.org/svn/f-spot/trunk/extensions/Tools/RawPlusJpeg/RawPlusJpeg.cs@4585
+ *
  * This is free software. See COPYING for details
  */
 
