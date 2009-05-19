@@ -6,8 +6,9 @@ A module for reading and writing EXIF information.
 """
 __revision__ = "$Id$"
 
-import subprocess
 import locale
+import logging
+import subprocess
 
 class Exif:
    """
@@ -52,7 +53,8 @@ class Exif:
          self.fields[key] = self._decode(self.fields[key])
 
 
-   def _decode(self, field):
+   @staticmethod
+   def _decode(field):
       """
       Decode string "field" by trying these encodings:
 
@@ -60,7 +62,6 @@ class Exif:
 
       If none of these succeeds, just despair and return "???".
       """
-      successful_encoding = None
       encodings = ['utf-8']
       #
       # next we add anything we can learn from the locale
@@ -128,19 +129,22 @@ class Exif:
       from myexif. The fields used for merging have to be defined in exiffields.
       Raises IOError on errors.
       """
+      logger = logging.getLogger("exiassign.assign_file")
       # Fields we want to keep
       exiffields = ["Artist", "Credit", "Copyright", "CopyrightNotice", 
                     "ImageDescription", "Keywords", "Location", "UserComment",
                     "XPTitle"]
-      command = "exiftool -overwrite_original -x Orientation -P -TagsFromFile " + sourcefile
+      command = "exiftool -overwrite_original -x Orientation -P -TagsFromFile %s --Keywords" \
+                % sourcefile
       for field in exiffields:
          if field in self.fields:
             if field == "Keywords":
-               for keyword in self.fields[field].split(","):
-                  command += " -%s=\"%s\"" % (field, keyword)
+               for keyword in set(self.fields[field].split(",")):
+                  command += " -%s=\"%s\"" % (field, keyword.strip())
             else:
                command += " -%s=\"%s\"" % (field, self.fields[field])
       command += " " + self.filename
+      logger.debug("Calling: %s", command)
       exiftool = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE)
       # exiftool doesn't reflect errors in it's return code, so we have to
