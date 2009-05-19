@@ -2,7 +2,7 @@ Source: exiflow
 Section: python
 Priority: optional
 Maintainer: Sebastian Berthold <exiflow@sleif.de>
-Build-Depends: debhelper (>= 5), python-dev
+Build-Depends: debhelper (>= 5), python (>=2.4)
 Standards-Version: 3.7.2
 Homepage: http://exiflow.org/
 

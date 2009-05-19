@@ -1,3 +1,23 @@
+exiflow (0.4.3-1) UNRELEASED; urgency=low
+
+  * fixes #2691924 - deal with non-utf8 chars in exif data
+    Try hard to decode EXIF values as UTF-8, current locale, and Latin1. 
+    Don't die if none of these encodings succeed. Instead, use "???". 
+    Thanks to Gilbert Laycock for the patch!
+
+  * make exirename able to modify filenames which are already in the exiflow 
+    schema to allow switching to or from timestamp inclusion
+
+  * exiassign: take exif tag "Model" to decide if file has already camera exif
+    informations
+
+  * Fix update_exif() to not blow up the amount of keywords when used 
+    repeatedly.
+  
+  * Some bug fixes and minor cleanups.
+
+ -- Sebastian Berthold <exiflow@sleif.de>  Tue, 02 Sep 2008 21:37:15 +0100
+
 exiflow (0.4.2-1) UNRELEASED; urgency=low
 
   * fixes #2053225 - exirename bug
