@@ -56,11 +56,9 @@ def assign_file(filename, prefix, force=False):
    except IOError, msg:
       logger.warning(str(msg))
       return 1
+   # Currently F-spot always tries to write "DateTimeOriginal", so we must change
+   # the key to detect files with valid exif information.
    #if not force and exif_file.fields.has_key("DateTimeOriginal"):
-   """
-   Currently F-spot always try to write "DateTimeOriginal", so we must change
-   the key to detect files with valid exif information.
-   """
    if not force and exif_file.fields.has_key("Model"):
       logger.info("Skipping %s, it seems to contain EXIF data.", filename)
       return 0
