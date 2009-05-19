@@ -7,6 +7,7 @@ A module for reading and writing EXIF information.
 __revision__ = "$Id$"
 
 import subprocess
+import locale
 
 class Exif:
    """
@@ -46,9 +47,51 @@ class Exif:
          # We don't need an empty "ImageDescription" for any merge operations.
          if self.fields["ImageDescription"] == "":
             del self.fields["ImageDescription"] 
-      # Be shure to have proper UTF8 strings
+      # Be sure to have proper UTF8 strings
       for key in self.fields:
-         self.fields[key] = unicode(self.fields[key], "utf-8")
+         self.fields[key] = self._decode(self.fields[key])
+
+
+   def _decode(self, field):
+      """
+      Decode string "field" by trying these encodings:
+
+      UTF-8, Current locale, Latin1
+
+      If none of these succeeds, just despair and return "???".
+      """
+      successful_encoding = None
+      encodings = ['utf-8']
+      #
+      # next we add anything we can learn from the locale
+      try:
+         encodings.append(locale.nl_langinfo(locale.CODESET))
+      except AttributeError:
+         pass
+      try:
+         encodings.append(locale.getlocale()[1])
+      except (AttributeError, IndexError):
+         pass
+      try:
+         encodings.append(locale.getdefaultlocale()[1])
+      except (AttributeError, IndexError):
+         pass
+      #
+      # we try 'latin-1' last
+      encodings.append('latin-1')
+      for enc in encodings:
+         # some of the locale calls 
+         # may have returned None
+         if not enc:
+            continue
+         try:
+            decoded = unicode(field, enc)
+         except (UnicodeError, LookupError):
+            decoded = unicode("???", "utf-8")
+         else:
+            break
+
+      return decoded
 
 
    def write_exif(self):
