@@ -139,8 +139,8 @@ class Exif:
       for field in exiffields:
          if field in self.fields:
             if field == "Keywords":
-               for keyword in set(self.fields[field].split(",")):
-                  command += " -%s=\"%s\"" % (field, keyword.strip())
+               for keyword in set([s.strip() for s in self.fields[field].split(",")]):
+                  command += " -%s=\"%s\"" % (field, keyword)
             else:
                command += " -%s=\"%s\"" % (field, self.fields[field])
       command += " " + self.filename
