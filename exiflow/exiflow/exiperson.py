@@ -22,7 +22,8 @@ import exiflow.filelist
 import exiflow.configfile
 
 
-def personalize_file(filename, personals, forced_personals):
+def personalize_file(filename, personals, options_section_personals, \
+      forced_personals):
    """
    Personalize an image using data from the dictionary "personals".
    The optional "forced_personals" override all other personals.
@@ -45,18 +46,22 @@ def personalize_file(filename, personals, forced_personals):
          sys.stderr.write("Get rid of this message by defining at least"
                           " an empty [%s] section.\n" %
                           exif_file.fields["Model"])
-   
-   if len(forced_personals) > 0:
-      personals.update(forced_personals)
 
-   if len(personals) == 0:
-      logger.warning("No [all] or [%s] section with data, skipping.", 
-                     exif_file.fields["Model"])
+   if len(options_section_personals) > 0:
+      personals += options_section_personals
+   
+   if len(personals) == 0 and len(forced_personals) == 0:
+      logger.warning("No [all] or [%s] section with data, nor custom tags,"
+                     " skipping.", exif_file.fields["Model"])
       return 1
 
    exif_file.fields = {}
    for key, value in personals:
       exif_file.fields[key] = value
+
+   if len(forced_personals) > 0:
+      for key in forced_personals:
+         exif_file.fields[key] = forced_personals[key]
 
    try:
       exif_file.write_exif()
@@ -93,12 +98,13 @@ def run(argv, callback=None):
    exifconfig = exiflow.configfile.parse("exif")
 
    defaultpersonals = []
+   options_section_personals = []
    if exifconfig.has_section("all"):
       defaultpersonals += exifconfig.items("all")
 
    if options.section:
       if exifconfig.has_section(options.section):
-         defaultpersonals += exifconfig.items(options.section)
+         options_section_personals += exifconfig.items(options.section)
       else:
          logger.error("ERROR: Section %s not found in config files",
                       options.section)
@@ -110,7 +116,7 @@ def run(argv, callback=None):
    for arg in args:
       if arg.startswith("-") and "=" in arg:
          field, value = arg.lstrip("-").split("=")
-         forced_personals[field] += value
+         forced_personals[field] = value
       else:
          remaining_args.append(arg)
 
@@ -121,7 +127,8 @@ def run(argv, callback=None):
             break
       # Note to programmer:
       # The [:] is needed to get a slice copy instead of a reference.
-      personalize_file(filename, defaultpersonals[:], forced_personals)
+      personalize_file(filename, defaultpersonals[:], \
+        options_section_personals[:], forced_personals)
 
 
 if __name__ == "__main__":
