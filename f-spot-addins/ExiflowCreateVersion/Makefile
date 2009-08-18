@@ -10,7 +10,8 @@ PACKAGES = \
 	-pkg:gnome-vfs-sharp-2.0
 
 ASSEMBLIES = \
-	-r:Mono.Posix
+	-r:Mono.Posix \
+	-r:/home/sb/local/opt/f-spot/lib/f-spot/gio-sharp.dll
 
 RESOURCES = \
 	-resource:ExiflowCreateVersion.addin.xml
@@ -19,7 +20,7 @@ SOURCES = \
 	ExiflowCreateVersion.cs
 
 install: all
-	cp *.dll ~/.gnome2/f-spot/addins/
+	cp *.dll ~/.config/f-spot/addins/
 
 mpack: ExiflowCreateVersion.dll
 	mautil p ExiflowCreateVersion.dll
