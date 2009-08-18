@@ -10,7 +10,8 @@ clean:
 	rm -rf repository/
 
 install: all
-	rsync -avuzH repository/ rompe@shell.sf.net:/home/groups/e/ex/exiflow/htdocs/f-spot-addins
+	ssh rompe,exiflow@shell.sf.net create
+	rsync -avuzH repository/ rompe,exiflow@shell.sf.net:/home/groups/e/ex/exiflow/htdocs/f-spot-addins
 
 
 .PHONY: install clean all repository
