@@ -1,12 +1,12 @@
 <Addin namespace="FSpot"
 	name="ExiflowEditComment"
-	version="0.4.4.100"
+	version="0.6"
 	description="Edit EXIF comment of selected photos."
 	url="http://exiflow.org/"
 	author="Ulf Rompe"
 	category="Tools">
 	<Dependencies>
-		<Addin id="Core" version="0.4.4.100"/>
+		<Addin id="Core" version="0.6"/>
 	</Dependencies>
 	<Extension path = "/FSpot/Menus/PhotoPopup">
 		<Command id = "ExiflowEditComment" _label = "Edit Comment" command_type = "ExiflowEditCommentExtension.ExiflowEditComment" insertbefore="OpenWith"/>
