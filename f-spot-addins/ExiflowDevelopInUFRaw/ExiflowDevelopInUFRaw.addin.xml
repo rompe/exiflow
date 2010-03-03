@@ -11,7 +11,7 @@
 	<Extension path = "/FSpot/Menus/PhotoPopup">
 		<Command id = "ExiflowDevelopInUFRaw" _label = "Exiflow: _Develop in UFRaw" command_type = "ExiflowDevelopInUFRawExtension.ExiflowDevelopInUFRaw" insertbefore="OpenWith"/>
 		<Condition id="PhotoSelection" selection="multiple">
-			<Command id = "DevelopInUFRawBatchExiflow" _label = "Exiflow: Batch Develop" command_type = "ExiflowDevelopInUFRawExtension.ExiflowDevelopInUFRaw" insertbefore="OpenWith"/>
+			<Command id = "DevelopInUFRawBatchExiflow" _label = "Exiflow: Batch Develop" command_type = "ExiflowDevelopInUFRawExtension.DevelopInUFRawBatchExiflow" insertbefore="OpenWith"/>
 		</Condition>
 
 	</Extension>
