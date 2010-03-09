@@ -79,15 +79,15 @@ def run(argv, callback=None):
                stat.S_IMODE(0644))
 
    # Unmount card
-   pmount = subprocess.Popen("pmount", stdout=subprocess.PIPE)
-   for line in pmount.communicate()[0].splitlines():
+   mount = subprocess.Popen("mount", stdout=subprocess.PIPE)
+   for line in mount.communicate()[0].splitlines():
       # Example line: /dev/sdc1 on /media/NIKON D70 type vfat (rw,nosuid,n[...]
       line_parts = line.split(" type", 1)[0].split(None, 2)
       print "DEBUG", line_parts
       if (len(line_parts) == 3 and line_parts[1] == "on" and
           os.path.realpath(options.mount) == os.path.realpath(line_parts[2])):
-         logger.warn("Trying to umount %s.", line_parts[0])
-         subprocess.call(["pumount", line_parts[0]])
+         logger.warn("Trying to unmount %s.", line_parts[0])
+         subprocess.call(["umount", line_parts[0]])
 
 
 if __name__ == "__main__":
