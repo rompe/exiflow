@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# vim: tabstop=3 expandtab shiftwidth=3
+# vim: tabstop=4 expandtab shiftwidth=4
 """
 Convert any RAW images into JPEG images.
 
