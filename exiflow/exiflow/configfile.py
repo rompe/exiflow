@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# vim: tabstop=3 expandtab shiftwidth=3
+# vim: tabstop=4 expandtab shiftwidth=4
 """
 A set of functions to handle config files.
 They look for existance of ~/.exiflow/<classname>.cfg and will create it if
@@ -84,74 +84,74 @@ __cache = {}
 __stats = {}
 
 def __stat(filename):
-   """
-   Return a stat object or None if "filename" doesn't exist.
-   """
-   try:
-      return os.stat(filename)
-   except OSError:
-      return None
+    """
+    Return a stat object or None if "filename" doesn't exist.
+    """
+    try:
+        return os.stat(filename)
+    except OSError:
+        return None
 
 def parse(configname):
-   """
-   Handle cached access to <configname>.cfg.
-   Return a configparser object and a list of processed files.
-   """
-   logger = logging.getLogger("configfile.parse")
-   local_config = os.path.join(__local_config_dir, configname + ".cfg")
-   global_config = os.path.join(__global_config_dir, configname + ".cfg")
-   if not __cache.has_key(configname) \
-      or __stats.get(local_config, None) != __stat(local_config) \
-      or __stats.get(global_config, None) != __stat(global_config):
-      if not os.path.exists(local_config):
-         if not os.path.isdir(__local_config_dir):
-            os.makedirs(__local_config_dir)
-         file(local_config, "w").write(__default_contents[configname])
-         logger.warning("Created example %s.", local_config)
-      __stats[local_config] = __stat(local_config)
-      __stats[global_config] = __stat(global_config)
-      config = ConfigParser.ConfigParser()
-      read_files = config.read([global_config, local_config])
-      logger.info("Read %s config files: %s", configname, " ".join(read_files))
-      __cache[configname] = config
-   return __cache[configname]
+    """
+    Handle cached access to <configname>.cfg.
+    Return a configparser object and a list of processed files.
+    """
+    logger = logging.getLogger("configfile.parse")
+    local_config = os.path.join(__local_config_dir, configname + ".cfg")
+    global_config = os.path.join(__global_config_dir, configname + ".cfg")
+    if not __cache.has_key(configname) \
+        or __stats.get(local_config, None) != __stat(local_config) \
+        or __stats.get(global_config, None) != __stat(global_config):
+        if not os.path.exists(local_config):
+            if not os.path.isdir(__local_config_dir):
+                os.makedirs(__local_config_dir)
+            file(local_config, "w").write(__default_contents[configname])
+            logger.warning("Created example %s.", local_config)
+        __stats[local_config] = __stat(local_config)
+        __stats[global_config] = __stat(global_config)
+        config = ConfigParser.ConfigParser()
+        read_files = config.read([global_config, local_config])
+        logger.info("Read %s config files: %s", configname, " ".join(read_files))
+        __cache[configname] = config
+    return __cache[configname]
 
 
 def get_options(configname, section, options):
-   """
-   Try to get options from section "section" from configfile "configname".
-   If section doesn't exist or options don't exist in it, fall back to
-   section "all". If that doesn't succed either, call append() and return
-   empty values.
-   """
-   config = parse(configname)
-   values = []
-   must_append = False
-   for option in options:
-      if config.has_section(section) and config.has_option(section, option):
-         values.append(config.get(section, option))
-      elif config.has_section("all") and config.has_option("all", option):
-         values.append(config.get("all", option))
-      else:
-         must_append = True
-         values.append("")
-   if must_append:
-      append(configname, section, options)
-   return values
+    """
+    Try to get options from section "section" from configfile "configname".
+    If section doesn't exist or options don't exist in it, fall back to
+    section "all". If that doesn't succed either, call append() and return
+    empty values.
+    """
+    config = parse(configname)
+    values = []
+    must_append = False
+    for option in options:
+        if config.has_section(section) and config.has_option(section, option):
+            values.append(config.get(section, option))
+        elif config.has_section("all") and config.has_option("all", option):
+            values.append(config.get("all", option))
+        else:
+            must_append = True
+            values.append("")
+    if must_append:
+        append(configname, section, options)
+    return values
 
 
 def append(configname, section, options):
-   """
-   Append a commented section with options to "configname".cfg
-   """
-   configfile = os.path.join(__local_config_dir, configname + ".cfg")
-   string_to_append = "\n#[%s]\n#%s = \n" % (section, " = \n#".join(options))
-   if string_to_append in "".join(file(configfile, "r").readlines()):
-      sys.stderr.write("Commented section [%s] found in %s\nPlease edit!\n" %
-                       (section, configfile))
-   else:
-      sys.stderr.write("Adding commented section [%s] to %s\nPlease edit!\n" %
-                       (section, configfile))
-      file(configfile, "a").write(string_to_append)
+    """
+    Append a commented section with options to "configname".cfg
+    """
+    configfile = os.path.join(__local_config_dir, configname + ".cfg")
+    string_to_append = "\n#[%s]\n#%s = \n" % (section, " = \n#".join(options))
+    if string_to_append in "".join(file(configfile, "r").readlines()):
+        sys.stderr.write("Commented section [%s] found in %s\nPlease edit!\n" %
+                         (section, configfile))
+    else:
+        sys.stderr.write("Adding commented section [%s] to %s\nPlease edit!\n" %
+                         (section, configfile))
+        file(configfile, "a").write(string_to_append)
 
 
