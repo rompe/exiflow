@@ -83,7 +83,6 @@ def run(argv, callback=None):
    for line in mount.communicate()[0].splitlines():
       # Example line: /dev/sdc1 on /media/NIKON D70 type vfat (rw,nosuid,n[...]
       line_parts = line.split(" type", 1)[0].split(None, 2)
-      print "DEBUG", line_parts
       if (len(line_parts) == 3 and line_parts[1] == "on" and
           os.path.realpath(options.mount) == os.path.realpath(line_parts[2])):
          logger.warn("Trying to unmount %s.", line_parts[0])
