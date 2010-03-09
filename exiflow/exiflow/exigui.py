@@ -297,12 +297,9 @@ class Window1(object):
       logger = logging.getLogger("exigui.run_exiimport")
       args = ["-v"]
       import_dir = self.wtree.get_widget("exiimport_importdir_entry")
-      device = self.wtree.get_widget("exiimport_device_entry")
       target_dir = self.wtree.get_widget("exiimport_targetdir_entry")
       if import_dir.get_text():
          args.append("--mount=" + import_dir.get_text())
-      if device.get_text():
-         args.append("--device=" + device.get_text())
       if target_dir.get_text():
          args.append("--target=" + target_dir.get_text())
       try:
@@ -412,16 +409,12 @@ def run(argv):
    parser.set_defaults(batch_order="exiimport,exirename,exiperson,"
                                    "exiconvert,exiassign,exigate")
    parser.add_option("-m", "--mount", dest="mount",
-                     help="Mountpoint of directory to import. Corresponds"
-                          " to %m in the gnome-volume-manager config dialog.")
+                     help="Mountpoint of directory to import.")
    parser.add_option("-t", "--target", dest="target",
                      help="Target directory. A subdirectory will be created"
                           " in this directory.")
    parser.add_option("-d", "--device", dest="device",
-                     help="Mounted device file. If given, this device will be "
-                          "unmounted using pumount after the import. "
-                          "Corresponds to %d in the gnome-volume-manager "
-                          "config dialog.")
+                     help="(Ignored for backwards compatibility. Do not use.)")
    parser.add_option("-b", "--batch", action="store_true", dest="batch",
                      help="Autorun from exiimport over exirename, exiperson "
                           "and exiconvert to exiassign.")
@@ -436,8 +429,6 @@ def run(argv):
       win1 = Window1()
       if options.mount:
          win1.set_text("exiimport_importdir_entry", options.mount)
-      if options.device:
-         win1.set_text("exiimport_device_entry", options.device)
       if options.target:
          win1.set_text("exiimport_targetdir_entry", options.target)
       if len(args) > 0:

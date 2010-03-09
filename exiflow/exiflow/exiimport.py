@@ -33,10 +33,7 @@ def run(argv, callback=None):
                      help="Target directory. A subdirectory will be created"
                           " in this directory.")
    parser.add_option("-d", "--device", dest="device",
-                     help="Mounted device file. If given, this device will be"
-                          " unmounted using pumount after the import."
-                          " Corresponds to %d in the gnome-volume-manager"
-                          " config dialog.")
+                     help="(Ignored for backwards compatibility. Do not use.)")
    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
                      help="Be verbose.")
    options, args = parser.parse_args(argv)
@@ -82,8 +79,15 @@ def run(argv, callback=None):
                stat.S_IMODE(0644))
 
    # Unmount card
-   if options.device:
-      subprocess.call("pumount " + options.device, shell=True)
+   pmount = subprocess.Popen("pmount", stdout=subprocess.PIPE)
+   for line in pmount.communicate()[0].splitlines():
+      # Example line: /dev/sdc1 on /media/NIKON D70 type vfat (rw,nosuid,n[...]
+      line_parts = line.split(" type", 1)[0].split(None, 2)
+      print "DEBUG", line_parts
+      if (len(line_parts) == 3 and line_parts[1] == "on" and
+          os.path.realpath(options.mount) == os.path.realpath(line_parts[2])):
+         logger.warn("Trying to umount %s.", line_parts[0])
+         subprocess.call(["pumount", line_parts[0]])
 
 
 if __name__ == "__main__":
