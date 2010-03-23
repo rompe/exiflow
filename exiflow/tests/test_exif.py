@@ -37,7 +37,6 @@ class TestExif(unittest.TestCase):
     def test_read_exif_without_image(self):
         """ Tests for read_exif() with invalid filename """
         exif = exiflow.exif.Exif(self.__nosuchfile)
-        self.failUnless(isinstance(exif, exiflow.exif.Exif))
         self.failUnlessRaises(IOError, exif.read_exif)
 
     def test_read_exif_with_corrupt_image(self):
