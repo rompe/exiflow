@@ -3,35 +3,57 @@
 """
 Unit tests for exif.py
 """
-__revision__ = "$Id: $"
+__revision__ = "$Id$"
 
 
-import unittest
-import sys
+import shutil
 import os
+import pprint
+import sys
+import tempfile
+import unittest
+
+import NikonD70
 sys.path.append(os.path.dirname(sys.path[0]))
-import exif
+import exiflow.exif
 
 
 class TestExif(unittest.TestCase):
+    """ Tests for exif.py """
 
     def setUp(self):
-        self.seq = range(10)
+        """ Create a directory with an image. """
+        self.__tempdir = tempfile.mkdtemp()
+        self.__d70jpeg = os.path.join(self.__tempdir, "NikonD70.jpg")
+        shutil.copy(os.path.join(sys.path[0], "NikonD70.jpg"), self.__tempdir)
+        self.__emptyfile = os.path.join(self.__tempdir, "emptyfile.jpg")
+        file(self.__emptyfile, 'w')
+        self.__nosuchfile = os.path.join(self.__tempdir, "nosuchfile.jpg")
 
-    def test_shuffle(self):
-        # make sure the shuffled sequence does not lose any elements
-        random.shuffle(self.seq)
-        self.seq.sort()
-        self.assertEqual(self.seq, range(10))
+    def tearDown(self):
+        """ Clean up. """
+        shutil.rmtree(self.__tempdir)
 
-    def test_choice(self):
-        element = random.choice(self.seq)
-        self.assertTrue(element in self.seq)
+    def test_read_exif_without_image(self):
+        """ Tests for read_exif() with invalid filename """
+        exif = exiflow.exif.Exif(self.__nosuchfile)
+        self.failUnless(isinstance(exif, exiflow.exif.Exif))
+        self.failUnlessRaises(IOError, exif.read_exif)
 
-    def test_sample(self):
-        self.assertRaises(ValueError, random.sample, self.seq, 20)
-        for element in random.sample(self.seq, 5):
-            self.assertTrue(element in self.seq)
+    def test_read_exif_with_corrupt_image(self):
+        """ Tests for read_exif() with invalid image content """
+        exif = exiflow.exif.Exif(self.__emptyfile)
+        self.failUnlessRaises(IOError, exif.read_exif)
+
+    def test_read_exif(self):
+        """ Tests for read_exif() with valid image """
+        exif = exiflow.exif.Exif(self.__d70jpeg)
+        self.failUnless(isinstance(exif, exiflow.exif.Exif))
+        exif.read_exif()
+        for field in ("Directory", "FileModifyDate"):
+            exif.fields[field] = NikonD70.fields[field]
+        self.failUnlessEqual(exif.fields, NikonD70.fields)
+
 
 if __name__ == '__main__':
     unittest.main()
