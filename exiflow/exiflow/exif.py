@@ -103,7 +103,7 @@ class Exif:
         for field in self.fields.keys():
             if field == "Keywords":
                 for keyword in self.fields[field].split(","):
-                    command += " -%s=\"%s\"" % (field, keyword)
+                    command += " -%s=\"%s\"" % (field, keyword.strip())
             elif field == "DateTimeOriginal":
                 # TODO: Writing back DateTimeOriginal seems to be a bad idea since
                 # gthumb drops seconds and there is some confusion with time strings
