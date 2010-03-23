@@ -23,7 +23,7 @@ class TestExif(unittest.TestCase):
 
     def setUp(self):
         """ Create a directory with an image. """
-        self.__fields = {"Aperture": u"3.5", "Flash": u"No Flash"}
+        self.__fields = {"Keywords": u"foo, bar, thingamabob", "Description": u"Hello world!"}
         self.__tempdir = tempfile.mkdtemp()
         self.__d70jpeg = os.path.join(self.__tempdir, "NikonD70.jpg")
         shutil.copy(os.path.join(sys.path[0], "NikonD70.jpg"), self.__tempdir)
@@ -82,11 +82,26 @@ class TestExif(unittest.TestCase):
         self.failUnlessEqual(exif.fields["ImageDescription"], 
             u"ImageDescription first row äöüß\nImageDescription second row ÄÖÜß\n")
 
-    def test_write_exif_wihout_image(self):
+    def test_write_exif_without_image(self):
         """ Test for write_exif() with invalid filename """
-        exif = exiflow.exif.Exif(self.__emptyfile)
-        exif.fields = self.__fields.copy()
+        exif = exiflow.exif.Exif(self.__nosuchfile)
+        exif.fields = self.__fields
         self.failUnlessRaises(IOError, exif.write_exif)
+
+    def test_write_exif_with_corrupt_image(self):
+        """ Test for write_exif() with invalid image content """
+        exif = exiflow.exif.Exif(self.__emptyfile)
+        exif.fields = self.__fields
+        self.failUnlessRaises(IOError, exif.write_exif)
+
+    def test_write_exif(self):
+        """ Test for write_exif() with valid image """
+        exif = exiflow.exif.Exif(self.__d70jpeg)
+        exif.fields = self.__fields.copy()
+        self.failUnlessEqual(exif.write_exif(), 0)
+        exif.read_exif()
+        for field in self.__fields:
+            self.failUnlessEqual(exif.fields[field], self.__fields[field])
 
 
 if __name__ == '__main__':
