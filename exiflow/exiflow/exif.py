@@ -30,15 +30,14 @@ class Exif:
         exiftool = subprocess.Popen("exiftool -d %s -S " + self.filename,
                                     shell=True, stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE)
-        for line in exiftool.stdout:
-            if ": " in line:
-                key, value = line.split(": ", 1)
-                self.fields[key] = value.strip()
-        # TODO: Check if we may rely on exit status or if we have to check stderr
-        # like we do in write_exif
-        if exiftool.wait():
-            raise IOError, "".join(exiftool.stderr)
+        stdout, stderr = exiftool.communicate()
+        if len(stderr) > 0:
+            raise IOError, stderr
         else:
+            for line in stdout.splitlines():
+                if ": " in line:
+                    key, value = line.split(": ", 1)
+                    self.fields[key] = value.strip()
             # We have to read the ImageDescription binary because it may contain
             # things like line breaks.
             self.fields["ImageDescription"] = \
@@ -90,7 +89,7 @@ class Exif:
             except (UnicodeError, LookupError):
                 decoded = unicode("???", "utf-8")
             else:
-               break
+                break
 
         return decoded
 
