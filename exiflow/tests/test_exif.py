@@ -23,6 +23,7 @@ class TestExif(unittest.TestCase):
 
     def setUp(self):
         """ Create a directory with an image. """
+        self.__fields = {"Aperture": u"3.5", "Flash": u"No Flash"}
         self.__tempdir = tempfile.mkdtemp()
         self.__d70jpeg = os.path.join(self.__tempdir, "NikonD70.jpg")
         shutil.copy(os.path.join(sys.path[0], "NikonD70.jpg"), self.__tempdir)
@@ -81,7 +82,12 @@ class TestExif(unittest.TestCase):
         self.failUnlessEqual(exif.fields["ImageDescription"], 
             u"ImageDescription first row äöüß\nImageDescription second row ÄÖÜß\n")
 
-    
+    def test_write_exif_wihout_image(self):
+        """ Test for write_exif() with invalid filename """
+        exif = exiflow.exif.Exif(self.__emptyfile)
+        exif.fields = self.__fields.copy()
+        self.failUnlessRaises(IOError, exif.write_exif)
+
 
 if __name__ == '__main__':
     unittest.main()
