@@ -25,6 +25,8 @@ class TestExif(unittest.TestCase):
         """ Create a directory with an image. """
         self.__fields = {"Keywords": u"foo, bar, thingamabob", "Description": u"Hello world!"}
         self.__tempdir = tempfile.mkdtemp()
+        self.__virginjpeg = os.path.join(self.__tempdir, "python.jpg")
+        shutil.copy(os.path.join(sys.path[0], "python.jpg"), self.__tempdir)
         self.__d70jpeg = os.path.join(self.__tempdir, "NikonD70.jpg")
         shutil.copy(os.path.join(sys.path[0], "NikonD70.jpg"), self.__tempdir)
         self.__d70jpeg_imgdesc_latin1 = os.path.join(self.__tempdir,
@@ -58,17 +60,15 @@ class TestExif(unittest.TestCase):
         exif = exiflow.exif.Exif(self.__d70jpeg)
         self.failUnless(isinstance(exif, exiflow.exif.Exif))
         exif.read_exif()
-        for field in ("Directory", "FileModifyDate"):
-            exif.fields[field] = NikonD70.fields[field]
-        self.failUnlessEqual(exif.fields, NikonD70.fields)
+        for field in NikonD70.fields:
+            self.failUnless(field in exif.fields, field + " not in fields")
+            self.failUnlessEqual(exif.fields[field], NikonD70.fields[field])
 
     def test_read_exif_imagedescription(self):
         """ Tests for read_exif() with valid image """
         exif = exiflow.exif.Exif(self.__d70jpeg_imgdesc_utf8)
         self.failUnless(isinstance(exif, exiflow.exif.Exif))
         exif.read_exif()
-        for field in ("Directory", "FileModifyDate"):
-            exif.fields[field] = NikonD70.fields[field]
         self.failUnlessEqual(exif.fields["ImageDescription"], 
             u"ImageDescription first row äöüß\nImageDescription second row ÄÖÜß\n")
 
@@ -77,8 +77,6 @@ class TestExif(unittest.TestCase):
         exif = exiflow.exif.Exif(self.__d70jpeg_imgdesc_latin1)
         self.failUnless(isinstance(exif, exiflow.exif.Exif))
         exif.read_exif()
-        for field in ("Directory", "FileModifyDate"):
-            exif.fields[field] = NikonD70.fields[field]
         self.failUnlessEqual(exif.fields["ImageDescription"], 
             u"ImageDescription first row äöüß\nImageDescription second row ÄÖÜß\n")
 
@@ -102,6 +100,32 @@ class TestExif(unittest.TestCase):
         exif.read_exif()
         for field in self.__fields:
             self.failUnlessEqual(exif.fields[field], self.__fields[field])
+
+    def test_update_exif_without_image(self):
+        """ Test for update_exif() with invalid filename """
+        exif = exiflow.exif.Exif(self.__nosuchfile)
+        self.failUnlessRaises(IOError, exif.update_exif, self.__d70jpeg)
+        exif = exiflow.exif.Exif(self.__d70jpeg)
+        self.failUnlessRaises(IOError, exif.update_exif, self.__nosuchfile)
+
+    def test_update_exif_with_corrupt_image(self):
+        """ Test for update_exif() with invalid image content """
+        exif = exiflow.exif.Exif(self.__emptyfile)
+        self.failUnlessRaises(IOError, exif.update_exif, self.__d70jpeg)
+        exif = exiflow.exif.Exif(self.__d70jpeg)
+        self.failUnlessRaises(IOError, exif.update_exif, self.__emptyfile)
+
+    def test_update_exif(self):
+        """ Test for update_exif() with valid image """
+        exif = exiflow.exif.Exif(self.__virginjpeg)
+        self.failUnlessEqual(exif.update_exif(self.__d70jpeg), 0)
+        exif.read_exif()
+        for field in NikonD70.fields:
+            self.failUnless(field in exif.fields, field + " not in fields")
+            self.failUnlessEqual(exif.fields[field], NikonD70.fields[field])
+        #pprint.pprint(exif.fields)
+        #pprint.pprint(NikonD70.fields)
+        #self.failUnlessEqual(exif.fields, NikonD70.fields)
 
 
 if __name__ == '__main__':
