@@ -123,9 +123,6 @@ class TestExif(unittest.TestCase):
         for field in NikonD70.fields:
             self.failUnless(field in exif.fields, field + " not in fields")
             self.failUnlessEqual(exif.fields[field], NikonD70.fields[field])
-        #pprint.pprint(exif.fields)
-        #pprint.pprint(NikonD70.fields)
-        #self.failUnlessEqual(exif.fields, NikonD70.fields)
 
 
 if __name__ == '__main__':
