@@ -23,19 +23,20 @@ class TestExif(unittest.TestCase):
 
     def setUp(self):
         """ Create a directory with an image. """
+        data_dir = os.path.join(sys.path[0], "testdata")
         self.__fields = {"Keywords": u"foo, bar, thingamabob", "Description": u"Hello world!"}
         self.__tempdir = tempfile.mkdtemp()
         self.__virginjpeg = os.path.join(self.__tempdir, "python.jpg")
-        shutil.copy(os.path.join(sys.path[0], "python.jpg"), self.__tempdir)
+        shutil.copy(os.path.join(data_dir, "python.jpg"), self.__tempdir)
         self.__d70jpeg = os.path.join(self.__tempdir, "NikonD70.jpg")
-        shutil.copy(os.path.join(sys.path[0], "NikonD70.jpg"), self.__tempdir)
+        shutil.copy(os.path.join(data_dir, "NikonD70.jpg"), self.__tempdir)
         self.__d70jpeg_imgdesc_latin1 = os.path.join(self.__tempdir,
             "NikonD70_ImageDescription_2rows_latin1.jpg")
-        shutil.copy(os.path.join(sys.path[0], 
+        shutil.copy(os.path.join(data_dir, 
             "NikonD70_ImageDescription_2rows_latin1.jpg"), self.__tempdir)
         self.__d70jpeg_imgdesc_utf8 = os.path.join(self.__tempdir,
             "NikonD70_ImageDescription_2rows_utf8.jpg")
-        shutil.copy(os.path.join(sys.path[0], 
+        shutil.copy(os.path.join(data_dir, 
             "NikonD70_ImageDescription_2rows_utf8.jpg"), self.__tempdir)
         self.__emptyfile = os.path.join(self.__tempdir, "emptyfile.jpg")
         file(self.__emptyfile, 'w')
