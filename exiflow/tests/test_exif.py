@@ -8,7 +8,6 @@ __revision__ = "$Id$"
 
 import shutil
 import os
-import pprint
 import sys
 import tempfile
 import unittest
