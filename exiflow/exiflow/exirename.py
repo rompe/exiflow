@@ -117,9 +117,8 @@ def rename_file(filename, filelist, with_time, cam_id_override=None,
     logger = logging.getLogger("exirename.rename_file")
     filename_re = re.compile("^(\d{8})(-(\d{6}))?-(.{3})(\d{4})-((.{2})(.{3}))(\.[^.]*)$")
     mymatch = filename_re.match(os.path.basename(filename))
-    """differentiate between getting values from existing filenames or getting initial 
-       values from exif and config file
-    """
+    # differentiate between getting values from existing filenames or getting initial 
+    # values from exif and config file
     if mymatch:
         date = mymatch.group(1)
         image_time = mymatch.group(3)
