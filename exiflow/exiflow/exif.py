@@ -31,6 +31,10 @@ class Exif:
                                     shell=True, stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE)
         stdout, stderr = exiftool.communicate()
+        # exiftool doesn't necessarily use stderr on errors...
+        for line in stdout.splitlines():
+            if line.startswith("Error:"):
+                stderr += line
         if len(stderr) > 0:
             raise IOError, stderr
         else:
