@@ -147,10 +147,10 @@ class Gthumb:
         Returns True on success and False if no comment file exists.
         """
         if os.path.isfile(self.commentsfile):
-             os.utime(self.commentsfile, (mtime, mtime))
-             return True
+            os.utime(self.commentsfile, (mtime, mtime))
+            return True
         else:
-             return False
+            return False
 
     def cleanup(self):
         """
