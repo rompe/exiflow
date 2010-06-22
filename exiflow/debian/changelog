@@ -1,3 +1,20 @@
+exiflow (0.4.4-1) UNRELEASED; urgency=low
+
+  * added some unit tests
+
+  * fix exiftool error detection, making all unit tests pass
+
+  * fix: stop whitespace inflation when saving keywords
+
+  * Use mount/umount instead of pmount/pumount.
+    pmount isn't part of standard installations anymore. It's job is now done
+    by udisks, but we are just happy with plain mount.
+
+  * commandline tags and section take precedence over camera model section
+    from exif.conf now
+
+ -- Sebastian Berthold <exiflow@sleif.de>  Tue, 22 Jun 2010 21:37:15 +0100
+
 exiflow (0.4.3-1) UNRELEASED; urgency=low
 
   * fixes #2691924 - deal with non-utf8 chars in exif data
