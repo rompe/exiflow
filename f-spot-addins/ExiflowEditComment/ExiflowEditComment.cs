@@ -43,7 +43,7 @@ namespace ExiflowEditCommentExtension
 			
 			// collect comments of selected photos in current_comments
 			ArrayList current_comments = new ArrayList ();
-			foreach (Photo p in MainWindow.Toplevel.SelectedPhotos ()) {
+			foreach (Photo p in App.Instance.Organizer.SelectedPhotos ()) {
 				if (p.Description.Length > 0 && ! current_comments.Contains(p.Description)) {
 					current_comments.Add(p.Description);
 				}
@@ -73,10 +73,10 @@ namespace ExiflowEditCommentExtension
 			}
 			Console.WriteLine ("ok pressed in ExiflowEditComments EXTENSION");
 			Console.WriteLine ("New comment is: " + comment.Buffer.Text);
-			foreach (Photo p in MainWindow.Toplevel.SelectedPhotos ()) {
+			foreach (Photo p in App.Instance.Organizer.SelectedPhotos ()) {
 				p.Description = comment.Buffer.Text;
 				p.Changes.DataChanged = true;
-				Core.Database.Photos.Commit (p);
+				App.Instance.Database.Photos.Commit (p);
 			}
 			dialog.Destroy ();
 		}
