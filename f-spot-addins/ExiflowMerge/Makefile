@@ -1,11 +1,13 @@
 ADDIN = ExiflowMerge
-FSPOTDIR = ~/local/opt/f-spot
+#FSPOTDIR = ~/local/opt/f-spot
+FSPOTDIR = /usr
 
 all: $(ADDIN).dll
 
 PACKAGES = \
 	-pkg:gtk-sharp-2.0	\
-	-pkg:f-spot
+	-pkg:f-spot 		\
+ 	-r:$(FSPOTDIR)/lib/f-spot/Hyena.Gui.dll 
 
 ASSEMBLIES =
 

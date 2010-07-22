@@ -23,6 +23,10 @@ using Gtk;
 using FSpot;
 using FSpot.UI.Dialog;
 using FSpot.Extensions;
+using FSpot.Imaging;
+
+using Hyena;
+using Hyena.Widgets;
 
 namespace ExiflowMergeExtension
 {
@@ -33,7 +37,7 @@ namespace ExiflowMergeExtension
 			Console.WriteLine ("EXECUTING EXIFLOW MERGE EXTENSION");
 
 			if (ResponseType.Ok != HigMessageDialog.RunHigConfirmation (
-				MainWindow.Toplevel.Window,
+				App.Instance.Organizer.Window,
 				DialogFlags.DestroyWithParent,
 				MessageType.Warning,
 				"Merge exiflow revisions",
@@ -41,7 +45,7 @@ namespace ExiflowMergeExtension
 				"Do it now"))
 				return;
 
-			Photo [] photos = Core.Database.Photos.Query ((Tag [])null, null, null, null);
+			Photo [] photos = App.Instance.Database.Photos.Query ((Tag [])null, null, null, null);
 			Array.Sort (photos, new CompareName ());
 
 			Photo previousphoto = null;
@@ -71,7 +75,7 @@ namespace ExiflowMergeExtension
 			foreach (MergeRequest mr in merge_requests)
 				mr.Merge ();
 			
-			MainWindow.Toplevel.UpdateQuery ();
+			App.Instance.Organizer.UpdateQuery ();
 		}
 
 		private static bool ExiflowMatch (Photo p1, Photo p2)
@@ -110,10 +114,10 @@ namespace ExiflowMergeExtension
 			{
 				Photo p1 = (Photo)obj1;
 				Photo p2 = (Photo)obj2;
-				if (ImageFile.IsRaw(p2.Name)) {
+				if (ImageFile.IsRaw(p2.DefaultVersion.Uri)) {
 					return 1;
 				}
-				return String.Compare (p1.Name, p2.Name);
+				return String.Compare (p1.DefaultVersion.Uri, p2.DefaultVersion.Uri);
 			}
 		}
 
@@ -163,8 +167,8 @@ namespace ExiflowMergeExtension
 						}
 					}	
 					raw.Changes.DataChanged = true;
-					Core.Database.Photos.Commit (raw);
-					Core.Database.Photos.Remove (jpeg);
+					App.Instance.Database.Photos.Commit (raw);
+					App.Instance.Database.Photos.Remove (jpeg);
 				}
 			}
 		}
