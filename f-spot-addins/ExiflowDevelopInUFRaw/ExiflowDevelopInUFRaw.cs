@@ -7,8 +7,7 @@
  * Heavily based on the original DevelopInUFRaw extension written by
  * 	Stephane Delcroix  <stephane@delcroix.org>
  *
- * Synced with:
- * http://svn.gnome.org/svn/f-spot/trunk/extensions/Tools/DevelopInUFraw/DevelopInUFRaw.cs@4585
+ * Synced with: DevelopInUFRaw.cs 0.7.1
  *
  * This is free software. See COPYING for details
  */
@@ -21,9 +20,11 @@ using System.Text.RegularExpressions;
 
 using Mono.Unix;
 
+using Hyena;
 using FSpot;
-using FSpot.Extensions;
 using FSpot.Utils;
+using FSpot.Extensions;
+using FSpot.Imaging;
 using FSpot.UI.Dialog;
 
 namespace ExiflowDevelopInUFRawExtension
@@ -37,10 +38,10 @@ namespace ExiflowDevelopInUFRawExtension
 		public override void Run (object o, EventArgs e)
 		{
 			Log.Information ("Executing DevelopInUFRawExiflow extension");
-			
-			foreach (Photo p in MainWindow.Toplevel.SelectedPhotos ()) {
+
+			foreach (Photo p in App.Instance.Organizer.SelectedPhotos ()) {
 				DevelopPhoto (p);
-			}	
+			}
 		}
 	}
 
@@ -54,18 +55,18 @@ namespace ExiflowDevelopInUFRawExtension
 		{
 			ProgressDialog pdialog = new ProgressDialog(Catalog.GetString ("Developing photos"),
 														ProgressDialog.CancelButtonType.Cancel,
-														MainWindow.Toplevel.SelectedPhotos ().Length,
-														MainWindow.Toplevel.Window);
+														App.Instance.Organizer.SelectedPhotos ().Length,
+														App.Instance.Organizer.Window);
 			Log.Information ("Executing DevelopInUFRawExiflow extension in batch mode");
-			
-			foreach (Photo p in MainWindow.Toplevel.SelectedPhotos ()) {
+
+			foreach (Photo p in App.Instance.Organizer.SelectedPhotos ()) {
 				bool cancelled = pdialog.Update(String.Format(Catalog.GetString ("Developing {0}"), p.Name));
 				if (cancelled) {
 					break;
 				}
 
 				DevelopPhoto (p);
-			}	
+			}
 			pdialog.Destroy();
 		}
 	}
@@ -82,7 +83,7 @@ namespace ExiflowDevelopInUFRawExtension
 		public const string UFRAW_JPEG_QUALITY_KEY = APP_FSPOT_EXTENSION + EXTENSION_DEVELOPINUFRAW + "ufraw_jpeg_quality";
 		public const string UFRAW_ARGUMENTS_KEY = APP_FSPOT_EXTENSION + EXTENSION_DEVELOPINUFRAW + "ufraw_arguments";
 		public const string UFRAW_BATCH_ARGUMENTS_KEY = APP_FSPOT_EXTENSION + EXTENSION_DEVELOPINUFRAW + "ufraw_batch_arguments";
-			
+
 		int ufraw_jpeg_quality;
 		string ufraw_args;
 		string ufraw_batch_args;
@@ -101,8 +102,8 @@ namespace ExiflowDevelopInUFRawExtension
 			LoadPreference (UFRAW_BATCH_ARGUMENTS_KEY);
 
 			PhotoVersion raw = p.GetVersion (Photo.OriginalVersionId) as PhotoVersion;
-			if (!ImageFile.IsRaw (raw.Uri.AbsolutePath)) {
-				Log.Warning ("The Original version of this image is not a (supported) RAW file");
+			if (!ImageFile.IsRaw (raw.Uri)) {
+				Log.Warning ("The original version of this image is not a (supported) RAW file");
 				return;
 			}
 
@@ -120,16 +121,16 @@ namespace ExiflowDevelopInUFRawExtension
 			switch (executable) {
 				case "ufraw":
 					args += ufraw_args;
-					if (new Gnome.Vfs.Uri (Path.ChangeExtension (raw.Uri.ToString (), ".ufraw")).Exists) {
+					if (GLib.FileFactory.NewForUri (Path.ChangeExtension (raw.Uri.ToString (), ".ufraw")).Exists) {
 						// We found an ID file, use that instead of the raw file
-						idfile = "--conf=" + Path.ChangeExtension (raw.Uri.LocalPath, ".ufraw");
+						idfile = "--conf=" + GLib.Shell.Quote (Path.ChangeExtension (raw.Uri.LocalPath, ".ufraw"));
 					}
 					break;
 				case "ufraw-batch":
 					args += ufraw_batch_args;
-					if (new Gnome.Vfs.Uri (Path.Combine (FSpot.Global.BaseDirectory, "batch.ufraw")).Exists) {
+					if (GLib.FileFactory.NewForUri (Path.Combine (FSpot.Global.BaseDirectory, "batch.ufraw")).Exists) {
 						// We found an ID file, use that instead of the raw file
-						idfile = "--conf=" + Path.Combine (FSpot.Global.BaseDirectory, "batch.ufraw");
+						idfile = "--conf=" + GLib.Shell.Quote (Path.Combine (FSpot.Global.BaseDirectory, "batch.ufraw"));
 					}
 					break;
 			}
@@ -137,18 +138,18 @@ namespace ExiflowDevelopInUFRawExtension
 			args += String.Format(" --exif --overwrite --create-id=also --compression={0} --out-type=jpeg {1} --output={2} {3}", 
 				ufraw_jpeg_quality,
 				idfile,
-				CheapEscape (developed.LocalPath),
-				CheapEscape (raw.Uri.ToString ()));
+				GLib.Shell.Quote (developed.LocalPath),
+				GLib.Shell.Quote (raw.Uri.LocalPath));
 			Log.Debug (executable + " " + args);
 
-			System.Diagnostics.Process ufraw = System.Diagnostics.Process.Start (executable, args); 
+			System.Diagnostics.Process ufraw = System.Diagnostics.Process.Start (executable, args);
 			ufraw.WaitForExit ();
-			if (!(new Gnome.Vfs.Uri (developed.ToString ())).Exists) {
+			if (!(GLib.FileFactory.NewForUri (developed.ToString ())).Exists) {
 				Log.Warning ("UFRaw quit with an error. Check that you have UFRaw 0.13 or newer. Or did you simply clicked on Cancel?");
 				return;
 			}
 
-			if (new Gnome.Vfs.Uri (Path.ChangeExtension (developed.ToString (), ".ufraw")).Exists) {
+			if (GLib.FileFactory.NewForUri (Path.ChangeExtension (developed.ToString (), ".ufraw")).Exists) {
 				// We save our own copy of the last ufraw settings, as ufraw can overwrite it's own last used settings outside f-spot
 				File.Delete (Path.Combine (FSpot.Global.BaseDirectory, "batch.ufraw"));
 				File.Copy (Path.ChangeExtension (developed.LocalPath, ".ufraw"), Path.Combine (FSpot.Global.BaseDirectory, "batch.ufraw"));
@@ -160,26 +161,10 @@ namespace ExiflowDevelopInUFRawExtension
 				}
 			}
 
-			p.DefaultVersionId = p.AddVersion (developed, GetVersionName(name), true);
+			p.DefaultVersionId = p.AddVersion (new SafeUri (developed).GetBaseUri (),new SafeUri (developed).GetFilename (), name, true);
 			p.Changes.DataChanged = true;
-			Core.Database.Photos.Commit (p);
+			App.Instance.Database.Photos.Commit (p);
 		}
-
-		void LoadPreference (string key)
-		{
-			switch (key) {
-				case UFRAW_JPEG_QUALITY_KEY:
-					ufraw_jpeg_quality = Preferences.Get<int> (key);
-					break;
-				case UFRAW_ARGUMENTS_KEY:
-					ufraw_args = Preferences.Get<string> (key);
-					break;
-				case UFRAW_BATCH_ARGUMENTS_KEY:
-					ufraw_batch_args = Preferences.Get<string> (key);
-					break;
-			}
-		}
-
 
 		private static string GetNextVersionFileName (Photo p)
 		{
@@ -192,7 +177,7 @@ namespace ExiflowDevelopInUFRawExtension
 			Match exiflowpatmatch = exiflowpat.Match(p.Name);
 			string filename = String.Format("{0}{1}00.jpg", exiflowpatmatch.Groups[1], i, exiflowpatmatch.Groups[5]);
 			System.Uri developed = GetUriForVersionFileName (p, filename);
-			if (p.VersionNameExists (GetVersionName(filename)) || System.IO.File.Exists(CheapEscape(developed.LocalPath)))
+			if (p.VersionNameExists (GetVersionName(filename)) || System.IO.File.Exists(GLib.Shell.Quote(developed.LocalPath)))
 				return GetNextVersionFileName (p, i + 1);
 			return filename;
 		}
@@ -210,19 +195,25 @@ namespace ExiflowDevelopInUFRawExtension
 			return new System.Uri (System.IO.Path.Combine (DirectoryPath (p),  version_name ));
 		}
 
-		private static string CheapEscape (string input)
-		{
-			string escaped = input;
-			escaped = escaped.Replace (" ", "\\ ");
-			escaped = escaped.Replace ("(", "\\(");
-			escaped = escaped.Replace (")", "\\)");
-			return escaped;
-		}
-		
 		private static string DirectoryPath (Photo p)
 		{
-			System.Uri uri = p.VersionUri (Photo.OriginalVersionId);
-			return uri.Scheme + "://" + uri.Host + System.IO.Path.GetDirectoryName (uri.AbsolutePath);
+			return p.VersionUri (Photo.OriginalVersionId).GetBaseUri ();
 		}
+
+		void LoadPreference (string key)
+		{
+			switch (key) {
+				case UFRAW_JPEG_QUALITY_KEY:
+					ufraw_jpeg_quality = Preferences.Get<int> (key);
+					break;
+				case UFRAW_ARGUMENTS_KEY:
+					ufraw_args = Preferences.Get<string> (key);
+					break;
+				case UFRAW_BATCH_ARGUMENTS_KEY:
+					ufraw_batch_args = Preferences.Get<string> (key);
+					break;
+			}
+		}
+
 	}
 }

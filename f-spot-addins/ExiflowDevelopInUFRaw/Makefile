@@ -1,4 +1,5 @@
-FSPOTDIR = ~/local/opt/f-spot
+#FSPOTDIR = ~/local/opt/f-spot
+FSPOTDIR = /usr
 GCONFTOOL = /usr/bin/gconftool-2
 
 all: ExiflowDevelopInUFRaw.dll
@@ -8,7 +9,11 @@ PACKAGES = \
 	-pkg:glade-sharp-2.0	\
 	-pkg:glib-sharp-2.0	\
 	-pkg:f-spot \
-	-pkg:gnome-vfs-sharp-2.0
+	-pkg:gnome-vfs-sharp-2.0 \
+        -r:$(FSPOTDIR)/lib/f-spot/gtk-sharp-beans.dll \
+        -r:$(FSPOTDIR)/lib/f-spot/gio-sharp.dll \
+        -r:$(FSPOTDIR)/lib/f-spot/Hyena.dll \
+        -r:$(FSPOTDIR)/lib/f-spot/Hyena.Gui.dll 
 
 ASSEMBLIES = \
 	-r:Mono.Posix
