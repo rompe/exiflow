@@ -1,4 +1,5 @@
-FSPOTDIR = ~/local/opt/f-spot
+#FSPOTDIR = ~/local/opt/f-spot
+FSPOTDIR = /usr
 GCONFTOOL = /usr/bin/gconftool-2
 
 all: ExiflowCreateVersion.dll
@@ -10,8 +11,11 @@ PACKAGES = \
 	-pkg:gnome-vfs-sharp-2.0
 
 ASSEMBLIES = \
-	-r:Mono.Posix \
-	-r:/home/sb/local/opt/f-spot/lib/f-spot/gio-sharp.dll
+	-r:Mono.Posix 	\
+        -r:$(FSPOTDIR)/lib/f-spot/gtk-sharp-beans.dll \
+        -r:$(FSPOTDIR)/lib/f-spot/gio-sharp.dll \
+        -r:$(FSPOTDIR)/lib/f-spot/Hyena.dll \
+        -r:$(FSPOTDIR)/lib/f-spot/Hyena.Gui.dll 
 
 RESOURCES = \
 	-resource:ExiflowCreateVersion.addin.xml

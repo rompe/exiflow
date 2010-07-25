@@ -23,6 +23,7 @@ using GLib;
 using Gnome;
 using Gnome.Vfs;
 
+using Hyena;
 using FSpot;
 using FSpot.Extensions;
 using FSpot.Widgets;
@@ -87,7 +88,7 @@ namespace ExiflowCreateVersionExtension
 			gtk_ok.UseStock = true;
 			gtk_ok.Clicked += OkClicked;
 
-			foreach (Photo p in MainWindow.Toplevel.SelectedPhotos ()) {
+			foreach (Photo p in App.Instance.Organizer.SelectedPhotos ()) {
 				this.currentphoto = p;
 				//Console.WriteLine ("MimeType: "+ Gnome.Vfs.MimeType.GetMimeTypeForUri (p.DefaultVersionUri.ToString ()));
 				
@@ -130,8 +131,8 @@ namespace ExiflowCreateVersionExtension
 
 		public Gtk.ComboBox GetComboBox ()
 		{
-			owcb = new OpenWithComboBox (MainWindow.Toplevel.SelectedMimeTypes, "f-spot");
-			owcb.ApplicationActivated += MainWindow.Toplevel.HandleOpenWith;
+			owcb = new OpenWithComboBox (App.Instance.Organizer.SelectedMimeTypes, "f-spot");
+			owcb.ApplicationActivated += App.Instance.Organizer.HandleOpenWith;
 
 			//owcb.IgnoreApp = "f-spot";
                         if (owcb != null)
@@ -157,9 +158,9 @@ namespace ExiflowCreateVersionExtension
 		protected void CreateNewVersion()
 		{
 			try {
-				System.Uri original_uri = GetUriForVersionFileName (this.currentphoto, this.currentphoto.DefaultVersionUri.LocalPath);
+				System.Uri original_uri = GetUriForVersionFileName (this.currentphoto, this.currentphoto.DefaultVersion.Uri.LocalPath);
 				System.Uri new_uri = GetUriForVersionFileName (this.currentphoto, new_filename);
-				//Console.WriteLine ("ok pressed: old: " + this.currentphoto.DefaultVersionUri.LocalPath + "; " + original_uri.ToString() + " new: " + new_filename + "; " + new_uri.ToString() + "to open with: " );
+				Console.WriteLine ("ok pressed: old: " + this.currentphoto.DefaultVersion.Uri.LocalPath + "; " + original_uri.ToString() + " new: " + new_filename + "; " + new_uri.ToString() + "to open with: " );
 
                                 // check if new version exist and remove
                                 foreach (uint id in currentphoto.VersionIds) {
@@ -167,15 +168,16 @@ namespace ExiflowCreateVersionExtension
 						this.currentphoto.DeleteVersion ( id );
 					}
 				}
-				Xfer.XferUri (
-					new Gnome.Vfs.Uri (original_uri.ToString ()), 
-					new Gnome.Vfs.Uri (new_uri.ToString ()),
-					XferOptions.Default, XferErrorMode.Abort, 
-					XferOverwriteMode.Abort, 
-					delegate (Gnome.Vfs.XferProgressInfo info) {return 1;});
-				FSpot.ThumbnailGenerator.Create (new_uri).Dispose ();
-				this.currentphoto.DefaultVersionId = this.currentphoto.AddVersion (new_uri, new_version_entry.Text, true);
-				Core.Database.Photos.Commit (this.currentphoto);
+				GLib.File destination = GLib.FileFactory.NewForUri (new_uri);
+				if (destination.Exists)
+					throw new Exception (String.Format ("An object at this uri {0} already exists", new_uri));
+	
+		//FIXME. or better, fix the copy api !
+				GLib.File source = GLib.FileFactory.NewForUri (original_uri);
+				source.Copy (destination, GLib.FileCopyFlags.None, null, null);
+
+				this.currentphoto.DefaultVersionId = this.currentphoto.AddVersion (new SafeUri (new_uri).GetBaseUri (),new SafeUri (new_uri).GetFilename (), new_version_entry.Text, true);
+				App.Instance.Database.Photos.Commit (this.currentphoto);
 
 				this.currentphoto.Changes.DataChanged = true;;
                                 // run new version with selected application
@@ -448,8 +450,7 @@ namespace ExiflowCreateVersionExtension
 		
 		private static string DirectoryPath (Photo p)
 		{
-			System.Uri uri = p.VersionUri (Photo.OriginalVersionId);
-			return uri.Scheme + "://" + uri.Host + System.IO.Path.GetDirectoryName (uri.AbsolutePath);
+			return p.VersionUri (Photo.OriginalVersionId).GetBaseUri ();
 		}
 	}
 
