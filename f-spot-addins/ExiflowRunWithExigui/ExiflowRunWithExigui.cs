@@ -28,7 +28,7 @@ namespace ExiflowRunWithExiguiExtension
 
 			string filelist = "";
 			
-			foreach (Photo p in MainWindow.Toplevel.SelectedPhotos ()) {
+			foreach (Photo p in App.Instance.Organizer.SelectedPhotos ()) {
 				foreach (uint version_id in p.VersionIds) {
 					PhotoVersion pv = p.GetVersion (version_id) as PhotoVersion;
 					filelist = filelist + " " + CheapEscape(pv.Uri.AbsolutePath);
