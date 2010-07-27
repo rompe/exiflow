@@ -16,6 +16,7 @@ using Gtk;
 using Gnome;
 using Gnome.Vfs;
 
+using Hyena;
 using FSpot;
 using FSpot.Extensions;
 using Mono.Unix;
@@ -73,7 +74,7 @@ namespace ExiflowRenameVersionExtension
 			gtk_ok.UseStock = true;
 			gtk_ok.Clicked += OkClicked;
 
-			foreach (Photo p in MainWindow.Toplevel.SelectedPhotos ()) {
+			foreach (Photo p in App.Instance.Organizer.SelectedPhotos ()) {
 				this.currentphoto = p;
 				//Console.WriteLine ("MimeType: "+ Gnome.Vfs.MimeType.GetMimeTypeForUri (p.DefaultVersionUri.ToString ()));
 				
@@ -125,7 +126,7 @@ namespace ExiflowRenameVersionExtension
 		protected void RenameNewVersion()
 		{
 			try {
-				System.Uri original_uri = GetUriForVersionFileName (this.currentphoto, this.currentphoto.DefaultVersionUri.LocalPath);
+				System.Uri original_uri = GetUriForVersionFileName (this.currentphoto, this.currentphoto.DefaultVersion.Uri.LocalPath);
 				System.Uri new_uri = GetUriForVersionFileName (this.currentphoto, new_filename);
 				//Console.WriteLine ("ok pressed: old: " + this.currentphoto.DefaultVersionUri.LocalPath + "; " + original_uri.ToString() + " new: " + new_filename + "; " + new_uri.ToString() + "to open with: " );
 
@@ -135,22 +136,23 @@ namespace ExiflowRenameVersionExtension
 						this.currentphoto.DeleteVersion ( id );
 					}
 				}
-				Xfer.XferUri (
-					new Gnome.Vfs.Uri (original_uri.ToString ()), 
-					new Gnome.Vfs.Uri (new_uri.ToString ()),
-					XferOptions.Default, XferErrorMode.Abort, 
-					XferOverwriteMode.Abort, 
-					delegate (Gnome.Vfs.XferProgressInfo info) {return 1;});
-				FSpot.ThumbnailGenerator.Create (new_uri).Dispose ();
-				this.currentphoto.DefaultVersionId = this.currentphoto.AddVersion (new_uri, new_version_entry.Text, true);
+				GLib.File destination = GLib.FileFactory.NewForUri (new_uri);
+				if (destination.Exists)
+					throw new Exception (String.Format ("An object at this uri {0} already exists", new_uri));
+	
+		//FIXME. or better, fix the copy api !
+				GLib.File source = GLib.FileFactory.NewForUri (original_uri);
+				source.Copy (destination, GLib.FileCopyFlags.None, null, null);
+
+				this.currentphoto.DefaultVersionId = this.currentphoto.AddVersion (new SafeUri (new_uri).GetBaseUri (),new SafeUri (new_uri).GetFilename (), new_version_entry.Text, true);
 				uint currentid = this.currentphoto.DefaultVersionId;
 				foreach (uint id in currentphoto.VersionIds){
-					if ( currentphoto.GetVersion (id).DefaultVersionUri.ToString() == original_uri.ToString() ) {
+					if ( currentphoto.GetVersion (id).Uri.ToString() == original_uri.ToString() ) {
 						this.currentphoto.DeleteVersion (id, false, false);
 					}
 				}
 				this.currentphoto.DefaultVersionId = currentid;
-				Core.Database.Photos.Commit (this.currentphoto);
+				App.Instance.Database.Photos.Commit (this.currentphoto);
 
 				this.currentphoto.Changes.DataChanged = true;
 			} finally {
@@ -388,8 +390,7 @@ namespace ExiflowRenameVersionExtension
 		
 		private static string DirectoryPath (Photo p)
 		{
-			System.Uri uri = p.VersionUri (Photo.OriginalVersionId);
-			return uri.Scheme + "://" + uri.Host + System.IO.Path.GetDirectoryName (uri.AbsolutePath);
+			return p.VersionUri (Photo.OriginalVersionId).GetBaseUri ();
 		}
 	}
 }
