@@ -128,9 +128,9 @@ namespace ExiflowDevelopInUFRawExtension
 					break;
 				case "ufraw-batch":
 					args += ufraw_batch_args;
-					if (GLib.FileFactory.NewForUri (Path.Combine (FSpot.Global.BaseDirectory, "batch.ufraw")).Exists) {
+					if (GLib.FileFactory.NewForUri (Path.Combine (FSpot.Core.Global.BaseDirectory, "batch.ufraw")).Exists) {
 						// We found an ID file, use that instead of the raw file
-						idfile = "--conf=" + GLib.Shell.Quote (Path.Combine (FSpot.Global.BaseDirectory, "batch.ufraw"));
+						idfile = "--conf=" + GLib.Shell.Quote (Path.Combine (FSpot.Core.Global.BaseDirectory, "batch.ufraw"));
 					}
 					break;
 			}
@@ -151,8 +151,8 @@ namespace ExiflowDevelopInUFRawExtension
 
 			if (GLib.FileFactory.NewForUri (Path.ChangeExtension (developed.ToString (), ".ufraw")).Exists) {
 				// We save our own copy of the last ufraw settings, as ufraw can overwrite it's own last used settings outside f-spot
-				File.Delete (Path.Combine (FSpot.Global.BaseDirectory, "batch.ufraw"));
-				File.Copy (Path.ChangeExtension (developed.LocalPath, ".ufraw"), Path.Combine (FSpot.Global.BaseDirectory, "batch.ufraw"));
+				File.Delete (Path.Combine (FSpot.Core.Global.BaseDirectory, "batch.ufraw"));
+				File.Copy (Path.ChangeExtension (developed.LocalPath, ".ufraw"), Path.Combine (FSpot.Core.Global.BaseDirectory, "batch.ufraw"));
 
 				// Rename the ufraw file to match the original RAW filename, instead of the (Developed In UFRaw) filename
 				if (!(Path.ChangeExtension (raw.Uri.LocalPath, ".ufraw") == Path.ChangeExtension (developed.LocalPath, ".ufraw"))){
