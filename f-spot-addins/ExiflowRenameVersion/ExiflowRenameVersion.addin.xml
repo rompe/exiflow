@@ -1,12 +1,12 @@
 <Addin namespace="FSpot"
 	name="ExiflowRenameVersion"
-	version="0.7.1"
+	version="0.7.2"
 	description="Rename a Version, supporting revision numbers of the exiflow project ( http://exiflow.org/ )."
 	url="http://exiflow.org/"
 	author="Sebastian Berthold"
 	category="Tools">
 	<Dependencies>
-		<Addin id="Core" version="0.7"/>
+		<Addin id="Core" version="0.7.2"/>
 	</Dependencies>
 <!--
 	<Extension path = "/FSpot/Menus/PhotoPopup">
