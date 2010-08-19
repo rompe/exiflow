@@ -1,12 +1,12 @@
 <Addin namespace="FSpot"
 	name="ExiflowRunWithExigui"
-	version="0.7.1"
+	version="0.7.2"
 	description="Open Exigui with all versions from selected photos( http://exiflow.org/ )."
 	url="http://exiflow.org/"
 	author="Sebastian Berthold"
 	category="Tools">
 	<Dependencies>
-		<Addin id="Core" version="0.7"/>
+		<Addin id="Core" version="0.7.2"/>
 	</Dependencies>
 	<Extension path = "/FSpot/Menus/PhotoPopup">
 		<Command id = "ExiflowRunWithExigui" _label = "Exiflow: Open with _Exigui" command_type = "ExiflowRunWithExiguiExtension.ExiflowRunWithExigui" insertbefore="OpenWith"/>
