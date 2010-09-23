@@ -1,6 +1,6 @@
 ADDIN = ExiflowEditComment
-#FSPOTDIR = ~/local/opt/f-spot
-FSPOTDIR = /usr
+FSPOTDIR = /home/sb/local/opt/f-spot
+#FSPOTDIR = /usr
 
 all: $(ADDIN).dll
 

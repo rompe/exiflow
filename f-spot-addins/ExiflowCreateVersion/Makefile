@@ -1,5 +1,5 @@
-#FSPOTDIR = ~/local/opt/f-spot
-FSPOTDIR = /usr
+FSPOTDIR = /home/sb/local/opt/f-spot
+#FSPOTDIR = /usr
 GCONFTOOL = /usr/bin/gconftool-2
 
 all: ExiflowCreateVersion.dll
