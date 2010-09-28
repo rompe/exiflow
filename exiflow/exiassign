@@ -1,5 +1,4 @@
 #!/usr/bin/python
 import sys
-sys.path.insert(1, "/usr/share/exiflow")
 import exiflow.exiassign
 sys.exit(exiflow.exiassign.run(sys.argv[1:]))
