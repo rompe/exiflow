@@ -1,0 +1,9 @@
+prune *
+graft exi*
+graft tests
+graft debian
+include INSTALL
+include README
+include COPYING
+include setup.py
+include Makefile
