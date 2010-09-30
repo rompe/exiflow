@@ -1,15 +1,23 @@
 ADDIN = ExiflowMerge
-FSPOTDIR = /home/sb/local/opt/f-spot
-#FSPOTDIR = /usr
+
+prefix ?= /usr
+INSTALL_PATH ?= $(prefix)/lib/f-spot/Extensions
 
 all: $(ADDIN).dll
 
 PACKAGES = \
 	-pkg:gtk-sharp-2.0	\
-	-pkg:f-spot 		\
- 	-r:$(FSPOTDIR)/lib/f-spot/Hyena.Gui.dll 
+	-pkg:glade-sharp-2.0	\
+	-pkg:glib-sharp-2.0	\
+	-pkg:f-spot \
+	-pkg:gnome-vfs-sharp-2.0
 
-ASSEMBLIES =
+ASSEMBLIES = \
+	-r:Mono.Posix \
+        -r:$(prefix)/lib/f-spot/gtk-sharp-beans.dll \
+        -r:$(prefix)/lib/f-spot/gio-sharp.dll \
+        -r:$(prefix)/lib/f-spot/Hyena.dll \
+        -r:$(prefix)/lib/f-spot/Hyena.Gui.dll 
 
 RESOURCES = \
 	-resource:$(ADDIN).addin.xml
@@ -18,16 +26,17 @@ SOURCES = \
 	$(ADDIN).cs
 
 $(ADDIN).dll: $(SOURCES) $(ADDIN).addin.xml
-	PKG_CONFIG_PATH=$(FSPOTDIR)/lib/pkgconfig gmcs -target:library -o:$@ $(SOURCES) $(PACKAGES) $(ASSEMBLIES) $(RESOURCES)
-
-clean:
-	rm -f *.dll *~ *.bak *.mpack
+	PKG_CONFIG_PATH=$(prefix)/lib/pkgconfig gmcs -target:library $(SOURCES) $(PACKAGES) $(ASSEMBLIES) $(RESOURCES)
 
 install: all
-	cp $(ADDIN).dll ~/.config/f-spot/addins/
+	cp *.dll $(INSTALL_PATH)
 
 mpack: $(ADDIN).dll
 	mautil p $(ADDIN).dll
 
+clean:
+	rm -f *.dll *~ *.bak .mpack
+
 PHONY:
 	install clean all mpack
+

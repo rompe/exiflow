@@ -1,37 +1,38 @@
-FSPOTDIR = /home/sb/local/opt/f-spot
-#FSPOTDIR = /usr
-GCONFTOOL = /usr/bin/gconftool-2
+ADDIN = ExiflowDevelopInUFRaw
 
-all: ExiflowDevelopInUFRaw.dll
+prefix ?= /usr
+INSTALL_PATH ?= $(prefix)/lib/f-spot/Extensions
+
+all: $(ADDIN).dll
 
 PACKAGES = \
 	-pkg:gtk-sharp-2.0	\
 	-pkg:glade-sharp-2.0	\
 	-pkg:glib-sharp-2.0	\
 	-pkg:f-spot \
-	-pkg:gnome-vfs-sharp-2.0 \
-        -r:$(FSPOTDIR)/lib/f-spot/gtk-sharp-beans.dll \
-        -r:$(FSPOTDIR)/lib/f-spot/gio-sharp.dll \
-        -r:$(FSPOTDIR)/lib/f-spot/Hyena.dll \
-        -r:$(FSPOTDIR)/lib/f-spot/Hyena.Gui.dll 
+	-pkg:gnome-vfs-sharp-2.0
 
 ASSEMBLIES = \
-	-r:Mono.Posix
+	-r:Mono.Posix \
+        -r:$(prefix)/lib/f-spot/gtk-sharp-beans.dll \
+        -r:$(prefix)/lib/f-spot/gio-sharp.dll \
+        -r:$(prefix)/lib/f-spot/Hyena.dll \
+        -r:$(prefix)/lib/f-spot/Hyena.Gui.dll 
 
 RESOURCES = \
-	-resource:ExiflowDevelopInUFRaw.addin.xml
+	-resource:$(ADDIN).addin.xml
 
 SOURCES = \
-	ExiflowDevelopInUFRaw.cs
+	$(ADDIN).cs
+
+$(ADDIN).dll: $(SOURCES) $(ADDIN).addin.xml
+	PKG_CONFIG_PATH=$(prefix)/lib/pkgconfig gmcs -target:library $(SOURCES) $(PACKAGES) $(ASSEMBLIES) $(RESOURCES)
 
 install: all
-	cp *.dll ~/.config/f-spot/addins/
+	cp *.dll $(INSTALL_PATH)
 
-mpack: ExiflowDevelopInUFRaw.dll
-	mautil p ExiflowDevelopInUFRaw.dll
-
-%.dll: $(SOURCES) ExiflowDevelopInUFRaw.addin.xml
-	PKG_CONFIG_PATH=$(FSPOTDIR)/lib/pkgconfig gmcs -target:library $(SOURCES) $(PACKAGES) $(ASSEMBLIES) $(RESOURCES)
+mpack: $(ADDIN).dll
+	mautil p $(ADDIN).dll
 
 clean:
 	rm -f *.dll *~ *.bak .mpack

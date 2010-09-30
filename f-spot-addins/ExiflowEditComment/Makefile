@@ -1,6 +1,6 @@
 ADDIN = ExiflowEditComment
-FSPOTDIR = /home/sb/local/opt/f-spot
-#FSPOTDIR = /usr
+prefix ?= /usr
+INSTALL_PATH ?= $(prefix)/lib/f-spot/Extensions
 
 all: $(ADDIN).dll
 
@@ -22,13 +22,13 @@ SOURCES = \
 	$(ADDIN).cs
 
 $(ADDIN).dll: $(SOURCES) $(ADDIN).addin.xml
-	PKG_CONFIG_PATH=$(FSPOTDIR)/lib/pkgconfig gmcs -target:library $(SOURCES) $(PACKAGES) $(ASSEMBLIES) $(RESOURCES)
+	PKG_CONFIG_PATH=$(prefix)/lib/pkgconfig gmcs -target:library $(SOURCES) $(PACKAGES) $(ASSEMBLIES) $(RESOURCES)
 
 clean:
 	rm -f *.dll *~ *.bak *.mpack
 
 install: all
-	cp $(ADDIN).dll ~/.config/f-spot/addins/
+	cp $(ADDIN).dll $(INSTALL_PATH)
 
 mpack: $(ADDIN).dll
 	mautil p $(ADDIN).dll
