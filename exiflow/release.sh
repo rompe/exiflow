@@ -1,4 +1,7 @@
 #!/bin/bash
+export GPGKEY=643D8C7A
+export DEBEMAIL='launchpad.net@rompe.org'
+export DEBFULLNAME='Ulf Rompe'
 version=`grep -w "version=" setup.py | cut -d\' -f2`
 if head -1 debian/changelog | grep -q $version; then
 	echo "The file debian/changelog already contains version ${version}."
@@ -10,6 +13,6 @@ python setup.py sdist
 mv dist/Exiflow-${version}.tar.gz dist/exiflow_${version}.orig.tar.gz
 svn export . dist/exiflow-${version}
 cd dist/exiflow-${version}
-debuild -S
+debuild -S -sa
 cd ..
-dput ppa:rompe/exiflow exiflow_${version}_source.changes
+echo dput ppa:rompe/exiflow exiflow_${version}_source.changes
