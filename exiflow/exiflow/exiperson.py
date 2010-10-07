@@ -115,8 +115,7 @@ def run(argv, callback=None):
     remaining_args = []
     for arg in args:
         if arg.startswith("-") and "=" in arg:
-            field, value = arg.lstrip("-").split("=")
-            forced_personals[field] = value
+            forced_personals.update(dict((arg.lstrip("-").split("="),)))
         else:
             remaining_args.append(arg)
 
