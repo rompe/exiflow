@@ -17,6 +17,7 @@ mpack:
 	for dir in Exiflow*/; do if [ -f $$dir/Makefile ]; then make -C $$dir mpack; fi; done
 
 install:
+	mkdir -p $(INSTALL_PATH)
 	for dir in Exiflow*/; do if [ -f $$dir/Makefile ]; then make -C $$dir install; fi; done
 
 clean:
