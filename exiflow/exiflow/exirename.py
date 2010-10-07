@@ -109,27 +109,28 @@ def get_new_filename_parts(filename, filelist):
     return number.zfill(4), revision, extension
 
 
-def rename_file(filename, filelist, with_time, cam_id_override=None,
-                artist_initials_override=None):
+def rename_file(filename, filelist, with_time, cam_id=None, artist_initials=None):
     """
     Rename filename and return the newly generated name without dir.
     """
     logger = logging.getLogger("exirename.rename_file")
-    filename_re = re.compile("^(\d{8})(-(\d{6}))?-(.{3})(\d{4})-((.{2})(.{3}))(\.[^.]*)$")
-    mymatch = filename_re.match(os.path.basename(filename))
+    match = re.match("^(\d{8})(-(\d{6}))?-(.{3})(\d{4})-((.{2})(.{3}))(\.[^.]*)$",
+                     os.path.basename(filename))
     # differentiate between getting values from existing filenames or getting initial 
     # values from exif and config file
-    if mymatch:
-        date = mymatch.group(1)
-        image_time = mymatch.group(3)
-        cam_id = mymatch.group(4)
-        number = mymatch.group(5)
-        artist_initials = mymatch.group(7)
-        revision = mymatch.group(8)
-        extension = mymatch.group(9)
+    if match:
+        date = match.group(1)
+        image_time = match.group(3)
+        if cam_id is None:
+            cam_id = match.group(4)
+        number = match.group(5)
+        if artist_initials is None:
+            artist_initials = match.group(7)
+        revision = match.group(8)
+        extension = match.group(9)
         if with_time:
             if not image_time:
-                dummymodel, dummydate, image_time = get_exif_information(filename)
+                image_time = get_exif_information(filename)[2]
             date += "-" + image_time
     else:
         model, date, image_time = get_exif_information(filename)
@@ -138,12 +139,6 @@ def rename_file(filename, filelist, with_time, cam_id_override=None,
         cam_id, artist_initials = exiflow.configfile.get_options("cameras", model,
                                                     ("cam_id", "artist_initials"))
         number, revision, extension = get_new_filename_parts(filename, filelist)
-
-    if cam_id_override:
-        cam_id = cam_id_override
-
-    if artist_initials_override:
-        artist_initials = artist_initials_override
 
     if len(cam_id) != 3 or len(artist_initials) != 2:
         logger.warning("Either cam_id or artist_initials is missing or of wrong length. "
@@ -157,7 +152,7 @@ def rename_file(filename, filelist, with_time, cam_id_override=None,
     newname = os.path.join(os.path.dirname(filename), newbasename)
     if filename == newname:
         raise IOError, "Filename does not change."
-    if os.path.exists(newname):
+    elif os.path.exists(newname):
         raise IOError, "Can't rename %s to %s, it already exists." % (filename, newname)
     os.rename(filename, newname)
     return newbasename
