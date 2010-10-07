@@ -1,4 +1,5 @@
 ADDIN = ExiflowEditComment
+
 prefix ?= /usr
 INSTALL_PATH ?= $(prefix)/lib/f-spot/Extensions
 
@@ -12,7 +13,11 @@ PACKAGES = \
 	-pkg:gnome-vfs-sharp-2.0
 
 ASSEMBLIES = \
-	-r:Mono.Posix
+	-r:Mono.Posix \
+        -r:$(prefix)/lib/f-spot/gtk-sharp-beans.dll \
+        -r:$(prefix)/lib/f-spot/gio-sharp.dll \
+        -r:$(prefix)/lib/f-spot/Hyena.dll \
+        -r:$(prefix)/lib/f-spot/Hyena.Gui.dll 
 
 RESOURCES = \
 	-resource:$(ADDIN).glade \
@@ -24,14 +29,14 @@ SOURCES = \
 $(ADDIN).dll: $(SOURCES) $(ADDIN).addin.xml
 	PKG_CONFIG_PATH=$(prefix)/lib/pkgconfig gmcs -target:library $(SOURCES) $(PACKAGES) $(ASSEMBLIES) $(RESOURCES)
 
-clean:
-	rm -f *.dll *~ *.bak *.mpack
-
 install: all
-	cp $(ADDIN).dll $(INSTALL_PATH)
+	cp *.dll $(INSTALL_PATH)/
 
 mpack: $(ADDIN).dll
-	mautil p $(ADDIN).dll
+	mautil p $(ADDIN).dll && touch mpack
+
+clean:
+	rm -f *.dll *~ *.bak *.mpack mpack
 
 PHONY:
-	install clean all mpack
+	install clean all 

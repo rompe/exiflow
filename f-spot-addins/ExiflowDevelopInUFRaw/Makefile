@@ -29,13 +29,13 @@ $(ADDIN).dll: $(SOURCES) $(ADDIN).addin.xml
 	PKG_CONFIG_PATH=$(prefix)/lib/pkgconfig gmcs -target:library $(SOURCES) $(PACKAGES) $(ASSEMBLIES) $(RESOURCES)
 
 install: all
-	cp *.dll $(INSTALL_PATH)
+	cp *.dll $(INSTALL_PATH)/
 
 mpack: $(ADDIN).dll
-	mautil p $(ADDIN).dll
+	mautil p $(ADDIN).dll && touch mpack
 
 clean:
-	rm -f *.dll *~ *.bak .mpack
+	rm -f *.dll *~ *.bak *.mpack mpack
 
 PHONY:
-	install clean all mpack
+	install clean all 
