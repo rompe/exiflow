@@ -5,14 +5,22 @@ export DEBFULLNAME='Ulf Rompe'
 version=`grep -w "version=" setup.py | cut -d\' -f2`
 if head -1 debian/changelog | grep -q $version; then
 	echo "The file debian/changelog already contains version ${version}."
-	echo "Please update version number in setup.py first."
-	exit 1
+	echo "Did you forget to update version number in setup.py firsti?"
+	read -p "Press Ctrl-C to stop, Enter to continue." bla
+else
+	dch -v ${version}-1 "Release Exiflow ${version}."
+	svn commit -m "Update debian changelog for ${version}." debian/changelog
 fi
-dch -v ${version}
 python setup.py sdist
 mv dist/Exiflow-${version}.tar.gz dist/exiflow_${version}.orig.tar.gz
 svn export . dist/exiflow-${version}
 cd dist/exiflow-${version}
-debuild -S -sa
+for dist in maverick lucid; do
+	dch --distribution ${dist} -b -v ${version}-1ppa1~${dist}1 "Upload Exiflow ${version} for ${dist}."
+	debuild -S -sa
+done
 cd ..
-echo dput ppa:rompe/exiflow exiflow_${version}_source.changes
+rm -rf exiflow-${version}
+dput ppa:rompe/exiflow exiflow_${version}-1ppa1~maverick1_source.changes
+dput ppa:rompe/exiflow exiflow_${version}-1ppa1~lucid1_source.changes
+
