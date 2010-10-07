@@ -25,7 +25,7 @@ done
 cd ..
 rm -rf exiflow-${version}
 for dist in ${DISTRIBUTIONS}; do
-	dput ppa:rompe/exiflow exiflow_${version}-1ppa1~${dist}1_source.changes
+	dput ppa:exiflow/exiflow exiflow_${version}-1ppa1~${dist}1_source.changes
 done
 
 # Now some files for Sourceforge
