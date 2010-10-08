@@ -3,7 +3,7 @@ set -e
 DISTRIBUTIONS="maverick"
 PACKAGE="f-spot-extension-exiflow"
 export GPGKEY=3E2898DA
-export DEBEMAIL='ubuntu@sleif.de'
+export DEBEMAIL='exiflow@sleif.de'
 export DEBFULLNAME='Sebastian Berthold'
 version=`grep -w "version=" ExiflowCreateVersion/ExiflowCreateVersion.addin.xml | cut -d\" -f2 | head -1`
 if head -1 debian/changelog | grep -q $version; then
