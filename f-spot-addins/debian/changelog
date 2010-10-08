@@ -1,3 +1,9 @@
+f-spot-extension-exiflow (0.8.0.1-1) lucid; urgency=low
+
+  * Release F-spot Exiflow extensions 0.8.0.1.
+
+ -- Sebastian Berthold <exiflow@sleif.de>  Fri, 08 Oct 2010 04:11:58 +0200
+
 f-spot-extension-exiflow (0.8-1) lucid; urgency=low
 
   * Release F-spot Exiflow extensions 0.8.
