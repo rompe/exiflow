@@ -2,12 +2,12 @@ Source: f-spot-extension-exiflow
 Priority: extra
 Maintainer: Sebastian Berthold <exiflow@sleif.de>
 Build-Depends: debhelper (>= 7), libgnome-vfs2.0-cil-dev, libgtk2.0-cil-dev, mono-addins-utils, libglade2.0-cil-dev
-Standards-Version: 3.8.3
+Standards-Version: 3.8.4
 Section: gnome
 Homepage: http://exiflow.org/
 
 Package: f-spot-extension-exiflow
-Architecture: any
+Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, f-spot, ufraw, exiflow
 Description: A set of extensions to support the exiflow workflow in f-spot
  F-Spot extensions:
