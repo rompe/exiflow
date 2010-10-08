@@ -7,7 +7,7 @@ Section: gnome
 Homepage: http://exiflow.org/
 
 Package: f-spot-extension-exiflow
-Architecture: all
+Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, f-spot, ufraw, exiflow
 Description: A set of extensions to support the exiflow workflow in f-spot
  F-Spot extensions:
