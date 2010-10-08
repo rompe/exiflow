@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 DISTRIBUTIONS="maverick lucid karmic"
 export GPGKEY=643D8C7A
 export DEBEMAIL='launchpad.net@rompe.org'
