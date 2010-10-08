@@ -8,8 +8,21 @@ Homepage: http://exiflow.org/
 
 Package: f-spot-extension-exiflow
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, f-spot
+Depends: ${shlibs:Depends}, ${misc:Depends}, f-spot, ufraw, exiflow
 Description: A set of extensions to support the exiflow workflow in f-spot
- insert long description, indented with spaces
+ F-Spot extensions:
+ - ExiflowCreateVersion: Creates a new photo version, naming the file according
+   to exiflow understanding of sane file names.
+ - ExiflowDevelopInUFRaw: Like F-Spot's own DevelopInUfraw extension, but
+   generating filenames with numbered versions.
+ - ExiflowMerge: Automatically merge all versions of your photos, using the
+   exiflow file naming scheme to associate them.
+ - ExiflowRenameVersion: Lets you rename a version of a photo.
+ - ExiflowRunWithExigui: Load selected photos into exigui for further
+   processing.
+ - ExiflowEditComment: Enter a comment into all selected photos, using an input
+   box that's big enough for the job. Features a comment merger to make sure no
+   existing comment is lost! insert long description, indented with spaces
  .
  Homepage: http://exiflow.org/
+

@@ -1,0 +1,5 @@
+f-spot-extension-exiflow (0.7-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Sebastian Berthold <exiflow@sleif.de>  Thu, 07 Oct 2010 23:09:00 +0200
