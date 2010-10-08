@@ -1,3 +1,9 @@
+f-spot-extension-exiflow (0.8-1) lucid; urgency=low
+
+  * Release F-spot Exiflow extensions 0.8.
+
+ -- Sebastian Berthold <exiflow@sleif.de>  Fri, 08 Oct 2010 02:10:06 +0200
+
 f-spot-extension-exiflow (0.7-1) unstable; urgency=low
 
   * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
