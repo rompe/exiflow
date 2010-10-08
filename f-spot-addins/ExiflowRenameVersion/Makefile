@@ -1,6 +1,6 @@
 ADDIN = ExiflowRenameVersion
 
-prefix ?= /usr
+prefix ?= $(DESTDIR)/usr
 INSTALL_PATH ?= $(prefix)/lib/f-spot/Extensions
 
 all: $(ADDIN).dll
