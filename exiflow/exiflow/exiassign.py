@@ -37,7 +37,12 @@ def find_siblings(filename, prefix):
     mtimes = {}
     for otherfile in glob.glob(os.path.join(os.path.dirname(filename),
                                             prefix + "*")):
+        leader, extension = os.path.splitext(otherfile)
+        extension = extension.lower()
+
         if otherfile == filename:
+            continue
+        elif extension in (".ufraw", ".xmp"):
             continue
         else:
             mtimes[str(os.stat(otherfile).st_mtime) + otherfile] = otherfile

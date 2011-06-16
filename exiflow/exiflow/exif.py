@@ -6,6 +6,7 @@ A module for reading and writing EXIF information.
 """
 __revision__ = "$Id$"
 
+import re
 import locale
 import logging
 import subprocess
@@ -151,10 +152,15 @@ class Exif:
         exiftool = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE)
         # exiftool doesn't reflect errors in it's return code, so we have to
-        # assume an error if something is written to stderr.
+        # assume an error if something is written to stderr but ignore warnings too.
         errors = exiftool.stderr.readlines()
         if len(errors) > 0:
-            raise IOError, "".join(errors + exiftool.stdout.readlines())
+            myregex = re.compile("^Warning: \[minor\] .* Fixed.")
+            mymatch = myregex.match(errors[0])
+            if mymatch:
+                logger.info("%s", errors)
+            else:
+                raise IOError, "".join(errors + exiftool.stdout.readlines())
         return exiftool.wait()
 
 
