@@ -1,3 +1,9 @@
+f-spot-extension-exiflow (0.8.0.3.2-1) oneiric; urgency=low
+
+  * Release F-spot Exiflow extensions 0.8.0.3.2.
+
+ -- Ulf Rompe <launchpad.net@rompe.org>  Thu, 24 Nov 2011 13:09:19 +0100
+
 f-spot-extension-exiflow (0.8.0.3-1) lucid; urgency=low
 
   * Release F-spot Exiflow extensions 0.8.0.3.
