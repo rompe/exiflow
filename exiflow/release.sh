@@ -1,13 +1,14 @@
 #!/bin/bash
 set -e
-DISTRIBUTIONS="maverick lucid karmic"
+DISTRIBUTIONS="maverick lucid karmic natty oneiric"
+DISTRIBUTIONS="oneiric"
 export GPGKEY=643D8C7A
 export DEBEMAIL='launchpad.net@rompe.org'
 export DEBFULLNAME='Ulf Rompe'
 version=`grep -w "version=" setup.py | cut -d\' -f2`
 if head -1 debian/changelog | grep -q $version; then
 	echo "The file debian/changelog already contains version ${version}."
-	echo "Did you forget to update version number in setup.py firsti?"
+	echo "Did you forget to update version number in setup.py first?"
 	read -p "Press Ctrl-C to stop, Enter to continue." bla
 else
 	dch -v ${version}-1 "Release Exiflow ${version}."
@@ -32,6 +33,6 @@ done
 # Now some files for Sourceforge
 rm -rf sourceforge
 mkdir sourceforge
-mv *.rpm *maverick*.deb Exiflow-${version}.tar.gz sourceforge/
+mv *.rpm *natty*.deb Exiflow-${version}.tar.gz sourceforge/
 echo "Now upload dist/sourceforge to Sourceforge."
 

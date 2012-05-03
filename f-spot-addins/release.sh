@@ -1,12 +1,12 @@
 #!/bin/bash
 set -e
-DISTRIBUTIONS="maverick"
+DISTRIBUTIONS="oneiric"
 PACKAGE="f-spot-extension-exiflow"
 export GPGKEY=3E2898DA
-export DEBEMAIL='exiflow@sleif.de'
-export DEBFULLNAME='Sebastian Berthold'
+export DEBEMAIL='launchpad.net@rompe.org'
+export DEBFULLNAME='Ulf Rompe'
 version=`grep -w "version=" ExiflowCreateVersion/ExiflowCreateVersion.addin.xml | cut -d\" -f2 | head -1`
-version=0.8.0.3
+version=0.8.0.3.2
 if head -1 debian/changelog | grep -q $version; then
 	echo "The file debian/changelog already contains version ${version}."
 	echo "Did you forget to update version number in setup.py firsti?"

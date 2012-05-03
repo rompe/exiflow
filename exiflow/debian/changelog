@@ -1,3 +1,9 @@
+exiflow (0.4.5.2-1) oneiric; urgency=low
+
+  * Just bump version number to 0.4.5.2.
+
+ -- Ulf Rompe <ulf@rompe.org>  Thu, 24 Nov 2011 12:42:35 +0100
+
 exiflow (0.4.5-1) maverick; urgency=low
 
   * Bring back setup.py, this time in a way that works.

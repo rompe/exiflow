@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Repository xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Repository xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Addin>
     <Url>FSpot.ExiflowCreateVersion_0.4.3.0.mpack</Url>
     <Addin>
@@ -221,132 +221,132 @@
     </Addin>
   </Addin>
   <Addin>
-    <Url>FSpot.DevelopInUFrawExiflow_0.4.4.100.mpack</Url>
-    <Addin>
-      <Id>DevelopInUFrawExiflow</Id>
-      <Namespace>FSpot</Namespace>
-      <Name>FSpot.DevelopInUFrawExiflow,0.4.4.100</Name>
-      <Version>0.4.4.100</Version>
-      <BaseVersion />
-      <Author>Sebastian Berthold</Author>
-      <Copyright />
-      <Url />
-      <Description>Develop the image in UFRaw, saves the result as a new version, supporting revision numbers of the exiflow project ( http://exiflow.sf.net )\n\nNote: Require ufraw 0.13 or CVS version newer than 2007-09-06 !!!</Description>
-      <Category>Tools</Category>
-      <Dependencies>
-        <AddinDependency>
-          <AddinId>Core</AddinId>
-          <Version>0.4.4.100</Version>
-        </AddinDependency>
-      </Dependencies>
-      <OptionalDependencies />
-    </Addin>
-  </Addin>
-  <Addin>
-    <Url>FSpot.ExiflowCreateVersion_0.4.4.100.mpack</Url>
+    <Url>FSpot.ExiflowCreateVersion_0.7.1.mpack</Url>
     <Addin>
       <Id>ExiflowCreateVersion</Id>
       <Namespace>FSpot</Namespace>
-      <Name>FSpot.ExiflowCreateVersion,0.4.4.100</Name>
-      <Version>0.4.4.100</Version>
+      <Name>ExiflowCreateVersion</Name>
+      <Version>0.7.1</Version>
       <BaseVersion />
       <Author>Sebastian Berthold</Author>
       <Copyright />
-      <Url />
-      <Description>Create a new Version, supporting revision numbers of the exiflow project ( http://exiflow.sf.net ).</Description>
+      <Url>http://exiflow.org/</Url>
+      <Description>Create a new Version, supporting revision numbers of the exiflow project ( http://exiflow.org/ ).</Description>
       <Category>Tools</Category>
       <Dependencies>
         <AddinDependency>
           <AddinId>Core</AddinId>
-          <Version>0.4.4.100</Version>
+          <Version>0.7</Version>
         </AddinDependency>
       </Dependencies>
       <OptionalDependencies />
     </Addin>
   </Addin>
   <Addin>
-    <Url>FSpot.ExiflowEditComment_0.4.4.100.mpack</Url>
+    <Url>FSpot.ExiflowDevelopInUFRaw_0.7.1.mpack</Url>
+    <Addin>
+      <Id>ExiflowDevelopInUFRaw</Id>
+      <Namespace>FSpot</Namespace>
+      <Name>ExiflowDevelopInUFRaw</Name>
+      <Version>0.7.1</Version>
+      <BaseVersion />
+      <Author>Sebastian Berthold</Author>
+      <Copyright />
+      <Url>http://exiflow.org/</Url>
+      <Description>Develop the image in UFRaw, saves the result as a new version, supporting revision numbers of the exiflow project ( http://exiflow.org/ )</Description>
+      <Category>Tools</Category>
+      <Dependencies>
+        <AddinDependency>
+          <AddinId>Core</AddinId>
+          <Version>0.7</Version>
+        </AddinDependency>
+      </Dependencies>
+      <OptionalDependencies />
+    </Addin>
+  </Addin>
+  <Addin>
+    <Url>FSpot.ExiflowEditComment_0.7.mpack</Url>
     <Addin>
       <Id>ExiflowEditComment</Id>
       <Namespace>FSpot</Namespace>
-      <Name>FSpot.ExiflowEditComment,0.4.4.100</Name>
-      <Version>0.4.4.100</Version>
+      <Name>ExiflowEditComment</Name>
+      <Version>0.7</Version>
       <BaseVersion />
       <Author>Ulf Rompe</Author>
       <Copyright />
-      <Url />
+      <Url>http://exiflow.org/</Url>
       <Description>Edit EXIF comment of selected photos.</Description>
       <Category>Tools</Category>
       <Dependencies>
         <AddinDependency>
           <AddinId>Core</AddinId>
-          <Version>0.4.4.100</Version>
+          <Version>0.7</Version>
         </AddinDependency>
       </Dependencies>
       <OptionalDependencies />
     </Addin>
   </Addin>
   <Addin>
-    <Url>FSpot.ExiflowMerge_0.4.4.100.mpack</Url>
+    <Url>FSpot.ExiflowMerge_0.7.1.mpack</Url>
     <Addin>
       <Id>ExiflowMerge</Id>
       <Namespace>FSpot</Namespace>
-      <Name>FSpot.ExiflowMerge,0.4.4.100</Name>
-      <Version>0.4.4.100</Version>
+      <Name>ExiflowMerge</Name>
+      <Version>0.7.1</Version>
       <BaseVersion />
       <Author>Ulf Rompe</Author>
       <Copyright />
-      <Url />
-      <Description>Merge RAW+Jpeg as multiple versions of the same photo, supporting revision numbers of the exiflow project ( http://exiflow.sf.net ).</Description>
+      <Url>http://exiflow.org/</Url>
+      <Description>Merge RAW+Jpeg as multiple versions of the same photo, supporting revision numbers of the exiflow project ( http://exiflow.org/ ).</Description>
       <Category>Tools</Category>
       <Dependencies>
         <AddinDependency>
           <AddinId>Core</AddinId>
-          <Version>0.4.4.100</Version>
+          <Version>0.7</Version>
         </AddinDependency>
       </Dependencies>
       <OptionalDependencies />
     </Addin>
   </Addin>
   <Addin>
-    <Url>FSpot.ExiflowRenameVersion_0.4.4.100.mpack</Url>
+    <Url>FSpot.ExiflowRenameVersion_0.7.1.mpack</Url>
     <Addin>
       <Id>ExiflowRenameVersion</Id>
       <Namespace>FSpot</Namespace>
-      <Name>FSpot.ExiflowRenameVersion,0.4.4.100</Name>
-      <Version>0.4.4.100</Version>
+      <Name>ExiflowRenameVersion</Name>
+      <Version>0.7.1</Version>
       <BaseVersion />
       <Author>Sebastian Berthold</Author>
       <Copyright />
-      <Url />
-      <Description>Rename a Version, supporting revision numbers of the exiflow project ( http://exiflow.sf.net ).</Description>
+      <Url>http://exiflow.org/</Url>
+      <Description>Rename a Version, supporting revision numbers of the exiflow project ( http://exiflow.org/ ).</Description>
       <Category>Tools</Category>
       <Dependencies>
         <AddinDependency>
           <AddinId>Core</AddinId>
-          <Version>0.4.4.100</Version>
+          <Version>0.7</Version>
         </AddinDependency>
       </Dependencies>
       <OptionalDependencies />
     </Addin>
   </Addin>
   <Addin>
-    <Url>FSpot.ExiflowRunWithExigui_0.4.4.100.mpack</Url>
+    <Url>FSpot.ExiflowRunWithExigui_0.7.1.mpack</Url>
     <Addin>
       <Id>ExiflowRunWithExigui</Id>
       <Namespace>FSpot</Namespace>
-      <Name>FSpot.ExiflowRunWithExigui,0.4.4.100</Name>
-      <Version>0.4.4.100</Version>
+      <Name>ExiflowRunWithExigui</Name>
+      <Version>0.7.1</Version>
       <BaseVersion />
       <Author>Sebastian Berthold</Author>
       <Copyright />
-      <Url />
-      <Description>Open Exigui with all versions from selected photos( http://exiflow.sf.net ).</Description>
+      <Url>http://exiflow.org/</Url>
+      <Description>Open Exigui with all versions from selected photos( http://exiflow.org/ ).</Description>
       <Category>Tools</Category>
       <Dependencies>
         <AddinDependency>
           <AddinId>Core</AddinId>
-          <Version>0.4.4.100</Version>
+          <Version>0.7</Version>
         </AddinDependency>
       </Dependencies>
       <OptionalDependencies />

@@ -8,7 +8,7 @@ __revision__ = "$Id: $"
 from distutils.core import setup
 
 setup(name='Exiflow',
-      version='0.4.5',
+      version='0.4.5.2',
       packages=['exiflow'],
       scripts=["exiassign", "exiconvert", "exigate", "exigui",
                "exiimport", "exiperson", "exirename"],
