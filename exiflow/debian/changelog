@@ -1,3 +1,9 @@
+exiflow (0.4.5.3-1) precise; urgency=low
+
+  * Just bump version number to 0.4.5.3.
+
+ -- Sebastian Berthold <exiflow@sleif.de>  Thu, 03 May 2012 23:25:53 +0200
+
 exiflow (0.4.5.2-1) oneiric; urgency=low
 
   * Just bump version number to 0.4.5.2.

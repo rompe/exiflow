@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
-DISTRIBUTIONS="maverick lucid karmic natty oneiric"
-DISTRIBUTIONS="oneiric"
+DISTRIBUTIONS="maverick lucid karmic natty oneiric precise"
 export GPGKEY=643D8C7A
 export DEBEMAIL='launchpad.net@rompe.org'
 export DEBFULLNAME='Ulf Rompe'
