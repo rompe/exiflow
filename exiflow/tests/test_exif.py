@@ -22,7 +22,7 @@ class TestExif(unittest.TestCase):
 
     def setUp(self):
         """ Create a directory with an image. """
-        data_dir = os.path.join(sys.path[0], "testdata")
+        data_dir = os.path.join(os.path.dirname(__file__), "testdata")
         self.__fields = {"Keywords": u"foo, bar, thingamabob", "Description": u"Hello world!"}
         self.__tempdir = tempfile.mkdtemp()
         self.__virginjpeg = os.path.join(self.__tempdir, "python.jpg")
