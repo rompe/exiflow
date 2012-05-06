@@ -22,7 +22,7 @@ import sys
 import glob
 import logging
 import optparse
-sys.path.insert(1, "/usr/share/exiflow") 
+sys.path.insert(1, "/usr/share/exiflow")
 import exiflow.exif
 import exiflow.filelist
 
@@ -61,8 +61,8 @@ def assign_file(filename, prefix, force=False):
     except IOError, msg:
         logger.warning(str(msg))
         return 1
-    # Currently F-spot always tries to write "DateTimeOriginal", so we must change
-    # the key to detect files with valid exif information.
+    # Currently F-spot always tries to write "DateTimeOriginal", so we must
+    # change the key to detect files with valid exif information.
     #if not force and exif_file.fields.has_key("DateTimeOriginal"):
     if not force and exif_file.fields.has_key("Model"):
         logger.info("Skipping %s, it seems to contain EXIF data.", filename)
@@ -85,8 +85,9 @@ def assign_file(filename, prefix, force=False):
 def run(argv, callback=None):
     """
     Take an equivalent of sys.argv[1:] and optionally a callable.
-    Parse options, assign relating files and gate meta information between them,
-    and optionally call the callable on every processed file with 3 arguments:
+    Parse options, assign relating files and gate meta information between
+    them, and optionally call the callable on every processed file with
+    3 arguments:
     filename, newname, percentage.
     If the callable returns True, stop the processing.
     """
@@ -127,4 +128,3 @@ def run(argv, callback=None):
 
 if __name__ == "__main__":
     run(sys.argv[1:])
-

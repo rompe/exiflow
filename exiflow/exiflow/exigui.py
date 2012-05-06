@@ -15,7 +15,7 @@ pygtk.require("2.0")
 import gtk
 import gtk.glade
 
-sys.path.insert(1, "/usr/share/exiflow") 
+sys.path.insert(1, "/usr/share/exiflow")
 import exiflow.filelist
 import exiflow.exiassign
 import exiflow.exiconvert
@@ -25,6 +25,7 @@ import exiflow.exiperson
 import exiflow.exirename
 
 gladefile = os.path.splitext(__file__)[0] + ".glade"
+
 
 class WritableTextView:
     """
@@ -50,7 +51,7 @@ class WritableTextView:
                 tag_table.add(tag)
             self.tag_names.append(color)
 
-    def write(self, msg):		
+    def write(self, msg):
         """
         Output msg to the textview.
         """
@@ -86,11 +87,12 @@ class Directorychooser1(object):
         self.callback = callback
         self.window.show()
 
-    def on_directorychooserdialog1_response(self, widget, data = None):
+    def on_directorychooserdialog1_response(self, widget, data=None):
         """ Callback function for the chooser. """
         if data == gtk.RESPONSE_OK and callable(self.callback):
             self.callback(widget.get_filename())
         self.window.destroy()
+
 
 class Filechooser1(object):
     """
@@ -109,7 +111,7 @@ class Filechooser1(object):
         self.callback = callback
         self.window.show()
 
-    def on_filechooserdialog1_response(self, widget, data = None):
+    def on_filechooserdialog1_response(self, widget, data=None):
         """ Callback function for the chooser. """
         if data == gtk.RESPONSE_OK and callable(self.callback):
             self.callback(widget.get_filenames())
@@ -143,7 +145,8 @@ class Window1(object):
         self.window.show()
         # Create TextView and use it
         sys.stdout = WritableTextView(self.wtree.get_widget("textview1"))
-        sys.stderr = WritableTextView(self.wtree.get_widget("textview1"), "blue")
+        sys.stderr = WritableTextView(self.wtree.get_widget("textview1"),
+                                      "blue")
         stdlog = WritableTextView(self.wtree.get_widget("textview1"), "red")
         logging.basicConfig(format="%(module)s: %(message)s", stream=stdlog,
                             level=logging.INFO)
@@ -249,15 +252,15 @@ class Window1(object):
                     if self.liststore[rownum][0] == filename:
                         self.liststore[rownum][0] = newname
         nbook = self.wtree.get_widget("notebook1")
-        ntab = nbook.get_tab_label(nbook.get_nth_page(nbook.get_current_page()))
-        label = ntab.get_text()
+        tab = nbook.get_tab_label(nbook.get_nth_page(nbook.get_current_page()))
+        label = tab.get_text()
         progressbar = self.wtree.get_widget("progressbar1")
         progressbar.set_fraction(float(percentage) / 100)
         progressbar.set_text(u"%s:   %s %%" % (label, percentage))
         while gtk.events_pending():
             gtk.main_iteration(False)
         return self._cancelled
-      
+
     def on_cancel_activate(self, widget, *dummy):
         """
         Called from the cancel button.
@@ -278,13 +281,13 @@ class Window1(object):
         nbook.set_sensitive(False)
         widget.set_sensitive(False)
         self._cancelled = False
-      
-        ntab = nbook.get_tab_label(nbook.get_nth_page(nbook.get_current_page()))
-        label = ntab.get_text()
+
+        tab = nbook.get_tab_label(nbook.get_nth_page(nbook.get_current_page()))
+        label = tab.get_text()
         logger.warning("Running %s", label)
         method = getattr(self, "_run_" + label.replace(" ", "_"))
         method()
-      
+
         progressbar = self.wtree.get_widget("progressbar1")
         progressbar.set_fraction(0 / 100)
         progressbar.set_text(u"")
@@ -311,10 +314,10 @@ class Window1(object):
         """ Run exirename. """
         logger = logging.getLogger("exigui.run_exirename")
         args = ["-v"]
-        artist_initials = self.wtree.get_widget("exirename_artist_initials_entry")
+        initials = self.wtree.get_widget("exirename_artist_initials_entry")
         cam_id = self.wtree.get_widget("exirename_cam_id_entry")
         if self._is_active("exirename_artist_initials_entry_button_custom"):
-            args.append("--artist_initials=" + artist_initials.get_text())
+            args.append("--artist_initials=" + initials.get_text())
         if self._is_active("exirename_cam_id_entry_button_custom"):
             args.append("--cam_id=" + cam_id.get_text())
         if self._is_active("exirename_include_timestamp_checkbutton"):
@@ -337,7 +340,7 @@ class Window1(object):
             exiflow.exiperson.run(args, self._progress_callback)
         except IOError, msg:
             logger.error("ERROR: %s", msg)
-      
+
     def _run_exiconvert(self):
         """ Run exiconvert. """
         logger = logging.getLogger("exigui.run_exiconvert")
@@ -414,7 +417,7 @@ def run(argv):
                       help="Target directory. A subdirectory will be created"
                            " in this directory.")
     parser.add_option("-d", "--device", dest="device",
-                      help="(Ignored for backwards compatibility. Do not use.)")
+                      help="(Ignored for backwards compatibility. Don't use.)")
     parser.add_option("-b", "--batch", action="store_true", dest="batch",
                       help="Autorun from exiimport over exirename, exiperson "
                            "and exiconvert to exiassign.")
@@ -441,5 +444,4 @@ def run(argv):
 
 
 if __name__ == "__main__":
-    run(sys.argv[1:]) 
-
+    run(sys.argv[1:])

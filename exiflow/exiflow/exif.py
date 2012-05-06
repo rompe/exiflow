@@ -11,6 +11,7 @@ import locale
 import logging
 import subprocess
 
+
 class Exif:
     """
     A class for reading and writing EXIF information.
@@ -37,25 +38,25 @@ class Exif:
             if line.startswith("Error:"):
                 stderr += line
         if len(stderr) > 0:
-            raise IOError, stderr
+            raise(IOError, stderr)
         else:
             for line in stdout.splitlines():
                 if ": " in line:
                     key, value = line.split(": ", 1)
                     self.fields[key] = value.strip()
-            # We have to read the ImageDescription binary because it may contain
-            # things like line breaks.
+            # We have to read the ImageDescription binary because it may
+            # contain things like line breaks.
             self.fields["ImageDescription"] = \
                 "".join(subprocess.Popen("exiftool -b -ImageDescription "
                                          + self.filename, shell=True,
                                          stdout=subprocess.PIPE).stdout)
-            # We don't need an empty "ImageDescription" for any merge operations.
+            # We don't need an empty "ImageDescription" for any merge
+            # operations.
             if self.fields["ImageDescription"] == "":
-                del self.fields["ImageDescription"] 
+                del self.fields["ImageDescription"]
         # Be sure to have proper UTF8 strings
         for key in self.fields:
             self.fields[key] = self._decode(self.fields[key])
-
 
     @staticmethod
     def _decode(field):
@@ -85,7 +86,7 @@ class Exif:
         # we try 'latin-1' last
         encodings.append('latin-1')
         for enc in encodings:
-            # some of the locale calls 
+            # some of the locale calls
             # may have returned None
             if not enc:
                 continue
@@ -98,7 +99,6 @@ class Exif:
 
         return decoded
 
-
     def write_exif(self):
         """
         Write Exif Information from self.fields into self.filename.
@@ -110,49 +110,53 @@ class Exif:
                 for keyword in self.fields[field].split(","):
                     command += " -%s=\"%s\"" % (field, keyword.strip())
             elif field == "DateTimeOriginal":
-                # TODO: Writing back DateTimeOriginal seems to be a bad idea since
-                # gthumb drops seconds and there is some confusion with time strings
-                # and epoch.
+                # TODO: Writing back DateTimeOriginal seems to be a bad idea
+                # since gthumb drops seconds and there is some confusion with
+                # time strings and epoch.
                 continue
             else:
                 command += " -%s=\"%s\"" % (field, self.fields[field])
         command += " " + self.filename
-        exiftool = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
+        exiftool = subprocess.Popen(command, shell=True,
+                                    stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE)
         # exiftool doesn't reflect errors in it's return code, so we have to
         # assume an error if something is written to stderr.
         errors = exiftool.stderr.readlines()
         if len(errors) > 0:
-            raise IOError, "".join(errors + exiftool.stdout.readlines())
+            raise(IOError, "".join(errors + exiftool.stdout.readlines()))
         return exiftool.wait()
-
 
     def update_exif(self, sourcefile):
         """
         Copy Exif Information from sourcefile into destfile and merge in values
-        from myexif. The fields used for merging have to be defined in exiffields.
+        from myexif. The fields used for merging have to be defined in
+        exiffields.
         Raises IOError on errors.
         """
         logger = logging.getLogger("exiassign.assign_file")
         # Fields we want to keep
-        exiffields = ["Artist", "Credit", "Copyright", "CopyrightNotice", 
-                      "ImageDescription", "Keywords", "Location", "UserComment",
-                      "XPTitle"]
-        command = "exiftool -overwrite_original -x Orientation -P -TagsFromFile %s --Keywords" \
-                  % sourcefile
+        exiffields = ["Artist", "Credit", "Copyright", "CopyrightNotice",
+                      "ImageDescription", "Keywords", "Location",
+                      "UserComment", "XPTitle"]
+        command = ("exiftool -overwrite_original -x Orientation -P "
+                   "-TagsFromFile %s --Keywords" % sourcefile)
         for field in exiffields:
             if field in self.fields:
                 if field == "Keywords":
-                    for keyword in set([s.strip() for s in self.fields[field].split(",")]):
+                    for keyword in set([s.strip() for s in
+                                        self.fields[field].split(",")]):
                         command += " -%s=\"%s\"" % (field, keyword)
                 else:
                     command += " -%s=\"%s\"" % (field, self.fields[field])
         command += " " + self.filename
         logger.debug("Calling: %s", command)
-        exiftool = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
+        exiftool = subprocess.Popen(command, shell=True,
+                                    stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE)
         # exiftool doesn't reflect errors in it's return code, so we have to
-        # assume an error if something is written to stderr but ignore warnings too.
+        # assume an error if something is written to stderr but ignore
+        # warnings too.
         errors = exiftool.stderr.readlines()
         if len(errors) > 0:
             myregex = re.compile("^Warning: \[minor\] .* Fixed.")
@@ -160,7 +164,5 @@ class Exif:
             if mymatch:
                 logger.info("%s", errors)
             else:
-                raise IOError, "".join(errors + exiftool.stdout.readlines())
+                raise(IOError, "".join(errors + exiftool.stdout.readlines()))
         return exiftool.wait()
-
-

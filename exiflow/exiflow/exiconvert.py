@@ -33,7 +33,7 @@ import sys
 import logging
 import optparse
 import subprocess
-sys.path.insert(1, "/usr/share/exiflow") 
+sys.path.insert(1, "/usr/share/exiflow")
 import exiflow.exif
 import exiflow.filelist
 import exiflow.configfile
@@ -66,7 +66,7 @@ def convert_file(filename):
     if not filename.endswith(raw_extension):
         logger.info("%s doesn't match, skipping.", filename)
         return basename
-      
+
     if raw_converter == "":
         logger.warning("No raw_converter configured, skipping %s", basename)
         return basename
@@ -83,10 +83,12 @@ def convert_file(filename):
         for line in process.stdout:
             logger.info(line)
         if process.wait() > 0:
-            logger.error("Converter invocation returned an error:\n%s", command)
+            logger.error("Converter invocation returned an error:\n%s",
+                         command)
         else:
             if not os.path.exists(newname):
-                logger.error("Converter returned 0, but %s is absent!", newname)
+                logger.error("Converter returned 0, but %s is absent!",
+                             newname)
             else:
                 return os.path.basename(newname)
     return basename
@@ -102,7 +104,7 @@ def run(argv, callback=None):
     """
     parser = optparse.OptionParser(usage="usage: %prog [options] "
                                          "<files or dirs>")
-    parser.add_option("-r", "--remove-lqjpeg", action="store_true", 
+    parser.add_option("-r", "--remove-lqjpeg", action="store_true",
                       dest="remove_lqjpeg",
                       help="removes the low quality jpeg (...00l.jpg) "
                             "example yyyymmdd-a00000-xy00l.jpg")
@@ -115,6 +117,7 @@ def run(argv, callback=None):
         logging.getLogger().setLevel(logging.INFO)
     logger = logging.getLogger("exiconvert")
 
+    filename_re = re.compile("^(\d{8}(-\d{6})?-.{3}\d{4}-.{2})000\.jpg$")
     for filename, percentage in exiflow.filelist.Filelist(args):
         callback_filename = None
         logger.info("%3s%% %s", percentage, filename)
@@ -128,7 +131,6 @@ def run(argv, callback=None):
             logger.error("Skipping %s:\n%s\n", filename, msg)
         if options.remove_lqjpeg:
             keep_original = False
-            filename_re = re.compile("^(\d{8}(-\d{6})?-.{3}\d{4}-.{2})000\.jpg$")
             mymatch = filename_re.match(newname)
             if mymatch:
                 lqname = os.path.join(os.path.dirname(filename),
@@ -138,7 +140,8 @@ def run(argv, callback=None):
                         os.remove(lqname)
                         callback_filename = lqname
                     except IOError, msg:
-                        logger.error("Skipping remove of %s:\n%s\n", lqname, msg)
+                        logger.error("Skipping remove of %s:\n%s\n",
+                                     lqname, msg)
         else:
             callback_filename = filename
             keep_original = True
@@ -152,4 +155,3 @@ def run(argv, callback=None):
 
 if __name__ == "__main__":
     run(sys.argv[1:])
-
