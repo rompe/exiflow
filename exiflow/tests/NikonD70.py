@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 Captured metadata of NikonD70.jpg .
-Make sure to ignore "Directory" and "FileModifyDate" when using this for comparison purposes..
+Make sure to ignore "Directory" and "FileModifyDate" when using this for
+comparison purposes..
 """
 __revision__ = "$Id$"
 
