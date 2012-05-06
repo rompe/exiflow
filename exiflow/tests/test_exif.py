@@ -23,7 +23,8 @@ class TestExif(unittest.TestCase):
     def setUp(self):
         """ Create a directory with an image. """
         data_dir = os.path.join(os.path.dirname(__file__), "testdata")
-        self.__fields = {"Keywords": u"foo, bar, thingamabob", "Description": u"Hello world!"}
+        self.__fields = {"Keywords": u"foo, bar, thingamabob",
+                         "Description": u"Hello world!"}
         self.__tempdir = tempfile.mkdtemp()
         self.__virginjpeg = os.path.join(self.__tempdir, "python.jpg")
         shutil.copy(os.path.join(data_dir, "python.jpg"), self.__tempdir)
@@ -70,7 +71,8 @@ class TestExif(unittest.TestCase):
         self.failUnless(isinstance(exif, exiflow.exif.Exif))
         exif.read_exif()
         self.failUnlessEqual(exif.fields["ImageDescription"], 
-            u"ImageDescription first row äöüß\nImageDescription second row ÄÖÜß\n")
+                             u"ImageDescription first row äöüß\n" +
+                             u"ImageDescription second row ÄÖÜß\n")
 
     def test_read_exif_imagedescription_decode(self):
         """ Tests for read_exif() with valid image """
@@ -78,7 +80,8 @@ class TestExif(unittest.TestCase):
         self.failUnless(isinstance(exif, exiflow.exif.Exif))
         exif.read_exif()
         self.failUnlessEqual(exif.fields["ImageDescription"], 
-            u"ImageDescription first row äöüß\nImageDescription second row ÄÖÜß\n")
+                             u"ImageDescription first row äöüß\n" +
+                             u"ImageDescription second row ÄÖÜß\n")
 
     def test_write_exif_without_image(self):
         """ Test for write_exif() with invalid filename """
@@ -127,4 +130,3 @@ class TestExif(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
