@@ -78,6 +78,7 @@ def get_exif_information(filename):
     exif_file.read_exif()
     model = exif_file.fields.get("Model", "all")
     date = exif_file.fields.get("DateTimeOriginal", "0")
+    quality = exif_file.fields.get("Quality", "0")
     image_time = date
     if ":" in date:
         image_time = image_time[11:13] + image_time[14:16] + image_time[17:19]
@@ -88,9 +89,9 @@ def get_exif_information(filename):
             image_time = date
         date = time.strftime("%Y%m%d", time.localtime(float(date)))
         image_time = time.strftime("%H%M%S", time.localtime(float(image_time)))
-    return model, date, image_time
+    return model, date, image_time, quality
 
-def get_new_filename_parts(filename, filelist):
+def get_new_filename_parts(filename, filelist, quality):
     """
     Return a new name for filename according to our holy naming scheme.
     """
@@ -103,7 +104,8 @@ def get_new_filename_parts(filename, filelist):
     if extension == ".jpg":
         versions = [vers[0] for vers in filelist if vers[0].startswith(leader)]
         if len(versions) > 1:
-            revision = "00l"
+            if quality not in "Fine fine":
+                revision = "00l"
     if not number:
         raise IOError, "Can't find a number in " + filename
     return number.zfill(4), revision, extension
@@ -133,12 +135,12 @@ def rename_file(filename, filelist, with_time, cam_id=None, artist_initials=None
                 image_time = get_exif_information(filename)[2]
             date += "-" + image_time
     else:
-        model, date, image_time = get_exif_information(filename)
+        model, date, image_time, quality = get_exif_information(filename)
         if with_time:
             date += "-" + image_time
         cam_id, artist_initials = exiflow.configfile.get_options("cameras", model,
                                                     ("cam_id", "artist_initials"))
-        number, revision, extension = get_new_filename_parts(filename, filelist)
+        number, revision, extension = get_new_filename_parts(filename, filelist, quality)
 
     if len(cam_id) != 3 or len(artist_initials) != 2:
         logger.warning("Either cam_id or artist_initials is missing or of wrong length. "
