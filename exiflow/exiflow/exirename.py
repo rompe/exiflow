@@ -104,7 +104,7 @@ def get_new_filename_parts(filename, filelist, quality):
     if extension == ".jpg":
         versions = [vers[0] for vers in filelist if vers[0].startswith(leader)]
         if len(versions) > 1:
-            if quality not in "Fine fine":
+            if quality.lower() not in ("fine", "high"):
                 revision = "00l"
     if not number:
         raise IOError, "Can't find a number in " + filename
