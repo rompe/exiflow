@@ -62,7 +62,7 @@ import sys
 import time
 import logging
 import optparse
-sys.path.insert(1, "/usr/share/exiflow") 
+sys.path.insert(1, "/usr/share/exiflow")
 import exiflow.exif
 import exiflow.filelist
 import exiflow.configfile
@@ -91,6 +91,7 @@ def get_exif_information(filename):
         image_time = time.strftime("%H%M%S", time.localtime(float(image_time)))
     return model, date, image_time, quality
 
+
 def get_new_filename_parts(filename, filelist, quality):
     """
     Return a new name for filename according to our holy naming scheme.
@@ -107,19 +108,21 @@ def get_new_filename_parts(filename, filelist, quality):
             if quality.lower() not in ("fine", "high"):
                 revision = "00l"
     if not number:
-        raise IOError, "Can't find a number in " + filename
+        raise IOError("Can't find a number in " + filename)
     return number.zfill(4), revision, extension
 
 
-def rename_file(filename, filelist, with_time, cam_id=None, artist_initials=None):
+def rename_file(filename, filelist, with_time, cam_id=None,
+                 artist_initials=None):
     """
     Rename filename and return the newly generated name without dir.
     """
     logger = logging.getLogger("exirename.rename_file")
-    match = re.match("^(\d{8})(-(\d{6}))?-(.{3})(\d{4})-((.{2})(.{3}))(\.[^.]*)$",
+    match = re.match("^(\d{8})(-(\d{6}))?-(.{3})(\d{4})-"
+                     "((.{2})(.{3}))(\.[^.]*)$",
                      os.path.basename(filename))
-    # differentiate between getting values from existing filenames or getting initial 
-    # values from exif and config file
+    # differentiate between getting values from existing filenames or getting
+    # initial values from exif and config file
     if match:
         date = match.group(1)
         image_time = match.group(3)
@@ -138,24 +141,28 @@ def rename_file(filename, filelist, with_time, cam_id=None, artist_initials=None
         model, date, image_time, quality = get_exif_information(filename)
         if with_time:
             date += "-" + image_time
-        cam_id, artist_initials = exiflow.configfile.get_options("cameras", model,
-                                                    ("cam_id", "artist_initials"))
-        number, revision, extension = get_new_filename_parts(filename, filelist, quality)
+        cam_id, artist_initials = exiflow.configfile.get_options("cameras",
+                                                                 model,
+                                                 ("cam_id", "artist_initials"))
+        number, revision, extension = get_new_filename_parts(filename,
+                                                             filelist, quality)
 
     if len(cam_id) != 3 or len(artist_initials) != 2:
-        logger.warning("Either cam_id or artist_initials is missing or of wrong length. "
-                       "cam_id should be 3 characters and is currently set to '%s', "
-                       "artist_initials should be 2 characters and is set to '%s'. "
+        logger.warning("Either cam_id or artist_initials is missing or of "
+                       "wrong length. cam_id should be 3 characters and is "
+                       "currently set to '%s', artist_initials should be 2 "
+                       "characters and is set to '%s'. "
                        "Skipping %s." % (cam_id, artist_initials, filename))
         return os.path.basename(filename)
-   
-    newbasename = date + "-" + cam_id + number + "-" + artist_initials + revision \
-                  + extension
+
+    newbasename = date + "-" + cam_id + number + "-" + artist_initials + \
+                  revision + extension
     newname = os.path.join(os.path.dirname(filename), newbasename)
     if filename == newname:
-        raise IOError, "Filename does not change."
+        raise IOError("Filename does not change.")
     elif os.path.exists(newname):
-        raise IOError, "Can't rename %s to %s, it already exists." % (filename, newname)
+        raise IOError("Can't rename %s to %s, it already exists." % (filename,
+                                                                     newname))
     os.rename(filename, newname)
     return newbasename
 
@@ -175,10 +182,11 @@ def run(argv, callback=None):
     parser.add_option("--artist_initials", "-a", dest="artist_initials",
                       help="Initials of the artist. Should be two characters"
                            " long.")
-    parser.add_option("-t", "--with_time", action="store_true", dest="with_time",
+    parser.add_option("-t", "--with_time", action="store_true",
+                      dest="with_time",
                       help="Create filenames containing the image time, for "
-                          "example 20071231-235959-n001234-xy000.jpg instead of "
-                          "20071231-n001234-xy000.jpg .")
+                           "example 20071231-235959-n001234-xy000.jpg instead "
+                           "of 20071231-n001234-xy000.jpg .")
     parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
                       help="Be verbose.")
     options, args = parser.parse_args(args=argv)
@@ -206,4 +214,3 @@ def run(argv, callback=None):
 
 if __name__ == "__main__":
     run(sys.argv[1:])
-
