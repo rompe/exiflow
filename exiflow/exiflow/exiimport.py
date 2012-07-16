@@ -14,8 +14,7 @@ import shutil
 import logging
 import optparse
 import subprocess
-sys.path.insert(1, "/usr/share/exiflow")
-import exiflow.filelist
+from . import filelist as exiflow_filelist
 
 
 def run(argv, callback=None):
@@ -48,7 +47,7 @@ def run(argv, callback=None):
         sys.exit(1)
 
     # Build file list whithout skipping unknown files
-    filelist = exiflow.filelist.Filelist([])
+    filelist = exiflow_filelist.Filelist([])
     filelist.process_unknown_types()
     filelist.add_files([options.mount])
 
