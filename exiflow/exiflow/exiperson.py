@@ -16,14 +16,14 @@ __revision__ = "$Id$"
 import sys
 import logging
 import optparse
-sys.path.insert(1, "/usr/share/exiflow") 
+sys.path.insert(1, "/usr/share/exiflow")
 import exiflow.exif
 import exiflow.filelist
 import exiflow.configfile
 
 
-def personalize_file(filename, personals, options_section_personals, \
-                     forced_personals):
+def personalize_file(filename, personals, options_section_personals,
+                       forced_personals):
     """
     Personalize an image using data from the dictionary "personals".
     The optional "forced_personals" override all other personals.
@@ -37,7 +37,7 @@ def personalize_file(filename, personals, options_section_personals, \
         logger.warning("Skipping %s: %s", filename, msg)
         return 1
 
-    if exif_file.fields.has_key("Model"):
+    if "Model" in exif_file.fields.has_key:
         if exifconfig.has_section(exif_file.fields["Model"]):
             personals += exifconfig.items(exif_file.fields["Model"])
         else:
@@ -49,7 +49,7 @@ def personalize_file(filename, personals, options_section_personals, \
 
     if len(options_section_personals) > 0:
         personals += options_section_personals
-   
+
     if len(personals) == 0 and len(forced_personals) == 0:
         logger.warning("No [all] or [%s] section with data, nor custom tags,"
                        " skipping.", exif_file.fields["Model"])
@@ -78,13 +78,14 @@ def run(argv, callback=None):
     on every processed file with 3 arguments: filename, newname, percentage.
     If the callable returns True, stop the processing.
     """
-    parser = optparse.OptionParser(usage="usage: %prog [options] [-- -TAGNAME=" \
-                                         "VALUE [...]] <files or dirs>")
+    parser = optparse.OptionParser(usage="usage: %prog [options] "
+                                         "[-- -TAGNAME=VALUE [...]] "
+                                         "<files or dirs>")
     parser.add_option("--section", "-s", dest="section",
-                      help="Name of a config file section to be read. This is" \
-                           " useful if different people are using the same" \
-                           " camera model. By default, the section name is" \
-                           " guessed from the camera model. Section 'all' is" \
+                      help="Name of a config file section to be read. This is"
+                           " useful if different people are using the same"
+                           " camera model. By default, the section name is"
+                           " guessed from the camera model. Section 'all' is"
                            " the default.")
     parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
                       help="Be verbose.")
@@ -132,4 +133,3 @@ def run(argv, callback=None):
 
 if __name__ == "__main__":
     run(sys.argv[1:])
-
