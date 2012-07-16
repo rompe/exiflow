@@ -37,7 +37,7 @@ def find_siblings(filename, prefix):
     mtimes = {}
     for otherfile in glob.glob(os.path.join(os.path.dirname(filename),
                                             prefix + "*")):
-        leader, extension = os.path.splitext(otherfile)
+        extension = os.path.splitext(otherfile)[1]
         extension = extension.lower()
 
         if otherfile == filename:
@@ -64,7 +64,7 @@ def assign_file(filename, prefix, force=False):
     # Currently F-spot always tries to write "DateTimeOriginal", so we must
     # change the key to detect files with valid exif information.
     #if not force and exif_file.fields.has_key("DateTimeOriginal"):
-    if not force and exif_file.fields.has_key("Model"):
+    if not force and "Model" in exif_file.fields:
         logger.info("Skipping %s, it seems to contain EXIF data.", filename)
         return 0
     for sibling in find_siblings(filename, prefix):
@@ -123,7 +123,6 @@ def run(argv, callback=None):
             if callable(callback):
                 if callback(filename, filename, percentage):
                     break
-
 
 
 if __name__ == "__main__":
