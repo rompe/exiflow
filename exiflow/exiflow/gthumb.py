@@ -11,6 +11,7 @@ import re
 import gzip
 import xml.dom.minidom
 
+
 class Gthumb:
     """
     A class that handles reading and writing gthumb comment files
@@ -26,8 +27,7 @@ class Gthumb:
         self.commentsdir = os.path.join(os.path.dirname(self.filename),
                                         ".comments")
         self.commentsfile = os.path.join(self.commentsdir,
-                                         os.path.basename(self.filename) + ".xml")
-
+                                     os.path.basename(self.filename) + ".xml")
 
     def read(self):
         """
@@ -65,16 +65,16 @@ class Gthumb:
                     if len(mynodes) > 0:
                         mydata[field] = mynodes[0].wholeText
 
-            for gthumb_key in gthumb_to_exif:
-                if gthumb_key in mydata:
-                    self.fields[gthumb_to_exif[gthumb_key]] = mydata[gthumb_key]
+            for key in gthumb_to_exif:
+                if key in mydata:
+                    self.fields[gthumb_to_exif[key]] = mydata[key]
             if "Note" in mydata:
                 note = []
                 myregex = re.compile("(\w+)::(.*)$")
                 for line in mydata["Note"].split("\n"):
-                    mymatch = myregex.match(line)
-                    if mymatch:
-                        self.fields[mymatch.group(1)] = mymatch.group(2).strip()
+                    match = myregex.match(line)
+                    if match:
+                        self.fields[match.group(1)] = match.group(2).strip()
                     else:
                         note.append(line)
                 if len(note) > 0:
@@ -83,7 +83,6 @@ class Gthumb:
             return True
         else:
             return False
-
 
     def write(self, myaddfields=False, mytemplate=False):
         """
@@ -130,7 +129,6 @@ class Gthumb:
             os.makedirs(self.commentsdir)
         gzip.open(self.commentsfile, "wb").write(mydom.toxml(encoding="utf-8"))
 
-
     def get_mtime(self):
         """
         Get modification time of comment file or 0 if it doesn't exist.
@@ -139,7 +137,6 @@ class Gthumb:
             return os.path.getmtime(self.commentsfile)
         else:
             return 0
-
 
     def set_mtime(self, mtime):
         """
