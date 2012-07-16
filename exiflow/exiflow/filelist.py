@@ -8,15 +8,15 @@ provide an iterable interface to them.
 __revision__ = "$Id$"
 
 import os
-import sys
 import time
 import logging
-sys.path.insert(1, "/usr/share/exiflow") 
-import exiflow.configfile
+from . import configfile
+
 
 class Filelist:
     """
     An iterable class that hosts information about files
+
     given in it's contructor.
     """
 
@@ -35,7 +35,6 @@ class Filelist:
         for path in pathes:
             self.add_files([path])
 
-
     def add_files(self, pathes):
         """
         Add filenames found in pathes either to _files or _skippedfiles,
@@ -45,7 +44,7 @@ class Filelist:
         Raises IOError on access errors.
         """
         logger = logging.getLogger("filelist.add_files")
-        settings = exiflow.configfile.parse("settings")
+        settings = configfile.parse("settings")
         unwanted_dirs = settings.get("all", "unwantend_dirs").split()
         for path in pathes:
             if path.startswith("file:///"):
@@ -62,10 +61,9 @@ class Filelist:
                     for basefile in files:
                         self._add_file(os.path.join(root, basefile))
             else:
-                logger.warning("%s is not a regular file or directory. Skipping.",
-                               path)
+                logger.warning("%s is not a regular file or directory. "
+                               "Skipping.", path)
         return bool(len(self._files)) and not bool(len(self._skippedfiles))
-
 
     def _add_file(self, filename):
         """
@@ -73,7 +71,7 @@ class Filelist:
         Return True if the file is added, False otherwise.
         """
         logger = logging.getLogger("filelist._add_file")
-        settings = exiflow.configfile.parse("settings")
+        settings = configfile.parse("settings")
         image_extensions = settings.get("all", "image_extensions").split()
         unwanted_files = settings.get("all", "unwantend_files").split()
         basefilename = os.path.basename(filename).lower()
@@ -92,7 +90,6 @@ class Filelist:
             self._skippedfiles.append(filename)
             return False
 
-
     def process_unknown_types(self):
         """
         Set _process_unknown_types to True, meaning that following method calls
@@ -101,7 +98,6 @@ class Filelist:
         arguments, then call this method, and then call add_files().
         """
         self._process_unknown_types = True
-
 
     def __iter__(self):
         """
@@ -112,7 +108,6 @@ class Filelist:
         for filename in self._files:
             size_so_far += self._filestats[filename].st_size
             yield(filename, 100 * size_so_far / self._fullsize)
-
 
     def get_daterange(self):
         """
@@ -125,20 +120,17 @@ class Filelist:
             range_string += "_-_" + dates.pop()
         return range_string
 
-
     def get_date(self, filename):
         """
         Get modification date for filename.
         """
         return self._filedates[filename]
 
-
     def get_fullsize(self):
         """
         Get cumulated bytes of files.
         """
         return self._fullsize
-
 
     def get_filecount(self):
         """
@@ -151,4 +143,3 @@ class Filelist:
         Get al list of all files.
         """
         return self._files
-
