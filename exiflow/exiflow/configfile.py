@@ -83,6 +83,7 @@ unwantend_dirs = .comments
 __cache = {}
 __stats = {}
 
+
 def __stat(filename):
     """
     Return a stat object or None if "filename" doesn't exist.
@@ -92,6 +93,7 @@ def __stat(filename):
     except OSError:
         return None
 
+
 def parse(configname):
     """
     Handle cached access to <configname>.cfg.
@@ -100,7 +102,7 @@ def parse(configname):
     logger = logging.getLogger("configfile.parse")
     local_config = os.path.join(__local_config_dir, configname + ".cfg")
     global_config = os.path.join(__global_config_dir, configname + ".cfg")
-    if not __cache.has_key(configname) \
+    if not configname in __cache.has_key \
         or __stats.get(local_config, None) != __stat(local_config) \
         or __stats.get(global_config, None) != __stat(global_config):
         if not os.path.exists(local_config):
@@ -112,7 +114,8 @@ def parse(configname):
         __stats[global_config] = __stat(global_config)
         config = ConfigParser.ConfigParser()
         read_files = config.read([global_config, local_config])
-        logger.info("Read %s config files: %s", configname, " ".join(read_files))
+        logger.info("Read %s config files: %s",
+                    configname, " ".join(read_files))
         __cache[configname] = config
     return __cache[configname]
 
@@ -150,8 +153,6 @@ def append(configname, section, options):
         sys.stderr.write("Commented section [%s] found in %s\nPlease edit!\n" %
                          (section, configfile))
     else:
-        sys.stderr.write("Adding commented section [%s] to %s\nPlease edit!\n" %
-                         (section, configfile))
+        sys.stderr.write("Adding commented section [%s] to %s\n"
+                         "Please edit!\n" % (section, configfile))
         file(configfile, "a").write(string_to_append)
-
-
