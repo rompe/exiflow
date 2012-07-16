@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# vim: tabstop=4 expandtab shiftwidth=4
 """
 Unit tests for exif.py
 """
@@ -32,11 +33,11 @@ class TestExif(unittest.TestCase):
         shutil.copy(os.path.join(data_dir, "NikonD70.jpg"), self.__tempdir)
         self.__d70jpeg_imgdesc_latin1 = os.path.join(self.__tempdir,
             "NikonD70_ImageDescription_2rows_latin1.jpg")
-        shutil.copy(os.path.join(data_dir, 
+        shutil.copy(os.path.join(data_dir,
             "NikonD70_ImageDescription_2rows_latin1.jpg"), self.__tempdir)
         self.__d70jpeg_imgdesc_utf8 = os.path.join(self.__tempdir,
             "NikonD70_ImageDescription_2rows_utf8.jpg")
-        shutil.copy(os.path.join(data_dir, 
+        shutil.copy(os.path.join(data_dir,
             "NikonD70_ImageDescription_2rows_utf8.jpg"), self.__tempdir)
         self.__emptyfile = os.path.join(self.__tempdir, "emptyfile.jpg")
         file(self.__emptyfile, 'w')
@@ -70,7 +71,7 @@ class TestExif(unittest.TestCase):
         exif = exiflow.exif.Exif(self.__d70jpeg_imgdesc_utf8)
         self.failUnless(isinstance(exif, exiflow.exif.Exif))
         exif.read_exif()
-        self.failUnlessEqual(exif.fields["ImageDescription"], 
+        self.failUnlessEqual(exif.fields["ImageDescription"],
                              u"ImageDescription first row äöüß\n" +
                              u"ImageDescription second row ÄÖÜß\n")
 
@@ -79,7 +80,7 @@ class TestExif(unittest.TestCase):
         exif = exiflow.exif.Exif(self.__d70jpeg_imgdesc_latin1)
         self.failUnless(isinstance(exif, exiflow.exif.Exif))
         exif.read_exif()
-        self.failUnlessEqual(exif.fields["ImageDescription"], 
+        self.failUnlessEqual(exif.fields["ImageDescription"],
                              u"ImageDescription first row äöüß\n" +
                              u"ImageDescription second row ÄÖÜß\n")
 
