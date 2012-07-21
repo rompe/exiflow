@@ -16,10 +16,9 @@ __revision__ = "$Id$"
 import sys
 import logging
 import optparse
-sys.path.insert(1, "/usr/share/exiflow")
-import exiflow.exif
-import exiflow.filelist
-import exiflow.configfile
+from . import exif
+from . import filelist
+from . import configfile
 
 
 def personalize_file(filename, personals, options_section_personals,
@@ -29,8 +28,8 @@ def personalize_file(filename, personals, options_section_personals,
     The optional "forced_personals" override all other personals.
     """
     logger = logging.getLogger("exiperson.personalize_file")
-    exifconfig = exiflow.configfile.parse("exif")
-    exif_file = exiflow.exif.Exif(filename)
+    exifconfig = configfile.parse("exif")
+    exif_file = exif.Exif(filename)
     try:
         exif_file.read_exif()
     except IOError, msg:
@@ -41,8 +40,8 @@ def personalize_file(filename, personals, options_section_personals,
         if exifconfig.has_section(exif_file.fields["Model"]):
             personals += exifconfig.items(exif_file.fields["Model"])
         else:
-            exiflow.configfile.append("exif", exif_file.fields["Model"],
-                                      ("artist", "contact"))
+            configfile.append("exif", exif_file.fields["Model"],
+                              ("artist", "contact"))
             sys.stderr.write("Get rid of this message by defining at least"
                              " an empty [%s] section.\n" %
                              exif_file.fields["Model"])
@@ -96,7 +95,7 @@ def run(argv, callback=None):
         logging.getLogger().setLevel(logging.INFO)
     logger = logging.getLogger("exiperson")
 
-    exifconfig = exiflow.configfile.parse("exif")
+    exifconfig = configfile.parse("exif")
 
     defaultpersonals = []
     options_section_personals = []
@@ -120,7 +119,7 @@ def run(argv, callback=None):
         else:
             remaining_args.append(arg)
 
-    for filename, percentage in exiflow.filelist.Filelist(remaining_args):
+    for filename, percentage in filelist.Filelist(remaining_args):
         logger.info("%3s%% %s", percentage, filename)
         if callable(callback):
             if callback(filename, filename, percentage):

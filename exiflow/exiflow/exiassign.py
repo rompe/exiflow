@@ -22,9 +22,8 @@ import sys
 import glob
 import logging
 import optparse
-sys.path.insert(1, "/usr/share/exiflow")
-import exiflow.exif
-import exiflow.filelist
+from . import exif
+from . import filelist
 
 
 def find_siblings(filename, prefix):
@@ -55,7 +54,7 @@ def assign_file(filename, prefix, force=False):
     With force=True, force update even if EXIF is already present.
     """
     logger = logging.getLogger("exiassign.assign_file")
-    exif_file = exiflow.exif.Exif(filename)
+    exif_file = exif.Exif(filename)
     try:
         exif_file.read_exif()
     except IOError, msg:
@@ -68,7 +67,7 @@ def assign_file(filename, prefix, force=False):
         logger.info("Skipping %s, it seems to contain EXIF data.", filename)
         return 0
     for sibling in find_siblings(filename, prefix):
-        other_exif_file = exiflow.exif.Exif(sibling)
+        other_exif_file = exif.Exif(sibling)
         try:
             other_exif_file.read_exif()
         except IOError:
@@ -110,11 +109,9 @@ def run(argv, callback=None):
         logging.getLogger().setLevel(logging.INFO)
     logger = logging.getLogger("exiassign")
 
-    filelist = exiflow.filelist.Filelist(args)
-
     filename_re = re.compile("^(\d{8}(-\d{6})?-.{3}\d{4}-)(.{5})\.[^.]*$")
 
-    for filename, percentage in filelist:
+    for filename, percentage in filelist.Filelist(args):
         mymatch = filename_re.match(os.path.basename(filename))
         if mymatch:
             logger.info("%3s%% %s", percentage, filename)

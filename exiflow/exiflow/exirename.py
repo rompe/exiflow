@@ -62,10 +62,9 @@ import sys
 import time
 import logging
 import optparse
-sys.path.insert(1, "/usr/share/exiflow")
-import exiflow.exif
-import exiflow.filelist
-import exiflow.configfile
+from . import exif
+from . import filelist
+from . import configfile
 
 
 def get_exif_information(filename):
@@ -73,7 +72,7 @@ def get_exif_information(filename):
     Read camera model and date from filename and return them.
     If The date isn't contained in EXIF, use the file's mtime.
     """
-    exif_file = exiflow.exif.Exif(filename)
+    exif_file = exif.Exif(filename)
     # read_exif may throw IOError. We leave the catching to our caller.
     exif_file.read_exif()
     model = exif_file.fields.get("Model", "all")
@@ -141,9 +140,9 @@ def rename_file(filename, filelist, with_time, cam_id=None,
         model, date, image_time, quality = get_exif_information(filename)
         if with_time:
             date += "-" + image_time
-        cam_id, artist_initials = exiflow.configfile.get_options("cameras",
-                                                                 model,
-                                                 ("cam_id", "artist_initials"))
+        cam_id, artist_initials = configfile.get_options("cameras", model,
+                                                         ("cam_id",
+                                                          "artist_initials"))
         number, revision, extension = get_new_filename_parts(filename,
                                                              filelist, quality)
 
@@ -196,10 +195,10 @@ def run(argv, callback=None):
         logging.getLogger().setLevel(logging.INFO)
     logger = logging.getLogger("exirename")
 
-    filelist = exiflow.filelist.Filelist(args)
-    for filename, percentage in filelist:
+    my_filelist = filelist.Filelist(args)
+    for filename, percentage in my_filelist:
         try:
-            newname = rename_file(filename, filelist, options.with_time,
+            newname = rename_file(filename, my_filelist, options.with_time,
                                   options.cam_id, options.artist_initials)
         except IOError, msg:
             newname = os.path.basename(filename)

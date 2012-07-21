@@ -33,10 +33,9 @@ import sys
 import logging
 import optparse
 import subprocess
-sys.path.insert(1, "/usr/share/exiflow")
-import exiflow.exif
-import exiflow.filelist
-import exiflow.configfile
+from . import exif
+from . import filelist
+from . import configfile
 
 
 def convert_file(filename):
@@ -50,13 +49,13 @@ def convert_file(filename):
         logger.debug("%s is a Jpeg file, skipping.", basename)
         return basename
 
-    exif_file = exiflow.exif.Exif(filename)
+    exif_file = exif.Exif(filename)
     # read_exif may throw IOError. We leave the catching to our caller.
     exif_file.read_exif()
     model = exif_file.fields.get("Model", "all")
 
     raw_extension, raw_converter = \
-        exiflow.configfile.get_options("cameras", model,
+        configfile.get_options("cameras", model,
                                        ("raw_extension", "raw_converter"))
 
     if raw_extension == "":
@@ -118,7 +117,7 @@ def run(argv, callback=None):
     logger = logging.getLogger("exiconvert")
 
     filename_re = re.compile("^(\d{8}(-\d{6})?-.{3}\d{4}-.{2})000\.jpg$")
-    for filename, percentage in exiflow.filelist.Filelist(args):
+    for filename, percentage in filelist.Filelist(args):
         callback_filename = None
         logger.info("%3s%% %s", percentage, filename)
         if callable(callback):

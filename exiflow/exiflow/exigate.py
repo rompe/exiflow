@@ -11,10 +11,9 @@ import os
 import sys
 import logging
 import optparse
-sys.path.insert(1, "/usr/share/exiflow")
-import exiflow.exif
-import exiflow.gthumb
-import exiflow.filelist
+from . import exif
+from . import gthumb
+from . import filelist
 
 
 def autogate_gthumb(filename, myoptions):
@@ -25,7 +24,7 @@ def autogate_gthumb(filename, myoptions):
     """
     logger = logging.getLogger("exigate.autogate_gthumb")
     filename = os.path.abspath(filename)
-    gthumbfile = exiflow.gthumb.Gthumb(filename)
+    gthumbfile = gthumb.Gthumb(filename)
     gthumbtimestamp = gthumbfile.get_mtime()
     filetimestamp = os.path.getmtime(filename)
     if gthumbtimestamp > filetimestamp:
@@ -36,7 +35,7 @@ def autogate_gthumb(filename, myoptions):
             logger.error("Error reading gthumb comment for %s:\n%s",
                          filename, msg)
             return False
-        exif_file = exiflow.exif.Exif(filename)
+        exif_file = exif.Exif(filename)
         exif_file.fields = gthumbfile.fields
         try:
             exif_file.write_exif()
@@ -55,7 +54,7 @@ def autogate_gthumb(filename, myoptions):
         or myoptions.addfields \
         or myoptions.template:
         logger.info("Updating comment file from %s.", filename)
-        exif_file = exiflow.exif.Exif(filename)
+        exif_file = exif.Exif(filename)
         try:
             exif_file.read_exif()
         except IOError, message:
@@ -104,9 +103,7 @@ def run(argv, callback=None):
         logging.getLogger().setLevel(logging.INFO)
     logger = logging.getLogger("exigate")
 
-    filelist = exiflow.filelist.Filelist(args)
-
-    for filename, percentage in filelist:
+    for filename, percentage in filelist.Filelist(args):
         if callable(callback):
             if callback(filename, filename, percentage):
                 break
@@ -114,7 +111,7 @@ def run(argv, callback=None):
         autogate_gthumb(filename, options)
         if options.cleanup:
             log_prefix = "Leaving"
-            if exiflow.gthumb.Gthumb(filename).cleanup():
+            if gthumb.Gthumb(filename).cleanup():
                 log_prefix = "Cleaning"
             if options.verbose:
                 logger.info("%s comment file of %s.", log_prefix, filename)

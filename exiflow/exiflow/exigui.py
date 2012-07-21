@@ -15,14 +15,13 @@ pygtk.require("2.0")
 import gtk
 import gtk.glade
 
-sys.path.insert(1, "/usr/share/exiflow")
-import exiflow.filelist
-import exiflow.exiassign
-import exiflow.exiconvert
-import exiflow.exigate
-import exiflow.exiimport
-import exiflow.exiperson
-import exiflow.exirename
+from . import filelist
+from . import exiassign
+from . import exiconvert
+from . import exigate
+from . import exiimport
+from . import exiperson
+from . import exirename
 
 gladefile = os.path.splitext(__file__)[0] + ".glade"
 
@@ -204,7 +203,7 @@ class Window1(object):
         """
         logger = logging.getLogger("exigui.set_filelist")
         self.liststore.clear()
-        for filename in exiflow.filelist.Filelist(files).get_files():
+        for filename in filelist.Filelist(files).get_files():
             filename = os.path.abspath(filename)
             if os.path.exists(filename):
                 self.liststore.append([filename])
@@ -306,7 +305,7 @@ class Window1(object):
         if target_dir.get_text():
             args.append("--target=" + target_dir.get_text())
         try:
-            exiflow.exiimport.run(args, self._progress_callback)
+            exiimport.run(args, self._progress_callback)
         except IOError, msg:
             logger.error("ERROR: %s", msg)
 
@@ -324,7 +323,7 @@ class Window1(object):
             args.append("--with_time")
         args += [entry[0] for entry in self.liststore]
         try:
-            exiflow.exirename.run(args, self._progress_callback)
+            exirename.run(args, self._progress_callback)
         except IOError, msg:
             logger.error("ERROR: %s", msg)
 
@@ -337,7 +336,7 @@ class Window1(object):
             args.append("--section=" + exif_section.get_text())
         args += [entry[0] for entry in self.liststore]
         try:
-            exiflow.exiperson.run(args, self._progress_callback)
+            exiperson.run(args, self._progress_callback)
         except IOError, msg:
             logger.error("ERROR: %s", msg)
 
@@ -349,7 +348,7 @@ class Window1(object):
             args.append("--remove-lqjpeg")
         args += [entry[0] for entry in self.liststore]
         try:
-            exiflow.exiconvert.run(args, self._progress_callback)
+            exiconvert.run(args, self._progress_callback)
         except IOError, msg:
             logger.error("ERROR: %s", msg)
 
@@ -361,7 +360,7 @@ class Window1(object):
             args.append("--force")
         args += [entry[0] for entry in self.liststore]
         try:
-            exiflow.exiassign.run(args, self._progress_callback)
+            exiassign.run(args, self._progress_callback)
         except IOError, msg:
             logger.error("ERROR: %s", msg)
 
@@ -379,7 +378,7 @@ class Window1(object):
         args.append("-v")
         args += [entry[0] for entry in self.liststore]
         try:
-            exiflow.exigate.run(args, self._progress_callback)
+            exigate.run(args, self._progress_callback)
         except IOError, msg:
             logger.error("ERROR: %s", msg)
 
