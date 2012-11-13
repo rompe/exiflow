@@ -102,7 +102,7 @@ def parse(configname):
     logger = logging.getLogger("configfile.parse")
     local_config = os.path.join(__local_config_dir, configname + ".cfg")
     global_config = os.path.join(__global_config_dir, configname + ".cfg")
-    if not configname in __cache.has_key \
+    if not configname in __cache \
         or __stats.get(local_config, None) != __stat(local_config) \
         or __stats.get(global_config, None) != __stat(global_config):
         if not os.path.exists(local_config):
