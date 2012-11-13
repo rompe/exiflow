@@ -1,3 +1,9 @@
+exiflow (0.4.5.4-1) precise; urgency=low
+
+  * Release Exiflow 0.4.5.4.
+
+ -- Ulf Rompe <launchpad.net@rompe.org>  Tue, 13 Nov 2012 22:44:37 +0100
+
 exiflow (0.4.5.3-1) precise; urgency=low
 
   * Just bump version number to 0.4.5.3.
