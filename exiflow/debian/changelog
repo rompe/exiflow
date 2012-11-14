@@ -1,3 +1,9 @@
+exiflow (0.4.5.7-1) precise; urgency=low
+
+  * Release Exiflow 0.4.5.7.
+
+ -- Ulf Rompe <launchpad.net@rompe.org>  Wed, 14 Nov 2012 01:06:41 +0100
+
 exiflow (0.4.5.6-1) precise; urgency=low
 
   * Release Exiflow 0.4.5.6.
