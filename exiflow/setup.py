@@ -9,7 +9,8 @@ __revision__ = "$Id: $"
 from setuptools import setup
 
 setup(name='Exiflow',
-      version='0.4.5.3',
+      install_requires=["gtk", "glade2"],
+      version='0.4.5.7',
       packages=['exiflow'],
       scripts=["exiassign", "exiconvert", "exigate", "exigui",
                "exiimport", "exiperson", "exirename"],

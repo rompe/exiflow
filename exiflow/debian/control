@@ -2,15 +2,13 @@ Source: exiflow
 Section: python
 Priority: optional
 Maintainer: Ulf Rompe <debian@rompe.org>
-Build-Depends: debhelper (>= 7), python-support (>= 0.8.4)
+Build-Depends: debhelper (>= 7), python, python-setuptools
 Standards-Version: 3.8.4
-XS-Python-Version: current
 Homepage: http://exiflow.org/
 
 Package: exiflow
 Architecture: all
 Depends: ${misc:Depends}, ${python:Depends}, libimage-exiftool-perl
-XB-Python-Version: ${python:Versions}
 Provides: ${python:Provides}
 Suggests: f-spot, gthumb
 Description: A set of tools to provide a complete digital photo workflow
