@@ -10,7 +10,7 @@ from setuptools import setup
 
 setup(name='Exiflow',
       install_requires=["gtk", "glade2"],
-      version='0.4.5.7',
+      version='0.4.5.9',
       packages=['exiflow'],
       scripts=["exiassign", "exiconvert", "exigate", "exigui",
                "exiimport", "exiperson", "exirename"],
