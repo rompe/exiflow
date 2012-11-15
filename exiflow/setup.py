@@ -5,24 +5,24 @@ Install the exiflow collection on your computer.
 """
 __revision__ = "$Id: $"
 
-#from distutils.core import setup
-from setuptools import setup
+from distutils.core import setup
+#from setuptools import setup
 
 setup(name='Exiflow',
-      install_requires=["gtk", "glade2"],
-      version='0.4.5.9',
+      install_requires=["glade2"],
+      version='0.4.5.10',
       packages=['exiflow'],
       scripts=["exiassign", "exiconvert", "exigate", "exigui",
                "exiimport", "exiperson", "exirename"],
       package_data={"exiflow": ["exigui.glade"]},
       data_files=[('share/doc/exiflow', ['README', 'INSTALL', 'COPYING'])],
-      entry_points={'console_scripts': ["exiassign = exiflow.exiassign:run",
-                                        "exiconvert = exiflow.exiconvert:run",
-                                        "exigate = exiflow.exigate:run",
-                                        "exiimport = exiflow.exiimport:run",
-                                        "exiperson = exiflow.exiperson:run",
-                                        "exirename = exiflow.exirename:run"],
-                    'gui_scripts': ["exigui = exiflow.exigui:run"]},
+#      entry_points={'console_scripts': ["exiassign = exiflow.exiassign:run",
+#                                        "exiconvert = exiflow.exiconvert:run",
+#                                        "exigate = exiflow.exigate:run",
+#                                        "exiimport = exiflow.exiimport:run",
+#                                        "exiperson = exiflow.exiperson:run",
+#                                        "exirename = exiflow.exirename:run"],
+#                    'gui_scripts': ["exigui = exiflow.exigui:run"]},
       author='Ulf Rompe, Sebastian Berthold',
       author_email='exiflow-devel@lists.sourceforge.net',
       license='GNU General Public License (GPL)',
