@@ -1,9 +1,10 @@
-exiflow (0.4.5.9-1) UNRELEASED; urgency=low
+exiflow (0.4.5.10-1) UNRELEASED; urgency=low
 
   * Release Exiflow 0.4.5.8.
   * Release Exiflow 0.4.5.9.
+  * Release Exiflow 0.4.5.10.
 
- -- Ulf Rompe <launchpad.net@rompe.org>  Thu, 15 Nov 2012 08:36:50 +0100
+ -- Ulf Rompe <launchpad.net@rompe.org>  Thu, 15 Nov 2012 09:06:27 +0100
 
 exiflow (0.4.5.7-1) precise; urgency=low
 
