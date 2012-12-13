@@ -36,7 +36,7 @@ def personalize_file(filename, personals, options_section_personals,
         logger.warning("Skipping %s: %s", filename, msg)
         return 1
 
-    if "Model" in exif_file.fields.has_key:
+    if "Model" in exif_file.fields:
         if exifconfig.has_section(exif_file.fields["Model"]):
             personals += exifconfig.items(exif_file.fields["Model"])
         else:
