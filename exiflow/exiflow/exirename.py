@@ -140,9 +140,11 @@ def rename_file(filename, filelist, with_time, cam_id=None,
         model, date, image_time, quality = get_exif_information(filename)
         if with_time:
             date += "-" + image_time
-        cam_id, artist_initials = configfile.get_options("cameras", model,
-                                                         ("cam_id",
-                                                          "artist_initials"))
+        if cam_id is None:
+            cam_id = configfile.get_options("cameras", model, ("cam_id",))
+        if artist_initials is None:
+            artist_initials = configfile.get_options("cameras", model,
+                                                     ("artist_initials",))
         number, revision, extension = get_new_filename_parts(filename,
                                                              filelist, quality)
 

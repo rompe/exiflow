@@ -29,9 +29,8 @@ class Exif:
         Read EXIF information from self.filename into self.fields
         Raises IOError on errors.
         """
-        exiftool = subprocess.Popen("exiftool -d %s -S " + self.filename,
-                                    shell=True, stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE)
+        exiftool = subprocess.Popen(["exiftool", "-d", "%s", "-S", self.filename],
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = exiftool.communicate()
         # exiftool doesn't necessarily use stderr on errors...
         for line in stdout.splitlines():
@@ -47,8 +46,8 @@ class Exif:
             # We have to read the ImageDescription binary because it may
             # contain things like line breaks.
             self.fields["ImageDescription"] = \
-                "".join(subprocess.Popen("exiftool -b -ImageDescription "
-                                         + self.filename, shell=True,
+                "".join(subprocess.Popen(["exiftool", "-b", "-ImageDescription",
+                                          self.filename],
                                          stdout=subprocess.PIPE).stdout)
             # We don't need an empty "ImageDescription" for any merge
             # operations.
@@ -104,21 +103,21 @@ class Exif:
         Write Exif Information from self.fields into self.filename.
         Raises IOError on errors.
         """
-        command = "exiftool -overwrite_original -P"
+        command = ["exiftool", "-overwrite_original", "-P"]
         for field in self.fields.keys():
             if field == "Keywords":
                 for keyword in self.fields[field].split(","):
-                    command += " -%s=\"%s\"" % (field, keyword.strip())
+                    command.append("-%s=%s" % (field, keyword.strip()))
             elif field == "DateTimeOriginal":
                 # TODO: Writing back DateTimeOriginal seems to be a bad idea
                 # since gthumb drops seconds and there is some confusion with
                 # time strings and epoch.
                 continue
             else:
-                command += " -%s=\"%s\"" % (field, self.fields[field])
-        command += " " + self.filename
-        exiftool = subprocess.Popen(command, shell=True,
-                                    stdout=subprocess.PIPE,
+                command.append("-%s=%s" % (field, self.fields[field]))
+        command.append(self.filename)
+        logger.debug("Calling: %s", command)
+        exiftool = subprocess.Popen(command, stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE)
         # exiftool doesn't reflect errors in it's return code, so we have to
         # assume an error if something is written to stderr.
@@ -139,20 +138,18 @@ class Exif:
         exiffields = ["Artist", "Credit", "Copyright", "CopyrightNotice",
                       "ImageDescription", "Keywords", "Location",
                       "UserComment", "XPTitle"]
-        command = ("exiftool -overwrite_original -x Orientation -P "
-                   "-TagsFromFile %s --Keywords" % sourcefile)
+        command = ["exiftool", "-overwrite_original", "-x", "Orientation", "-P",
+                   "-TagsFromFile", sourcefile, "--Keywords"]
         for field in exiffields:
             if field in self.fields:
                 if field == "Keywords":
-                    for keyword in set([s.strip() for s in
-                                        self.fields[field].split(",")]):
-                        command += " -%s=\"%s\"" % (field, keyword)
+                    for keyword in self.fields[field].split(","):
+                        command.append("-%s=%s" % (field, keyword.strip()))
                 else:
-                    command += " -%s=\"%s\"" % (field, self.fields[field])
-        command += " " + self.filename
+                    command.append("-%s=%s" % (field, self.fields[field]))
+        command.append(self.filename)
         logger.debug("Calling: %s", command)
-        exiftool = subprocess.Popen(command, shell=True,
-                                    stdout=subprocess.PIPE,
+        exiftool = subprocess.Popen(command, stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE)
         # exiftool doesn't reflect errors in it's return code, so we have to
         # assume an error if something is written to stderr but ignore

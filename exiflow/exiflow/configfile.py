@@ -14,8 +14,8 @@ import sys
 import logging
 import ConfigParser
 
-__global_config_dir = "/etc/exiflow"
-__local_config_dir = os.path.expanduser('~/.exiflow')
+global_config_dir = "/etc/exiflow"
+local_config_dir = os.path.expanduser('~/.exiflow')
 
 # Defaults
 __default_contents = {"settings": """# settings.cfg
@@ -100,14 +100,14 @@ def parse(configname):
     Return a configparser object and a list of processed files.
     """
     logger = logging.getLogger("configfile.parse")
-    local_config = os.path.join(__local_config_dir, configname + ".cfg")
-    global_config = os.path.join(__global_config_dir, configname + ".cfg")
+    local_config = os.path.join(local_config_dir, configname + ".cfg")
+    global_config = os.path.join(global_config_dir, configname + ".cfg")
     if not configname in __cache \
         or __stats.get(local_config, None) != __stat(local_config) \
         or __stats.get(global_config, None) != __stat(global_config):
         if not os.path.exists(local_config):
-            if not os.path.isdir(__local_config_dir):
-                os.makedirs(__local_config_dir)
+            if not os.path.isdir(local_config_dir):
+                os.makedirs(local_config_dir)
             file(local_config, "w").write(__default_contents[configname])
             logger.warning("Created example %s.", local_config)
         __stats[local_config] = __stat(local_config)
@@ -147,7 +147,7 @@ def append(configname, section, options):
     """
     Append a commented section with options to "configname".cfg
     """
-    configfile = os.path.join(__local_config_dir, configname + ".cfg")
+    configfile = os.path.join(local_config_dir, configname + ".cfg")
     string_to_append = "\n#[%s]\n#%s = \n" % (section, " = \n#".join(options))
     if string_to_append in "".join(file(configfile, "r").readlines()):
         sys.stderr.write("Commented section [%s] found in %s\nPlease edit!\n" %
