@@ -103,6 +103,7 @@ class Exif:
         Write Exif Information from self.fields into self.filename.
         Raises IOError on errors.
         """
+        logger = logging.getLogger("exif.write_exif")
         command = ["exiftool", "-overwrite_original", "-P"]
         for field in self.fields.keys():
             if field == "Keywords":
@@ -133,7 +134,7 @@ class Exif:
         exiffields.
         Raises IOError on errors.
         """
-        logger = logging.getLogger("exiassign.assign_file")
+        logger = logging.getLogger("exif.update_exif")
         # Fields we want to keep
         exiffields = ["Artist", "Credit", "Copyright", "CopyrightNotice",
                       "ImageDescription", "Keywords", "Location",

@@ -147,12 +147,13 @@ def append(configname, section, options):
     """
     Append a commented section with options to "configname".cfg
     """
+    logger = logging.getLogger("configfile.append")
     configfile = os.path.join(local_config_dir, configname + ".cfg")
     string_to_append = "\n#[%s]\n#%s = \n" % (section, " = \n#".join(options))
     if string_to_append in "".join(file(configfile, "r").readlines()):
-        sys.stderr.write("Commented section [%s] found in %s\nPlease edit!\n" %
-                         (section, configfile))
+        logger.warning("Commented section [%s] found in %s\nPlease edit!\n",
+                       section, configfile)
     else:
-        sys.stderr.write("Adding commented section [%s] to %s\n"
-                         "Please edit!\n" % (section, configfile))
+        logger.warning("Adding commented section [%s] to %s\nPlease edit!\n",
+                       section, configfile)
         file(configfile, "a").write(string_to_append)
