@@ -164,6 +164,10 @@ class Window1(object):
         """ Retrun True if widget "name" is activated, False otherwise. """
         return self.wtree.get_widget(name).get_active()
 
+    def set_active(self, name):
+        """ Activate button of widget "name". """
+        self.wtree.get_widget(name).set_active(1)
+
     def set_text(self, name, text):
         """ Set text of widget "name" to text. """
         self.wtree.get_widget(name).set_text(text)
@@ -420,6 +424,16 @@ def run(argv):
     parser.add_option("-b", "--batch", action="store_true", dest="batch",
                       help="Autorun from exiimport over exirename, exiperson "
                            "and exiconvert to exiassign.")
+    parser.add_option("--cam_id", "-c", dest="cam_id",
+                      help="ID string for the camera model. Should normally be"
+                           " three characters long.")
+    parser.add_option("--artist_initials", "-a", dest="artist_initials",
+                      help="Initials of the artist. Should be two characters"
+                           " long.")
+    parser.add_option("-T", "--with_time", action="store_true", dest="with_time",
+                      help="Create filenames containing the image time, for"
+                           " example 20071231-235959-n001234-xy000.jpg instead"
+                           " of 20071231-n001234-xy000.jpg .")
     parser.add_option("--batch_order",
                       help="Comma separated processing order for --batch. "
                            "Default: %default")
@@ -433,6 +447,15 @@ def run(argv):
             win1.set_text("exiimport_importdir_entry", options.mount)
         if options.target:
             win1.set_text("exiimport_targetdir_entry", options.target)
+        if options.cam_id:
+            win1.set_active("exirename_cam_id_entry_button_custom")
+            win1.set_text("exirename_cam_id_entry", options.cam_id)
+        if options.artist_initials:
+            win1.set_active("exirename_artist_initials_entry_button_custom")
+            win1.set_text("exirename_artist_initials_entry", 
+                          options.artist_initials)
+        if options.with_time:
+            win1.set_active("exirename_include_timestamp_checkbutton")
         if len(args) > 0:
             win1.set_filelist(args)
         if options.batch:
