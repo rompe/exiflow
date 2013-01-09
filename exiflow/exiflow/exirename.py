@@ -100,7 +100,8 @@ def get_new_filename_parts(filename, filelist, quality):
     number = "".join([char for char in leader[-4:] if char.isdigit()])
     revision = "000"
     # Look for high quality versions of this image. This is the case if we are
-    # a .jpg and more than one file exists with the same prefix.
+    # a .jpg, more than one file exists with the same prefix and the quality is
+    # not "fine" or "high".
     if extension == ".jpg":
         versions = [vers[0] for vers in filelist if vers[0].startswith(leader)]
         if len(versions) > 1:
@@ -140,11 +141,13 @@ def rename_file(filename, filelist, with_time, cam_id=None,
         model, date, image_time, quality = get_exif_information(filename)
         if with_time:
             date += "-" + image_time
-        if cam_id is None:
-            cam_id = configfile.get_options("cameras", model, ("cam_id",))
-        if artist_initials is None:
-            artist_initials = configfile.get_options("cameras", model,
-                                                     ("artist_initials",))
+        if cam_id is None or artist_initials is None:
+            new_cam_id, new_artist_initials = configfile.get_options("cameras",
+                                         model, ("cam_id", "artist_initials"))
+            if cam_id is None:
+                cam_id = new_cam_id
+            if artist_initials is None:
+                artist_initials = new_artist_initials
         number, revision, extension = get_new_filename_parts(filename,
                                                              filelist, quality)
 
