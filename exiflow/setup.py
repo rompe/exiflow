@@ -10,7 +10,7 @@ from distutils.core import setup
 
 setup(name='Exiflow',
       install_requires=["glade2"],
-      version='0.4.5.10',
+      version='0.4.5.12',
       packages=['exiflow'],
       scripts=["exiassign", "exiconvert", "exigate", "exigui",
                "exiimport", "exiperson", "exirename"],
