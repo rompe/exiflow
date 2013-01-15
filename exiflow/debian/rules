@@ -18,7 +18,7 @@ unexport LDFLAGS
 
 %:
 	if `grep -q lucid /etc/lsb-release`; then \
-		dh $@ --buildsystem=python_distutils --force-buildsystem=False --with=python ;\
+		dh $@ --buildsystem=python_distutils --force-buildsystem=False ;\
 	else \
 		dh $@ --buildsystem=python_distutils --force-buildsystem=False --with=python2 ;\
 	fi
