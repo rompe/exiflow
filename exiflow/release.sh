@@ -1,9 +1,15 @@
 #!/bin/bash
 set -e
 DISTRIBUTIONS="lucid maverick natty oneiric precise quantal"
-export GPGKEY=643D8C7A
-export DEBEMAIL='launchpad.net@rompe.org'
-export DEBFULLNAME='Ulf Rompe'
+if [ ${USER} == "ulf" ]; then
+	export GPGKEY=643D8C7A
+	export DEBEMAIL='launchpad.net@rompe.org'
+	export DEBFULLNAME='Ulf Rompe'
+else
+	export GPGKEY=3E2898DA
+	export DEBEMAIL='exiflow@sleif.de'
+	export DEBFULLNAME='Sebastian Berthold'
+fi
 version=`grep -w "version=" setup.py | cut -d\' -f2`
 if head -1 debian/changelog | grep -q $version; then
 	echo "The file debian/changelog already contains version ${version}."
