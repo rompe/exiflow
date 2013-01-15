@@ -91,7 +91,7 @@ def get_exif_information(filename):
     return model, date, image_time, quality
 
 
-def get_new_filename_parts(filename, filelist, quality):
+def get_new_filename_parts(filename, my_filelist, quality):
     """
     Return a new name for filename according to our holy naming scheme.
     """
@@ -103,7 +103,8 @@ def get_new_filename_parts(filename, filelist, quality):
     # a .jpg, more than one file exists with the same prefix and the quality is
     # not "fine" or "high".
     if extension == ".jpg":
-        versions = [vers[0] for vers in filelist if vers[0].startswith(leader)]
+        versions = [vers[0] for vers in my_filelist
+                    if vers[0].startswith(leader)]
         if len(versions) > 1:
             if quality.lower() not in ("fine", "high"):
                 revision = "00l"
@@ -112,7 +113,7 @@ def get_new_filename_parts(filename, filelist, quality):
     return number.zfill(4), revision, extension
 
 
-def rename_file(filename, filelist, with_time, cam_id=None,
+def rename_file(filename, my_filelist, with_time, cam_id=None,
                  artist_initials=None):
     """
     Rename filename and return the newly generated name without dir.
@@ -144,12 +145,11 @@ def rename_file(filename, filelist, with_time, cam_id=None,
         if cam_id is None or artist_initials is None:
             new_cam_id, new_artist_initials = configfile.get_options("cameras",
                                          model, ("cam_id", "artist_initials"))
-            if cam_id is None:
-                cam_id = new_cam_id
-            if artist_initials is None:
-                artist_initials = new_artist_initials
+            cam_id = cam_id or new_cam_id
+            artist_initials = artist_initials or new_artist_initials
         number, revision, extension = get_new_filename_parts(filename,
-                                                             filelist, quality)
+                                                             my_filelist,
+                                                             quality)
 
     if len(cam_id) != 3 or len(artist_initials) != 2:
         logger.warning("Either cam_id or artist_initials is missing or of "

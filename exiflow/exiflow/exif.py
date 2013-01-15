@@ -29,8 +29,10 @@ class Exif:
         Read EXIF information from self.filename into self.fields
         Raises IOError on errors.
         """
-        exiftool = subprocess.Popen(["exiftool", "-d", "%s", "-S", self.filename],
-                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        exiftool = subprocess.Popen(["exiftool", "-d", "%s", "-S",
+                                     self.filename],
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE)
         stdout, stderr = exiftool.communicate()
         # exiftool doesn't necessarily use stderr on errors...
         for line in stdout.splitlines():
@@ -46,7 +48,8 @@ class Exif:
             # We have to read the ImageDescription binary because it may
             # contain things like line breaks.
             self.fields["ImageDescription"] = \
-                "".join(subprocess.Popen(["exiftool", "-b", "-ImageDescription",
+                "".join(subprocess.Popen(["exiftool", "-b",
+                                          "-ImageDescription",
                                           self.filename],
                                          stdout=subprocess.PIPE).stdout)
             # We don't need an empty "ImageDescription" for any merge
@@ -139,8 +142,8 @@ class Exif:
         exiffields = ["Artist", "Credit", "Copyright", "CopyrightNotice",
                       "ImageDescription", "Keywords", "Location",
                       "UserComment", "XPTitle"]
-        command = ["exiftool", "-overwrite_original", "-x", "Orientation", "-P",
-                   "-TagsFromFile", sourcefile, "--Keywords"]
+        command = ["exiftool", "-overwrite_original", "-x", "Orientation",
+                   "-P", "-TagsFromFile", sourcefile, "--Keywords"]
         for field in exiffields:
             if field in self.fields:
                 if field == "Keywords":
