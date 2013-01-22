@@ -31,10 +31,6 @@ class TestImport(unittest.TestCase):
         self.__configdir = tempfile.mkdtemp()
         exiflow.configfile.global_config_dir = self.__configdir
         exiflow.configfile.local_config_dir = self.__configdir
-        shutil.copyfile(os.path.join(self.__data_dir, "NikonD70.jpg"),
-                        os.path.join(self.__sourcedir, "DSC0001.jpg"))
-        shutil.copyfile(os.path.join(self.__data_dir, "NikonD70.jpg"),
-                        os.path.join(self.__sourcedir, "DSC0002.jpg"))
 
     def tearDown(self):
         """ Clean up. """
@@ -44,6 +40,10 @@ class TestImport(unittest.TestCase):
 
     def test_run(self):
         """ Test run(). """
+        shutil.copyfile(os.path.join(self.__data_dir, "NikonD70.jpg"),
+                        os.path.join(self.__sourcedir, "DSC0001.jpg"))
+        shutil.copyfile(os.path.join(self.__data_dir, "NikonD70.jpg"),
+                        os.path.join(self.__sourcedir, "DSC0002.jpg"))
         exiflow.exiimport.run(argv=["--mount", self.__sourcedir,
                                     "--target", self.__targetdir,
                                     "--verbose"])
@@ -55,6 +55,17 @@ class TestImport(unittest.TestCase):
                                     "--target", self.__targetdir])
         self.assertEqual(len(os.listdir(self.__targetdir)), 2)
 
+    def test_run__syntax_error(self):
+        """ Test run() with wrong syntax. """
+        result = exiflow.exiimport.run(argv=["--target", self.__targetdir,
+                                       "bla"])
+        self.assertTrue(result)
+
+    def test_run__no_files(self):
+        """ Test run() with empty source dir. """
+        result = exiflow.exiimport.run(argv=["--mount", self.__sourcedir,
+                                             "--target", self.__targetdir])
+        self.assertTrue(result)
 
     def test_run__callback(self):
         """ Test run() with a callback function. """
@@ -65,6 +76,8 @@ class TestImport(unittest.TestCase):
             mylist.append(True)
             return True
 
+        shutil.copyfile(os.path.join(self.__data_dir, "NikonD70.jpg"),
+                        os.path.join(self.__sourcedir, "DSC0001.jpg"))
         exiflow.exiimport.run(argv=["--mount", self.__sourcedir,
                                     "--target", self.__targetdir,
                                     "--verbose"], callback=callback)

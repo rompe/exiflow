@@ -161,7 +161,7 @@ class Window1(object):
         self.wtree.get_widget(name).set_sensitive(False)
 
     def _is_active(self, name):
-        """ Retrun True if widget "name" is activated, False otherwise. """
+        """ Return True if widget "name" is activated, False otherwise. """
         return self.wtree.get_widget(name).get_active()
 
     def set_active(self, name):

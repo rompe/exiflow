@@ -42,9 +42,7 @@ def run(argv, callback=None):
         logging.getLogger().setLevel(logging.INFO)
     logger = logging.getLogger("exiimport")
     if len(args) > 0 or not options.mount or not options.target:
-        logger.error("Wrong syntax.")
-        logger.warning(parser.format_help())
-        sys.exit(1)
+        return "Wrong syntax.\n" + parser.format_help()
 
     # Build file list whithout skipping unknown files
     filelist = exiflow_filelist.Filelist([])
@@ -53,8 +51,7 @@ def run(argv, callback=None):
 
     # Cry if we found no images
     if filelist.get_filecount() == 0:
-        logger.error("No files to import, sorry.")
-        sys.exit(1)
+        return "No files to import, sorry."
 
     # Create targetdir
     targetdir = os.path.join(options.target, filelist.get_daterange())
@@ -92,4 +89,4 @@ def run(argv, callback=None):
 
 
 if __name__ == "__main__":
-    run(sys.argv[1:])
+    sys.exit(run(sys.argv[1:]))
