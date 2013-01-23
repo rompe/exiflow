@@ -11,6 +11,8 @@ import sys
 import logging
 import optparse
 import pygtk
+import shutil
+import tempfile
 pygtk.require("2.0")
 import gtk
 import gtk.glade
@@ -150,6 +152,7 @@ class Window1(object):
         logging.basicConfig(format="%(module)s: %(message)s", stream=stdlog,
                             level=logging.INFO)
         self.batch_scripts = []
+        self.batch_tmpdir = ""
         self.window.connect("map_event", self.batch_run)
 
     def _make_sensitive(self, name):
@@ -404,6 +407,26 @@ class Window1(object):
                 nbook.set_current_page(tabs.index(script))
                 self.on_run_activate(run_button)
             self.batch_scripts = []
+            if self.batch_tmpdir:
+                self.set_text("exiimport_targetdir_entry", self.batch_target)
+                for subdir in os.listdir(self.batch_tmpdir):
+                    target_subdir = subdir
+                    while os.path.exists(os.path.join(self.batch_target, target_subdir)):
+                        logger.warning("%s already exists!", 
+                            os.path.join(self.batch_target, target_subdir))
+                        target_subdir += "+"
+                    logger.info("Moving %s into target directory %s", 
+                        subdir, os.path.join(self.batch_target, target_subdir))
+                    try:
+                        shutil.move(os.path.join(self.batch_tmpdir, subdir),
+                                    os.path.join(self.batch_target, target_subdir))
+                    except shutil.Error, msg:
+                        logger.error("ERROR: %s", msg)
+                    for rownum in range(0, len(self.liststore)):
+                        self.liststore[rownum][0] = self.liststore[rownum][0].\
+                            replace(os.path.join(self.batch_tmpdir, subdir),\
+                            os.path.join(self.batch_target, target_subdir))
+
         return 0
 
 
@@ -421,9 +444,6 @@ def run(argv):
                            " in this directory.")
     parser.add_option("-d", "--device", dest="device",
                       help="(Ignored for backwards compatibility. Don't use.)")
-    parser.add_option("-b", "--batch", action="store_true", dest="batch",
-                      help="Autorun from exiimport over exirename, exiperson "
-                           "and exiconvert to exiassign.")
     parser.add_option("--cam_id", "-c", dest="cam_id",
                       help="ID string for the camera model. Should normally be"
                            " three characters long.")
@@ -434,9 +454,17 @@ def run(argv):
                       help="Create filenames containing the image time, for"
                            " example 20071231-235959-n001234-xy000.jpg instead"
                            " of 20071231-n001234-xy000.jpg .")
+    parser.add_option("-b", "--batch", action="store_true", dest="batch",
+                      help="Autorun from exiimport over exirename, exiperson "
+                           "and exiconvert to exiassign.")
     parser.add_option("--batch_order",
                       help="Comma separated processing order for --batch. "
                            "Default: %default")
+    parser.add_option("--batch_tmpdir",
+                      help="If the processing order starts with 'exiimport', "
+                           "this temporary directory is used for batch processing. "
+                           "After batch processing, the created subdirectory will "
+                           "be moved into the target directory.")
     parser.add_option("--nofork", action="store_true",
                       help="Do not fork, stay in foreground instead.")
     options, args = parser.parse_args(argv)
@@ -460,6 +488,15 @@ def run(argv):
             win1.set_filelist(args)
         if options.batch:
             win1.batch_scripts = options.batch_order.split(',')
+            if options.batch_tmpdir and "exiimport" in win1.batch_scripts:
+                if not options.mount or not options.target:
+                    print( "Wrong syntax. Missing --mount or --target\n" 
+                          + parser.format_help())
+                    win1.batch_scripts = []
+                win1.batch_tmpdir = tempfile.mkdtemp(dir=options.batch_tmpdir)
+                win1.batch_target = options.target
+                win1.set_text("exiimport_targetdir_entry", win1.batch_tmpdir)
+                
         gtk.main()
 
     return 0
