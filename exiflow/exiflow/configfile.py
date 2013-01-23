@@ -61,6 +61,8 @@ unwantend_dirs = .comments
 # Configure global values in the [all] section and camera specific values
 # in a section for the camera model. It is also possible to create sections
 # with arbitrary names and supply these names later on the command line.
+# All supported tags of ExifTool are allowed as keys - so it's possible to set 
+# or unset (just use "keyword =") specific tags with exiperson.
 
 #[all]
 #Artist = Arthur Dent
@@ -77,6 +79,10 @@ unwantend_dirs = .comments
 
 #[NIKON Dxx]
 #artist = I. R. Baboon
+
+#[GT-I9100]
+#ImageUniqueID = 
+
 """}
 
 # ConfigParser Caches
