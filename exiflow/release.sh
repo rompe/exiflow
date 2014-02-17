@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-DISTRIBUTIONS="lucid maverick natty oneiric precise quantal"
+DISTRIBUTIONS="lucid maverick natty oneiric precise quantal raring saucy trusty"
 if [ ${USER} == "ulf" ]; then
 	export GPGKEY=643D8C7A
 	export DEBEMAIL='launchpad.net@rompe.org'

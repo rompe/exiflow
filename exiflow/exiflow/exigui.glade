@@ -1073,8 +1073,8 @@
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
     <property name="program_name">ExiFlow</property>
-    <property name="version">0.4.5.14</property>
-    <property name="copyright" translatable="yes">© Copyright 2006-2013. Some rights reserved.</property>
+    <property name="version">0.4.5.15</property>
+    <property name="copyright" translatable="yes">© Copyright 2006-2014. Some rights reserved.</property>
     <property name="comments" translatable="yes">This is a beta version. Use at your own risk.</property>
     <property name="website">http://exiflow.org/</property>
     <property name="website_label" translatable="yes">Exiflow Homepage</property>
