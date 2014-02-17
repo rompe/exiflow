@@ -10,7 +10,6 @@ it doesn't exist. Afterwards a configparser object of this file and
 __revision__ = "$Id: "
 
 import os
-import sys
 import logging
 import ConfigParser
 
@@ -56,12 +55,12 @@ unwantend_dirs = .comments
 #[C2040Z]
 #cam_id = o00
 """,
-                         "exif": """# exif.cfg
+                      "exif": """# exif.cfg
 # This file contains EXIF information to be inserted into images.
 # Configure global values in the [all] section and camera specific values
 # in a section for the camera model. It is also possible to create sections
 # with arbitrary names and supply these names later on the command line.
-# All supported tags of ExifTool are allowed as keys - so it's possible to set 
+# All supported tags of ExifTool are allowed as keys - so it's possible to set
 # or unset (just use "keyword =") specific tags with exiperson.
 
 #[all]
@@ -72,7 +71,7 @@ unwantend_dirs = .comments
 #Credit = adent@example.com
 # ATTENTION: You will want to set UserComment to an empty string even if you
 # do not use it. It will prevent Exiftool from setting it to the word "ASCII".
-#UserComment = 
+#UserComment =
 
 #[custom]
 #artist = I. M. Weasel
@@ -81,7 +80,7 @@ unwantend_dirs = .comments
 #artist = I. R. Baboon
 
 #[GT-I9100]
-#ImageUniqueID = 
+#ImageUniqueID =
 
 """}
 
@@ -108,9 +107,9 @@ def parse(configname):
     logger = logging.getLogger("configfile.parse")
     local_config = os.path.join(local_config_dir, configname + ".cfg")
     global_config = os.path.join(global_config_dir, configname + ".cfg")
-    if not configname in __cache \
-        or __stats.get(local_config, None) != __stat(local_config) \
-        or __stats.get(global_config, None) != __stat(global_config):
+    if (not configname in __cache
+            or __stats.get(local_config, None) != __stat(local_config)
+            or __stats.get(global_config, None) != __stat(global_config)):
         if not os.path.exists(local_config):
             if not os.path.isdir(local_config_dir):
                 os.makedirs(local_config_dir)

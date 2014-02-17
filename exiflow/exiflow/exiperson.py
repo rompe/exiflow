@@ -22,7 +22,7 @@ from . import configfile
 
 
 def personalize_file(filename, personals, options_section_personals,
-                       forced_personals):
+                     forced_personals):
     """
     Personalize an image using data from the dictionary "personals".
     The optional "forced_personals" override all other personals.
@@ -128,8 +128,8 @@ def run(argv, callback=None):
                 break
         # Note to programmer:
         # The [:] is needed to get a slice copy instead of a reference.
-        personalize_file(filename, defaultpersonals[:], \
-            options_section_personals[:], forced_personals)
+        personalize_file(filename, defaultpersonals[:],
+                         options_section_personals[:], forced_personals)
 
 
 if __name__ == "__main__":

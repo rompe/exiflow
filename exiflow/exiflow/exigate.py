@@ -50,9 +50,9 @@ def autogate_gthumb(filename, myoptions):
         # if that is needed and if so, if we can do it conditionally!
         gthumbfile.set_mtime(filetimestamp)
         os.utime(filename, (filetimestamp, filetimestamp))
-    elif filetimestamp > gthumbtimestamp \
-        or myoptions.addfields \
-        or myoptions.template:
+    elif (filetimestamp > gthumbtimestamp
+          or myoptions.addfields
+          or myoptions.template):
         logger.info("Updating comment file from %s.", filename)
         exif_file = exif.Exif(filename)
         try:

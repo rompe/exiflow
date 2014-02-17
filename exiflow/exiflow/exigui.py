@@ -28,7 +28,7 @@ from . import exirename
 gladefile = os.path.splitext(__file__)[0] + ".glade"
 
 
-class WritableTextView:
+class WritableTextView(object):
     """
     Provide a file object that writes to a GTK textview.
     """
@@ -153,6 +153,7 @@ class Window1(object):
                             level=logging.INFO)
         self.batch_scripts = []
         self.batch_tmpdir = ""
+        self.batch_target = ""
         self.window.connect("map_event", self.batch_run)
 
     def _make_sensitive(self, name):
@@ -182,12 +183,14 @@ class Window1(object):
     def on_button_exiimport_browse_importdir_clicked(self, *dummy):
         """ Callback for the exiimport's "browse importdir" button. """
         dummy = Directorychooser1(self.window,
-                 self.wtree.get_widget("exiimport_importdir_entry").set_text)
+                                  self.wtree.get_widget(
+                                      "exiimport_importdir_entry").set_text)
 
     def on_button_exiimport_browse_targetdir_clicked(self, *dummy):
         """ Callback for the exiimport's "browse targetdir" button. """
         dummy = Directorychooser1(self.window,
-                 self.wtree.get_widget("exiimport_targetdir_entry").set_text)
+                                  self.wtree.get_widget(
+                                      "exiimport_targetdir_entry").set_text)
 
     @staticmethod
     def on_info1_activate(*dummy):
@@ -411,21 +414,24 @@ class Window1(object):
                 self.set_text("exiimport_targetdir_entry", self.batch_target)
                 for subdir in os.listdir(self.batch_tmpdir):
                     target_subdir = subdir
-                    while os.path.exists(os.path.join(self.batch_target, target_subdir)):
-                        logger.warning("%s already exists!", 
-                            os.path.join(self.batch_target, target_subdir))
+                    while os.path.exists(os.path.join(self.batch_target,
+                                                      target_subdir)):
+                        logger.warning("%s already exists!",
+                                       os.path.join(self.batch_target,
+                                                    target_subdir))
                         target_subdir += "+"
-                    logger.info("Moving %s into target directory %s", 
-                        subdir, os.path.join(self.batch_target, target_subdir))
+                    logger.info("Moving %s into target directory %s", subdir,
+                                os.path.join(self.batch_target, target_subdir))
                     try:
                         shutil.move(os.path.join(self.batch_tmpdir, subdir),
                                     os.path.join(self.batch_target, target_subdir))
                     except shutil.Error, msg:
                         logger.error("ERROR: %s", msg)
                     for rownum in range(0, len(self.liststore)):
-                        self.liststore[rownum][0] = self.liststore[rownum][0].\
-                            replace(os.path.join(self.batch_tmpdir, subdir),\
-                            os.path.join(self.batch_target, target_subdir))
+                        self.liststore[rownum][0] = \
+                            self.liststore[rownum][0].replace(
+                                os.path.join(self.batch_tmpdir, subdir),
+                                os.path.join(self.batch_target, target_subdir))
 
         return 0
 
@@ -480,7 +486,7 @@ def run(argv):
             win1.set_text("exirename_cam_id_entry", options.cam_id)
         if options.artist_initials:
             win1.set_active("exirename_artist_initials_entry_button_custom")
-            win1.set_text("exirename_artist_initials_entry", 
+            win1.set_text("exirename_artist_initials_entry",
                           options.artist_initials)
         if options.with_time:
             win1.set_active("exirename_include_timestamp_checkbutton")
@@ -490,13 +496,13 @@ def run(argv):
             win1.batch_scripts = options.batch_order.split(',')
             if options.batch_tmpdir and "exiimport" in win1.batch_scripts:
                 if not options.mount or not options.target:
-                    print( "Wrong syntax. Missing --mount or --target\n" 
+                    print("Wrong syntax. Missing --mount or --target\n"
                           + parser.format_help())
                     win1.batch_scripts = []
                 win1.batch_tmpdir = tempfile.mkdtemp(dir=options.batch_tmpdir)
                 win1.batch_target = options.target
                 win1.set_text("exiimport_targetdir_entry", win1.batch_tmpdir)
-                
+
         gtk.main()
 
     return 0

@@ -27,8 +27,8 @@ def run(argv, callback=None):
     # Parse command line.
     parser = optparse.OptionParser()
     parser.add_option("-m", "--mount", dest="mount",
-                     help="Mountpoint of directory to import. Corresponds"
-                          " to %m in the gnome-volume-manager config dialog.")
+                      help="Mountpoint of directory to import. Corresponds"
+                           " to %m in the gnome-volume-manager config dialog.")
     parser.add_option("-t", "--target", dest="target",
                       help="Target directory. A subdirectory will be created"
                            " in this directory.")

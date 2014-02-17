@@ -56,7 +56,7 @@ def convert_file(filename):
 
     raw_extension, raw_converter = \
         configfile.get_options("cameras", model,
-                                       ("raw_extension", "raw_converter"))
+                               ("raw_extension", "raw_converter"))
 
     if raw_extension == "":
         logger.warning("No raw_extension configured, skipping %s", basename)
@@ -76,7 +76,7 @@ def convert_file(filename):
     else:
         command = raw_converter + " " + filename
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE)
+                                   stderr=subprocess.PIPE)
         for line in process.stderr:
             logger.warning(line)
         for line in process.stdout:
@@ -116,7 +116,7 @@ def run(argv, callback=None):
         logging.getLogger().setLevel(logging.INFO)
     logger = logging.getLogger("exiconvert")
 
-    filename_re = re.compile("^(\d{8}(-\d{6})?-.{3}\d{4}-.{2})000\.jpg$")
+    filename_re = re.compile("^(\\d{8}(-\\d{6})?-.{3}\\d{4}-.{2})000\\.jpg$")
     for filename, percentage in filelist.Filelist(args):
         callback_filename = None
         logger.info("%3s%% %s", percentage, filename)
@@ -133,7 +133,7 @@ def run(argv, callback=None):
             mymatch = filename_re.match(newname)
             if mymatch:
                 lqname = os.path.join(os.path.dirname(filename),
-                                         mymatch.group(1) + "00l.jpg")
+                                      mymatch.group(1) + "00l.jpg")
                 if os.path.exists(lqname):
                     try:
                         os.remove(lqname)

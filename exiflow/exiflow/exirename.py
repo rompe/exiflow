@@ -114,13 +114,13 @@ def get_new_filename_parts(filename, my_filelist, quality):
 
 
 def rename_file(filename, my_filelist, with_time, cam_id=None,
-                 artist_initials=None):
+                artist_initials=None):
     """
     Rename filename and return the newly generated name without dir.
     """
     logger = logging.getLogger("exirename.rename_file")
-    match = re.match("^(\d{8})(-(\d{6}))?-(.{3})(\d{4})-"
-                     "((.{2})(.{3}))(\.[^.]*)$",
+    match = re.match("^(\\d{8})(-(\\d{6}))?-(.{3})(\\d{4})-"
+                     "((.{2})(.{3}))(\\.[^.]*)$",
                      os.path.basename(filename))
     # differentiate between getting values from existing filenames or getting
     # initial values from exif and config file
@@ -143,8 +143,8 @@ def rename_file(filename, my_filelist, with_time, cam_id=None,
         if with_time:
             date += "-" + image_time
         if cam_id is None or artist_initials is None:
-            new_cam_id, new_artist_initials = configfile.get_options("cameras",
-                                         model, ("cam_id", "artist_initials"))
+            new_cam_id, new_artist_initials = configfile.get_options(
+                "cameras", model, ("cam_id", "artist_initials"))
             cam_id = cam_id or new_cam_id
             artist_initials = artist_initials or new_artist_initials
         number, revision, extension = get_new_filename_parts(filename,
@@ -156,11 +156,11 @@ def rename_file(filename, my_filelist, with_time, cam_id=None,
                        "wrong length. cam_id should be 3 characters and is "
                        "currently set to '%s', artist_initials should be 2 "
                        "characters and is set to '%s'. "
-                       "Skipping %s." % (cam_id, artist_initials, filename))
+                       "Skipping %s.", cam_id, artist_initials, filename)
         return os.path.basename(filename)
 
-    newbasename = date + "-" + cam_id + number + "-" + artist_initials + \
-                  revision + extension
+    newbasename = (date + "-" + cam_id + number + "-" + artist_initials +
+                   revision + extension)
     newname = os.path.join(os.path.dirname(filename), newbasename)
     if filename == newname:
         raise IOError("Filename does not change.")
