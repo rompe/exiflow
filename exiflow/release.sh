@@ -21,7 +21,7 @@ if head -1 debian/changelog | grep -q $version; then
 	read -p "Press Ctrl-C to stop, Enter to continue." bla
 else
 	dch -v ${version}-1 "Release Exiflow ${version}."
-	svn commit -m "Update debian changelog for ${version}." debian/changelog
+	git commit -m "Update debian changelog for ${version}." debian/changelog
 fi
 python setup.py bdist_rpm # For Sourceforge
 python setup.py sdist
