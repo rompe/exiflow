@@ -4,7 +4,7 @@ set -e
 # adopt version in ./exiflow/exigui.glade, ./setup.py
 # set Ubuntu versions in DISTRIBUTION
 #
-DISTRIBUTIONS="lucid maverick natty oneiric precise quantal raring saucy trusty"
+DISTRIBUTIONS="lucid precise quantal raring saucy trusty"
 if [ ${USER} == "ulf" ]; then
 	export GPGKEY=643D8C7A
 	export DEBEMAIL='launchpad.net@rompe.org'
