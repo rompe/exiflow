@@ -13,7 +13,7 @@ import logging
 from . import configfile
 
 
-class Filelist:
+class Filelist(object):
     """
     An iterable class that hosts information about files
 
@@ -75,9 +75,9 @@ class Filelist:
         image_extensions = settings.get("all", "image_extensions").split()
         unwanted_files = settings.get("all", "unwantend_files").split()
         basefilename = os.path.basename(filename).lower()
-        if (self._process_unknown_types \
-            or os.path.splitext(basefilename)[1] in image_extensions) \
-            and not basefilename in unwanted_files:
+        if ((self._process_unknown_types
+             or os.path.splitext(basefilename)[1] in image_extensions)
+                and not basefilename in unwanted_files):
             self._files.append(filename)
             filestat = os.stat(filename)
             self._filestats[filename] = filestat

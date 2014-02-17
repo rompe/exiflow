@@ -12,7 +12,7 @@ import gzip
 import xml.dom.minidom
 
 
-class Gthumb:
+class Gthumb(object):
     """
     A class that handles reading and writing gthumb comment files
     for an image file.
@@ -27,7 +27,7 @@ class Gthumb:
         self.commentsdir = os.path.join(os.path.dirname(self.filename),
                                         ".comments")
         self.commentsfile = os.path.join(self.commentsdir,
-                                     os.path.basename(self.filename) + ".xml")
+                                         os.path.basename(self.filename) + ".xml")
 
     def read(self):
         """
@@ -42,7 +42,7 @@ class Gthumb:
             "Copyright"         => "Note" line: "^Copyright::.*"
             "CopyrightNotice"   => "Note" line: "^CopyrightNotice::.*"
             "UserComment"       => "Note" line: "^UserComment::.*"
-            "ImageDescription"  => "Note" free text without "^\w+::"
+            "ImageDescription"  => "Note" free text without "^\\w+::"
             "Keywords"          => "Keywords" comma separated list
             "Location"          => "Place"
             "DateTimeOriginal"  => "Time" in seconds since 1970-01-01
@@ -70,7 +70,7 @@ class Gthumb:
                     self.fields[gthumb_to_exif[key]] = mydata[key]
             if "Note" in mydata:
                 note = []
-                myregex = re.compile("(\w+)::(.*)$")
+                myregex = re.compile("(\\w+)::(.*)$")
                 for line in mydata["Note"].split("\n"):
                     match = myregex.match(line)
                     if match:
