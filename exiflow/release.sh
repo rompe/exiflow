@@ -22,11 +22,13 @@ if head -1 debian/changelog | grep -q $version; then
 else
 	dch -v ${version}-1 "Release Exiflow ${version}."
 	git commit -m "Update debian changelog for ${version}." debian/changelog
+	git push
 fi
 python setup.py bdist_rpm # For Sourceforge
 python setup.py sdist
 cp dist/Exiflow-${version}.tar.gz dist/exiflow_${version}.orig.tar.gz
-svn export . dist/exiflow-${version}
+mkdir dist/exiflow-${version}/
+git archive master | tar -x -C dist/exiflow-${version}/
 cd dist/exiflow-${version}
 for dist in ${DISTRIBUTIONS}; do
 	dch --distribution ${dist} -b -v ${version}-1ppa1~${dist}1 "Upload Exiflow ${version} for ${dist}."
