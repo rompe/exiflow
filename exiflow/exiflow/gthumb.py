@@ -27,7 +27,8 @@ class Gthumb(object):
         self.commentsdir = os.path.join(os.path.dirname(self.filename),
                                         ".comments")
         self.commentsfile = os.path.join(self.commentsdir,
-                                         os.path.basename(self.filename) + ".xml")
+                                         os.path.basename(self.filename) +
+                                         ".xml")
 
     def read(self):
         """

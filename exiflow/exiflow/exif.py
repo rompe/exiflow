@@ -12,7 +12,7 @@ import logging
 import subprocess
 
 
-class Exif:
+class Exif(object):
     """
     A class for reading and writing EXIF information.
     """
@@ -39,7 +39,7 @@ class Exif:
             if line.startswith("Error:"):
                 stderr += line
         if len(stderr) > 0:
-            raise(IOError, stderr)
+            raise IOError(stderr)
         else:
             for line in stdout.splitlines():
                 if ": " in line:
@@ -127,7 +127,7 @@ class Exif:
         # assume an error if something is written to stderr.
         errors = exiftool.stderr.readlines()
         if len(errors) > 0:
-            raise(IOError, "".join(errors + exiftool.stdout.readlines()))
+            raise IOError("".join(errors + exiftool.stdout.readlines()))
         return exiftool.wait()
 
     def update_exif(self, sourcefile):
@@ -160,10 +160,10 @@ class Exif:
         # warnings too.
         errors = exiftool.stderr.readlines()
         if len(errors) > 0:
-            myregex = re.compile("^Warning: \[minor\] .* Fixed.")
+            myregex = re.compile("^Warning: \\[minor\\] .* Fixed.")
             mymatch = myregex.match(errors[0])
             if mymatch:
                 logger.info("%s", errors)
             else:
-                raise(IOError, "".join(errors + exiftool.stdout.readlines()))
+                raise IOError("".join(errors + exiftool.stdout.readlines()))
         return exiftool.wait()

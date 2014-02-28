@@ -80,8 +80,9 @@ def run(argv, callback=None):
     parser = optparse.OptionParser(usage="usage: %prog [options] "
                                          "[-- -TAGNAME=VALUE [...]] "
                                          "<files or dirs>")
-    parser.description = ("Hint: %prog is able to set or unset any tags supported in "
-                          "ExifTool with -TAGNAME=[VALUE] syntax.")
+    parser.description = ("Hint: %prog is able to set or unset any tags "
+                          "supported in ExifTool with -TAGNAME=[VALUE] "
+                          "syntax.")
     parser.add_option("--section", "-s", dest="section",
                       help="Name of a config file section to be read. This is"
                            " useful if different people are using the same"

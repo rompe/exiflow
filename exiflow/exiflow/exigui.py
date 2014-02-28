@@ -424,7 +424,8 @@ class Window1(object):
                                 os.path.join(self.batch_target, target_subdir))
                     try:
                         shutil.move(os.path.join(self.batch_tmpdir, subdir),
-                                    os.path.join(self.batch_target, target_subdir))
+                                    os.path.join(self.batch_target,
+                                                 target_subdir))
                     except shutil.Error, msg:
                         logger.error("ERROR: %s", msg)
                     for rownum in range(0, len(self.liststore)):
@@ -447,30 +448,31 @@ def run(argv):
                       help="Mountpoint of directory to import.")
     parser.add_option("-t", "--target", dest="target",
                       help="Target directory. A subdirectory will be created"
-                           " in this directory.")
+                      " in this directory.")
     parser.add_option("-d", "--device", dest="device",
                       help="(Ignored for backwards compatibility. Don't use.)")
     parser.add_option("--cam_id", "-c", dest="cam_id",
                       help="ID string for the camera model. Should normally be"
-                           " three characters long.")
+                      " three characters long.")
     parser.add_option("--artist_initials", "-a", dest="artist_initials",
                       help="Initials of the artist. Should be two characters"
-                           " long.")
-    parser.add_option("-T", "--with_time", action="store_true", dest="with_time",
+                      " long.")
+    parser.add_option("-T", "--with_time", action="store_true",
+                      dest="with_time",
                       help="Create filenames containing the image time, for"
-                           " example 20071231-235959-n001234-xy000.jpg instead"
-                           " of 20071231-n001234-xy000.jpg .")
+                      " example 20071231-235959-n001234-xy000.jpg instead"
+                      " of 20071231-n001234-xy000.jpg .")
     parser.add_option("-b", "--batch", action="store_true", dest="batch",
                       help="Autorun from exiimport over exirename, exiperson "
-                           "and exiconvert to exiassign.")
+                      "and exiconvert to exiassign.")
     parser.add_option("--batch_order",
                       help="Comma separated processing order for --batch. "
-                           "Default: %default")
+                      "Default: %default")
     parser.add_option("--batch_tmpdir",
                       help="If the processing order starts with 'exiimport', "
-                           "this temporary directory is used for batch processing. "
-                           "After batch processing, the created subdirectory will "
-                           "be moved into the target directory.")
+                      "this temporary directory is used for batch processing. "
+                      "After batch processing, the created subdirectory will "
+                      "be moved into the target directory.")
     parser.add_option("--nofork", action="store_true",
                       help="Do not fork, stay in foreground instead.")
     options, args = parser.parse_args(argv)

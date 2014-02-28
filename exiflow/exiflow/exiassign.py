@@ -109,7 +109,7 @@ def run(argv, callback=None):
         logging.getLogger().setLevel(logging.INFO)
     logger = logging.getLogger("exiassign")
 
-    filename_re = re.compile("^(\d{8}(-\d{6})?-.{3}\d{4}-)(.{5})\.[^.]*$")
+    filename_re = re.compile("^(\\d{8}(-\\d{6})?-.{3}\\d{4}-)(.{5})\\.[^.]*$")
 
     for filename, percentage in filelist.Filelist(args):
         mymatch = filename_re.match(os.path.basename(filename))
