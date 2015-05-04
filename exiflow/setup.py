@@ -5,8 +5,8 @@ Install the exiflow collection on your computer.
 """
 __revision__ = "$Id: $"
 
-from distutils.core import setup
-#from setuptools import setup
+#from distutils.core import setup
+from setuptools import setup
 
 setup(name='Exiflow',
       install_requires=["glade2"],
