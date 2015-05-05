@@ -10,7 +10,7 @@ from setuptools import setup
 
 setup(name='Exiflow',
       install_requires=["glade2"],
-      version='0.4.5.16',
+      version='0.4.5.17',
       packages=['exiflow'],
       scripts=["exiassign", "exiconvert", "exigate", "exigui",
                "exiimport", "exiperson", "exirename"],
@@ -53,4 +53,6 @@ setup(name='Exiflow',
                    'Topic :: Multimedia :: Graphics',
                    'Topic :: Multimedia :: Graphics :: Graphics Conversion',
                    'Topic :: System :: Archiving',
-                   'Topic :: Utilities'])
+                   'Topic :: Utilities'],
+	build_requires=["python", "perl-Image-ExifTool"],
+	requires=["python"])
