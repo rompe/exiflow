@@ -11,3 +11,6 @@ mock --rebuild dist/Exiflow-$version-1.src.rpm
 publish_in_outgoing.sh dist/Exiflow-$version-1.src.rpm
 # Trigger copr build
 copr-cli build exiflow http://rompe.net/outgoing/Exiflow-$version-1.src.rpm
+
+# Upload to pypi as well
+twine upload dist/Exiflow-${version}.tar.gz
