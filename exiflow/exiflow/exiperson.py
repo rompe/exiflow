@@ -32,7 +32,7 @@ def personalize_file(filename, personals, options_section_personals,
     exif_file = exif.Exif(filename)
     try:
         exif_file.read_exif()
-    except IOError, msg:
+    except IOError as msg:
         logger.warning("Skipping %s: %s", filename, msg)
         return 1
 
@@ -64,7 +64,7 @@ def personalize_file(filename, personals, options_section_personals,
 
     try:
         exif_file.write_exif()
-    except IOError, msg:
+    except IOError as msg:
         logger.error("Error writing EXIF data:%s\n%s", filename, msg)
         return 1
     return 0

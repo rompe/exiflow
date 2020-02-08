@@ -57,7 +57,7 @@ def assign_file(filename, prefix, force=False):
     exif_file = exif.Exif(filename)
     try:
         exif_file.read_exif()
-    except IOError, msg:
+    except IOError as msg:
         logger.warning(str(msg))
         return 1
     # Currently F-spot always tries to write "DateTimeOriginal", so we must

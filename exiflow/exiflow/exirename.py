@@ -205,7 +205,7 @@ def run(argv, callback=None):
         try:
             newname = rename_file(filename, my_filelist, options.with_time,
                                   options.cam_id, options.artist_initials)
-        except IOError, msg:
+        except IOError as msg:
             newname = os.path.basename(filename)
             logger.error("Skipping %s:\n %s", filename, str(msg))
         logger.info("%3s%% %s -> %s", percentage, filename, newname)

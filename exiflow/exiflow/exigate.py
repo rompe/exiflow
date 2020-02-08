@@ -31,7 +31,7 @@ def autogate_gthumb(filename, myoptions):
         logger.info("Updating %s from comment file.", filename)
         try:
             gthumbfile.read()
-        except IOError, msg:
+        except IOError as msg:
             logger.error("Error reading gthumb comment for %s:\n%s",
                          filename, msg)
             return False
@@ -39,7 +39,7 @@ def autogate_gthumb(filename, myoptions):
         exif_file.fields = gthumbfile.fields
         try:
             exif_file.write_exif()
-        except IOError, msg:
+        except IOError as msg:
             logger.error("Error writing EXIF data to %s:\n%s", filename, msg)
             return False
         # TODO: Find out why we intruduced this line. Seems odd...
@@ -57,7 +57,7 @@ def autogate_gthumb(filename, myoptions):
         exif_file = exif.Exif(filename)
         try:
             exif_file.read_exif()
-        except IOError, message:
+        except IOError as message:
             logger.info("Skipping %s: %s", filename, message)
             return 1
         gthumbfile.fields = exif_file.fields

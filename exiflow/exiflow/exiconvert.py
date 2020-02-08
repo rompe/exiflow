@@ -125,7 +125,7 @@ def run(argv, callback=None):
                 break
         try:
             newname = convert_file(filename)
-        except IOError, msg:
+        except IOError as msg:
             newname = os.path.basename(filename)
             logger.error("Skipping %s:\n%s\n", filename, msg)
         if options.remove_lqjpeg:
@@ -138,7 +138,7 @@ def run(argv, callback=None):
                     try:
                         os.remove(lqname)
                         callback_filename = lqname
-                    except IOError, msg:
+                    except IOError as msg:
                         logger.error("Skipping remove of %s:\n%s\n",
                                      lqname, msg)
         else:

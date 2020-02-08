@@ -316,7 +316,7 @@ class Window1(object):
             args.append("--target=" + target_dir.get_text())
         try:
             exiimport.run(args, self._progress_callback)
-        except IOError, msg:
+        except IOError as msg:
             logger.error("ERROR: %s", msg)
 
     def _run_exirename(self):
@@ -334,7 +334,7 @@ class Window1(object):
         args += [entry[0] for entry in self.liststore]
         try:
             exirename.run(args, self._progress_callback)
-        except IOError, msg:
+        except IOError as msg:
             logger.error("ERROR: %s", msg)
 
     def _run_exiperson(self):
@@ -347,7 +347,7 @@ class Window1(object):
         args += [entry[0] for entry in self.liststore]
         try:
             exiperson.run(args, self._progress_callback)
-        except IOError, msg:
+        except IOError as msg:
             logger.error("ERROR: %s", msg)
 
     def _run_exiconvert(self):
@@ -359,7 +359,7 @@ class Window1(object):
         args += [entry[0] for entry in self.liststore]
         try:
             exiconvert.run(args, self._progress_callback)
-        except IOError, msg:
+        except IOError as msg:
             logger.error("ERROR: %s", msg)
 
     def _run_exiassign(self):
@@ -371,7 +371,7 @@ class Window1(object):
         args += [entry[0] for entry in self.liststore]
         try:
             exiassign.run(args, self._progress_callback)
-        except IOError, msg:
+        except IOError as msg:
             logger.error("ERROR: %s", msg)
 
     def _run_exigate(self):
@@ -389,7 +389,7 @@ class Window1(object):
         args += [entry[0] for entry in self.liststore]
         try:
             exigate.run(args, self._progress_callback)
-        except IOError, msg:
+        except IOError as msg:
             logger.error("ERROR: %s", msg)
 
     def batch_run(self, *dummy):
@@ -426,7 +426,7 @@ class Window1(object):
                         shutil.move(os.path.join(self.batch_tmpdir, subdir),
                                     os.path.join(self.batch_target,
                                                  target_subdir))
-                    except shutil.Error, msg:
+                    except shutil.Error as msg:
                         logger.error("ERROR: %s", msg)
                     for rownum in range(0, len(self.liststore)):
                         self.liststore[rownum][0] = \

@@ -74,7 +74,7 @@ def run(argv, callback=None):
 
         shutil.copy2(filename, targetdir)
         os.chmod(os.path.join(targetdir, os.path.basename(filename)),
-                 stat.S_IMODE(0644))
+                 stat.S_IMODE(0o644))
 
     # Unmount card
     mount = subprocess.Popen("mount", stdout=subprocess.PIPE)
