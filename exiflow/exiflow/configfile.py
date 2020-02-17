@@ -11,7 +11,7 @@ __revision__ = "$Id: "
 
 import os
 import logging
-import ConfigParser
+import configparser
 
 global_config_dir = "/etc/exiflow"
 local_config_dir = os.path.expanduser('~/.exiflow')
@@ -113,11 +113,11 @@ def parse(configname):
         if not os.path.exists(local_config):
             if not os.path.isdir(local_config_dir):
                 os.makedirs(local_config_dir)
-            file(local_config, "w").write(__default_contents[configname])
+            open(local_config, "w").write(__default_contents[configname])
             logger.warning("Created example %s.", local_config)
         __stats[local_config] = __stat(local_config)
         __stats[global_config] = __stat(global_config)
-        config = ConfigParser.ConfigParser()
+        config = configparser.ConfigParser()
         read_files = config.read([global_config, local_config])
         logger.info("Read %s config files: %s",
                     configname, " ".join(read_files))
@@ -155,10 +155,10 @@ def append(configname, section, options):
     logger = logging.getLogger("configfile.append")
     configfile = os.path.join(local_config_dir, configname + ".cfg")
     string_to_append = "\n#[%s]\n#%s = \n" % (section, " = \n#".join(options))
-    if string_to_append in "".join(file(configfile, "r").readlines()):
+    if string_to_append in "".join(open(configfile, "r").readlines()):
         logger.warning("Commented section [%s] found in %s\nPlease edit!\n",
                        section, configfile)
     else:
         logger.warning("Adding commented section [%s] to %s\nPlease edit!\n",
                        section, configfile)
-        file(configfile, "a").write(string_to_append)
+        open(configfile, "a").write(string_to_append)
