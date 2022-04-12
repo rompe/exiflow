@@ -3,6 +3,7 @@
 # vim: tabstop=4 expandtab shiftwidth=4
 """
 Import files from given directories to your photo folder.
+
 Optionally unmounts source media after successfull import.
 """
 __revision__ = "$Id$"
@@ -12,36 +13,40 @@ import sys
 import stat
 import shutil
 import logging
-import optparse
+import argparse
 import subprocess
+from typing import Callable, Optional, Sequence
 from . import filelist as exiflow_filelist
 
 
-def run(argv, callback=None):
+def run(argv: Sequence[str],
+        callback: Optional[Callable[[str, str, float, bool], bool]] = None):
     """
     Take an equivalent of sys.argv[1:] and optionally a callable.
+
     Parse options, import files and optionally call the callable on every
     processed file with 3 arguments: filename, newname, percentage.
     If the callable returns True, stop the processing.
     """
     # Parse command line.
-    parser = optparse.OptionParser()
-    parser.add_option("-m", "--mount", dest="mount",
-                      help="Mountpoint of directory to import. Corresponds"
-                           " to %m in the gnome-volume-manager config dialog.")
-    parser.add_option("-t", "--target", dest="target",
-                      help="Target directory. A subdirectory will be created"
-                           " in this directory.")
-    parser.add_option("-d", "--device", dest="device",
-                      help="(Ignored for backwards compatibility.)")
-    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
-                      help="Be verbose.")
-    options, args = parser.parse_args(argv)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-m", "--mount", dest="mount",
+                        help="Mountpoint of directory to import. Corresponds"
+                             " to %m in the gnome-volume-manager config "
+                             "dialog.")
+    parser.add_argument("-t", "--target", dest="target",
+                        help="Target directory. A subdirectory will be created"
+                             " in this directory.")
+    parser.add_argument("-d", "--device", dest="device",
+                        help="(Ignored for backwards compatibility.)")
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose",
+                        help="Be verbose.")
+    options = parser.parse_args(argv)
     logging.basicConfig(format="%(module)s: %(message)s")
     if options.verbose:
         logging.getLogger().setLevel(logging.INFO)
     logger = logging.getLogger("exiimport")
-    if len(args) > 0 or not options.mount or not options.target:
+    if not options.mount or not options.target:
         return "Wrong syntax.\n" + parser.format_help()
 
     # Build file list whithout skipping unknown files
@@ -69,7 +74,7 @@ def run(argv, callback=None):
         if callable(callback):
             if callback("", os.path.join(targetdir,
                                          os.path.basename(filename)),
-                        percentage, keep_original=True):
+                        percentage, True):
                 break
 
         shutil.copy2(filename, targetdir)
@@ -77,14 +82,16 @@ def run(argv, callback=None):
                  stat.S_IMODE(0o644))
 
     # Unmount card
-    mount = subprocess.Popen("mount", stdout=subprocess.PIPE)
-    for line in mount.communicate()[0].splitlines():
+    with subprocess.Popen("mount", universal_newlines=True,
+                          stdout=subprocess.PIPE) as mount:
+        stdout = mount.communicate()[0]
+    for line in stdout.splitlines():
         # Example line:
         # /dev/sdc1 on /media/NIKON D70 type vfat (rw,nosuid,n[...]
         line_parts = line.split(" type", 1)[0].split(None, 2)
         if (len(line_parts) == 3 and line_parts[1] == "on" and
            os.path.realpath(options.mount) == os.path.realpath(line_parts[2])):
-            logger.warn("Trying to unmount %s.", line_parts[0])
+            logger.warning("Trying to unmount %s.", line_parts[0])
             subprocess.call(["umount", line_parts[0]])
 
 
