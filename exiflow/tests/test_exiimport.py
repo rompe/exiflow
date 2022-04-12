@@ -29,7 +29,7 @@ class TestImport(unittest.TestCase):
         self.__sourcedir = tempfile.mkdtemp()
         self.__targetdir = tempfile.mkdtemp()
         self.__configdir = tempfile.mkdtemp()
-        exiflow.configfile.global_config_dir = self.__configdir
+        exiflow.configfile.GLOBAL_CONFIG_DIR = self.__configdir
         exiflow.configfile.local_config_dir = self.__configdir
 
     def tearDown(self):
@@ -82,4 +82,3 @@ class TestImport(unittest.TestCase):
                                     "--target", self.__targetdir,
                                     "--verbose"], callback=callback)
         self.assertEqual(mylist, [True])
-

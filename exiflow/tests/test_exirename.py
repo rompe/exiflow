@@ -29,7 +29,7 @@ class TestExirename(unittest.TestCase):
         self.__data_dir = os.path.join(os.path.dirname(__file__), "testdata")
         self.__tempdir = tempfile.mkdtemp()
         self.__configdir = tempfile.mkdtemp()
-        exiflow.configfile.global_config_dir = self.__configdir
+        exiflow.configfile.GLOBAL_CONFIG_DIR = self.__configdir
         exiflow.configfile.local_config_dir = self.__configdir
 
     def tearDown(self):
@@ -82,7 +82,7 @@ class TestExirename(unittest.TestCase):
         exiflow.exirename.run(argv=["--with_time", self.__tempdir])
         self.assertEqual(os.listdir(self.__tempdir),
                          ["20121212-104346-n000001-ad000.jpg"])
-        
+
     def test_run__callback(self):
         """ Test run() with a callback function. """
         mylist = []

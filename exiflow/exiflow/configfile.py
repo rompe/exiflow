@@ -3,6 +3,7 @@
 # vim: tabstop=4 expandtab shiftwidth=4
 """
 A set of functions to handle config files.
+
 They look for existance of ~/.exiflow/<classname>.cfg and will create it if
 it doesn't exist. Afterwards a configparser object of this file and
 /etc/exiflow/<classname>.cfg is returned.
@@ -12,108 +13,52 @@ __revision__ = "$Id: "
 import os
 import logging
 import configparser
+from typing import Dict, List, Iterable, Optional
 
-global_config_dir = "/etc/exiflow"
+GLOBAL_CONFIG_DIR = "/etc/exiflow"
 local_config_dir = os.path.expanduser('~/.exiflow')
 
 # Defaults
-__default_contents = {"settings": """# settings.cfg
-# This file defines some values to tell exiflow which types of files
-# we want to process and which files and dirs we always want to skip.
-# The only valid section here is [all].
-
-[all]
-image_extensions = .jpg .nef .raw .crw .tif
-unwantend_files = nikon001.dsc
-unwantend_dirs = .comments
-""",
-                      "cameras": """# cameras.cfg
-# This file defines values to be used as filename parts and converters to be
-# used for conversion of RAW file formats to JPEG.. An example filename:
-#
-# 20080718-n005966-sb000.jpg
-#
-# In this case cam_id was "n00" and artist_initials was "sb".
-#
-# While it is possible to only have an [all] section in this file, we recommend
-# using camera specific sections for at least the cam_id to generate unique and
-# meaningfull filenames.
-
-#[all]
-#cam_id = 000
-#artist_initials = xy
-
-#[NIKON Dxx]
-#cam_id = n00
-#artist_initials = yz
-#raw_extension = .nef
-#raw_converter = LANG=C ufraw-batch --gamma=0.45 --saturation=1.0 --exposure=0.0 --black-point=0 --interpolation=ahd --compression=90 --noexif --wb=camera --curve=linear --linearity=0.02 --clip=film --restore=lch --out-type=jpeg
-
-#[HP PhotoSmart 715]
-#cam_id = hp0
-
-#[C2040Z]
-#cam_id = o00
-""",
-                      "exif": """# exif.cfg
-# This file contains EXIF information to be inserted into images.
-# Configure global values in the [all] section and camera specific values
-# in a section for the camera model. It is also possible to create sections
-# with arbitrary names and supply these names later on the command line.
-# All supported tags of ExifTool are allowed as keys - so it's possible to set
-# or unset (just use "keyword =") specific tags with exiperson.
-
-#[all]
-#Artist = Arthur Dent
-#Contact = adent@example.com
-#Copyright = (c)2008 adent@example.com
-#CopyrightNotice = All rights reserved, no redistribution without written permission.
-#Credit = adent@example.com
-# ATTENTION: You will want to set UserComment to an empty string even if you
-# do not use it. It will prevent Exiftool from setting it to the word "ASCII".
-#UserComment =
-
-#[custom]
-#artist = I. M. Weasel
-
-#[NIKON Dxx]
-#artist = I. R. Baboon
-
-#[GT-I9100]
-#ImageUniqueID =
-
-"""}
+__default_contents = {"settings": open(os.path.join(os.path.dirname(__file__),
+                                                    "default_settings.cfg"),
+                                       encoding="utf-8").read(),
+                      "cameras": open(os.path.join(os.path.dirname(__file__),
+                                                   "default_cameras.cfg"),
+                                      encoding="utf-8").read(),
+                      "exif": open(os.path.join(os.path.dirname(__file__),
+                                                "default_exif.cfg"),
+                                   encoding="utf-8").read()}
 
 # ConfigParser Caches
-__cache = {}
-__stats = {}
+__cache: Dict[str, configparser.ConfigParser] = {}
+__stats: Dict[str, Optional[os.stat_result]] = {}
 
 
-def __stat(filename):
-    """
-    Return a stat object or None if "filename" doesn't exist.
-    """
+def __stat(filename: str) -> Optional[os.stat_result]:
+    """Return a stat object or None if "filename" doesn't exist."""
     try:
         return os.stat(filename)
     except OSError:
         return None
 
 
-def parse(configname):
+def parse(configname: str) -> configparser.ConfigParser:
     """
     Handle cached access to <configname>.cfg.
+
     Return a configparser object and a list of processed files.
     """
     logger = logging.getLogger("configfile.parse")
     local_config = os.path.join(local_config_dir, configname + ".cfg")
-    global_config = os.path.join(global_config_dir, configname + ".cfg")
-    if (not configname in __cache
+    global_config = os.path.join(GLOBAL_CONFIG_DIR, configname + ".cfg")
+    if (configname not in __cache
             or __stats.get(local_config, None) != __stat(local_config)
             or __stats.get(global_config, None) != __stat(global_config)):
         if not os.path.exists(local_config):
             if not os.path.isdir(local_config_dir):
                 os.makedirs(local_config_dir)
-            open(local_config, "w").write(__default_contents[configname])
+            with open(local_config, "w", encoding="utf-8") as cfg_file:
+                cfg_file.write(__default_contents[configname])
             logger.warning("Created example %s.", local_config)
         __stats[local_config] = __stat(local_config)
         __stats[global_config] = __stat(global_config)
@@ -125,15 +70,16 @@ def parse(configname):
     return __cache[configname]
 
 
-def get_options(configname, section, options):
+def get_options(configname: str, section: str, options: Iterable[str]):
     """
     Try to get options from section "section" from configfile "configname".
+
     If section doesn't exist or options don't exist in it, fall back to
     section "all". If that doesn't succed either, call append() and return
     empty values.
     """
     config = parse(configname)
-    values = []
+    values: List[str] = []
     must_append = False
     for option in options:
         if config.has_section(section) and config.has_option(section, option):
@@ -148,17 +94,18 @@ def get_options(configname, section, options):
     return values
 
 
-def append(configname, section, options):
-    """
-    Append a commented section with options to "configname".cfg
-    """
+def append(configname: str, section: str, options: Iterable[str]) -> None:
+    """Append a commented section with options to "configname".cfg."""
     logger = logging.getLogger("configfile.append")
     configfile = os.path.join(local_config_dir, configname + ".cfg")
     string_to_append = "\n#[%s]\n#%s = \n" % (section, " = \n#".join(options))
-    if string_to_append in "".join(open(configfile, "r").readlines()):
+    with open(configfile, "r", encoding="utf-8") as cfg_file:
+        cfg_content = "".join(cfg_file.readlines())
+    if string_to_append in cfg_content:
         logger.warning("Commented section [%s] found in %s\nPlease edit!\n",
                        section, configfile)
     else:
         logger.warning("Adding commented section [%s] to %s\nPlease edit!\n",
                        section, configfile)
-        open(configfile, "a").write(string_to_append)
+        with open(configfile, "a", encoding="utf-8") as cfg_file:
+            cfg_file.write(string_to_append)
