@@ -1,0 +1,2 @@
+PyGObject>=3.42.0
+PyGObject-stubs>=0.0.8
