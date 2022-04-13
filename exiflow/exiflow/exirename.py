@@ -61,15 +61,17 @@ import re
 import sys
 import time
 import logging
-import optparse
+import argparse
+from typing import Callable, Optional, Sequence, Tuple
 from . import exif
 from . import filelist
 from . import configfile
 
 
-def get_exif_information(filename):
+def get_exif_information(filename: str) -> Tuple[str, str, str, str]:
     """
     Read camera model and date from filename and return them.
+
     If The date isn't contained in EXIF, use the file's mtime.
     """
     exif_file = exif.Exif(filename)
@@ -84,17 +86,16 @@ def get_exif_information(filename):
         date = date[0:4] + date[5:7] + date[8:10]
     else:
         if date == "0":
-            date = os.stat(filename).st_mtime
+            date = str(os.stat(filename).st_mtime)
             image_time = date
         date = time.strftime("%Y%m%d", time.localtime(float(date)))
         image_time = time.strftime("%H%M%S", time.localtime(float(image_time)))
     return model, date, image_time, quality
 
 
-def get_new_filename_parts(filename, my_filelist, quality):
-    """
-    Return a new name for filename according to our holy naming scheme.
-    """
+def get_new_filename_parts(filename: str, my_filelist: filelist.Filelist,
+                           quality: str) -> Tuple[str, str, str]:
+    """Return a new name for filename according to our holy naming scheme."""
     leader, extension = os.path.splitext(filename)
     extension = extension.lower()
     number = "".join([char for char in leader[-4:] if char.isdigit()])
@@ -113,11 +114,10 @@ def get_new_filename_parts(filename, my_filelist, quality):
     return number.zfill(4), revision, extension
 
 
-def rename_file(filename, my_filelist, with_time, cam_id=None,
-                artist_initials=None):
-    """
-    Rename filename and return the newly generated name without dir.
-    """
+def rename_file(filename: str, my_filelist: filelist.Filelist,
+                with_time: bool, cam_id: Optional[str] = None,
+                artist_initials: Optional[str] = None) -> str:
+    """Rename filename and return the newly generated name without dir."""
     logger = logging.getLogger("exirename.rename_file")
     match = re.match("^(\\d{8})(-(\\d{6}))?-(.{3})(\\d{4})-"
                      "((.{2})(.{3}))(\\.[^.]*)$",
@@ -143,6 +143,7 @@ def rename_file(filename, my_filelist, with_time, cam_id=None,
         if with_time:
             date += "-" + image_time
         if cam_id is None or artist_initials is None:
+            # pylint: disable=unbalanced-tuple-unpacking
             new_cam_id, new_artist_initials = configfile.get_options(
                 "cameras", model, ("cam_id", "artist_initials"))
             cam_id = cam_id or new_cam_id
@@ -151,7 +152,8 @@ def rename_file(filename, my_filelist, with_time, cam_id=None,
                                                              my_filelist,
                                                              quality)
 
-    if len(cam_id) != 3 or len(artist_initials) != 2:
+    if (not cam_id or len(cam_id) != 3 or
+            not artist_initials or len(artist_initials) != 2):
         logger.warning("Either cam_id or artist_initials is missing or of "
                        "wrong length. cam_id should be 3 characters and is "
                        "currently set to '%s', artist_initials should be 2 "
@@ -165,42 +167,45 @@ def rename_file(filename, my_filelist, with_time, cam_id=None,
     if filename == newname:
         raise IOError("Filename does not change.")
     elif os.path.exists(newname):
-        raise IOError("Can't rename %s to %s, it already exists." % (filename,
-                                                                     newname))
+        raise IOError(f"Can't rename {filename} to {newname}, "
+                      "it already exists.")
     os.rename(filename, newname)
     return newbasename
 
 
-def run(argv, callback=None):
+def run(argv: Sequence[str],
+        callback: Optional[Callable[[str, str, float, bool], bool]]
+        = None) -> None:
     """
     Take an equivalent of sys.argv[1:] and optionally a callable.
+
     Parse options, rename files and optionally call the callable on every
     processed file with 3 arguments: filename, newname, percentage.
     If the callable returns True, stop the processing.
     """
-    parser = optparse.OptionParser(usage="usage: %prog [options] "
-                                         "<files or dirs>")
-    parser.add_option("--cam_id", "-c", dest="cam_id",
-                      help="ID string for the camera model. Should normally be"
-                           " three characters long.")
-    parser.add_option("--artist_initials", "-a", dest="artist_initials",
-                      help="Initials of the artist. Should be two characters"
-                           " long.")
-    parser.add_option("-t", "--with_time", action="store_true",
-                      dest="with_time",
-                      help="Create filenames containing the image time, for "
-                           "example 20071231-235959-n001234-xy000.jpg instead "
-                           "of 20071231-n001234-xy000.jpg .")
-    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
-                      help="Be verbose.")
-    options, args = parser.parse_args(args=argv)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--cam_id", "-c", dest="cam_id",
+                        help="ID string for the camera model. "
+                        "Should normally be three characters long.")
+    parser.add_argument("--artist_initials", "-a", dest="artist_initials",
+                        help="Initials of the artist. Should be two characters"
+                        " long.")
+    parser.add_argument("-t", "--with_time", action="store_true",
+                        dest="with_time",
+                        help="Create filenames containing the image time, for "
+                        "example 20071231-235959-n001234-xy000.jpg instead "
+                        "of 20071231-n001234-xy000.jpg .")
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose",
+                        help="Be verbose.")
+    parser.add_argument("args", nargs="+", metavar="file_or_dir")
+    options = parser.parse_args(args=argv)
 
     logging.basicConfig(format="%(module)s: %(message)s")
     if options.verbose:
         logging.getLogger().setLevel(logging.INFO)
     logger = logging.getLogger("exirename")
 
-    my_filelist = filelist.Filelist(args)
+    my_filelist = filelist.Filelist(options.args)
     for filename, percentage in my_filelist:
         try:
             newname = rename_file(filename, my_filelist, options.with_time,
@@ -212,7 +217,7 @@ def run(argv, callback=None):
         if callable(callback):
             if callback(filename,
                         os.path.join(os.path.dirname(filename), newname),
-                        percentage):
+                        percentage, False):
                 break
 
 
