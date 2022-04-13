@@ -7,7 +7,7 @@ __revision__ = "$Id$"
 import os
 import re
 import gzip
-from typing import Dict, List
+from typing import Dict, List, Union
 import xml.dom.minidom
 
 
@@ -138,7 +138,7 @@ class Gthumb(object):
             mtime = int(os.path.getmtime(self.commentsfile))
         return mtime
 
-    def set_mtime(self, mtime: int) -> bool:
+    def set_mtime(self, mtime: Union[float, int]) -> bool:
         """
         Set modification time of comment file to mtime.
 
