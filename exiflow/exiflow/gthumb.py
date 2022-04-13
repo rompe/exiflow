@@ -55,7 +55,7 @@ class Gthumb(object):
             mydata: Dict[str, str] = {}
             mydom: xml.dom.minidom.Document = \
                 xml.dom.minidom.parse(  # type: ignore
-                    gzip.open(self.commentsfile))
+                    gzip.open(self.commentsfile))  # type: ignore
             for field in ("Note", "Keywords", "Place", "Time"):
                 mynodes: List[xml.dom.minidom.Element] = \
                     mydom.getElementsByTagName(field)  # type: ignore
