@@ -21,19 +21,21 @@ import re
 import sys
 import glob
 import logging
-import optparse
+import argparse
+from typing import Callable, Dict, List, Optional, Sequence
 from . import exif
 from . import filelist
 
 
-def find_siblings(filename, prefix):
+def find_siblings(filename: str, prefix: str) -> List[str]:
     """
-    Try to find siblings for "filename" in the same directory and return them
-    as a list of files reverse sorted by modification time.
+    Try to find siblings for "filename" in the same directory.
+
+    Return them as a list of files reverse sorted by modification time.
     Return [] if no sibling is found.
     A file is considered a sibling if it's basename starts with "prefix".
     """
-    mtimes = {}
+    mtimes: Dict[str, str] = {}
     for otherfile in glob.glob(os.path.join(os.path.dirname(filename),
                                             prefix + "*")):
         extension = os.path.splitext(otherfile)[1]
@@ -41,16 +43,16 @@ def find_siblings(filename, prefix):
 
         if otherfile == filename:
             continue
-        elif extension in (".ufraw", ".xmp"):
+        if extension in (".ufraw", ".xmp"):
             continue
-        else:
-            mtimes[str(os.stat(otherfile).st_mtime) + otherfile] = otherfile
+        mtimes[str(os.stat(otherfile).st_mtime) + otherfile] = otherfile
     return [mtimes[mtime] for mtime in sorted(mtimes, reverse=True)]
 
 
-def assign_file(filename, prefix, force=False):
+def assign_file(filename: str, prefix: str, force: bool = False) -> int:
     """
     Process "filename", passing "prefix" to find_siblings().
+
     With force=True, force update even if EXIF is already present.
     """
     logger = logging.getLogger("exiassign.assign_file")
@@ -62,7 +64,7 @@ def assign_file(filename, prefix, force=False):
         return 1
     # Currently F-spot always tries to write "DateTimeOriginal", so we must
     # change the key to detect files with valid exif information.
-    #if not force and exif_file.fields.has_key("DateTimeOriginal"):
+    # if not force and exif_file.fields.has_key("DateTimeOriginal"):
     if not force and "Model" in exif_file.fields:
         logger.info("Skipping %s, it seems to contain EXIF data.", filename)
         return 0
@@ -81,28 +83,27 @@ def assign_file(filename, prefix, force=False):
     return 0
 
 
-def run(argv, callback=None):
+def run(argv: Sequence[str],
+        callback: Optional[Callable[[str, str, float], bool]] = None) -> None:
     """
     Take an equivalent of sys.argv[1:] and optionally a callable.
+
     Parse options, assign relating files and gate meta information between
     them, and optionally call the callable on every processed file with
     3 arguments:
     filename, newname, percentage.
     If the callable returns True, stop the processing.
     """
-    parser = optparse.OptionParser(usage="usage: %prog [options] "
-                                         "<files or dirs>")
-    parser.add_option("-f", "--force", action="store_true", dest="force",
-                      help="Force update even if EXIF is already present. "
-                           "The fields handled by these scripts are kept "
-                           "anyway.")
-    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
-                      help="Be verbose.")
-    options, args = parser.parse_args(argv)
-
-    if len(args) == 0:
-        parser.print_help()
-        sys.exit(1)
+    parser = argparse.ArgumentParser(usage="usage: %prog [options] "
+                                     "<files or dirs>")
+    parser.add_argument("-f", "--force", action="store_true", dest="force",
+                        help="Force update even if EXIF is already present. "
+                             "The fields handled by these scripts are kept "
+                             "anyway.")
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose",
+                        help="Be verbose.")
+    parser.add_argument("args", nargs="+", metavar="file_or_dir")
+    options = parser.parse_args(argv)
 
     logging.basicConfig(format="%(module)s: %(message)s")
     if options.verbose:
@@ -111,7 +112,7 @@ def run(argv, callback=None):
 
     filename_re = re.compile("^(\\d{8}(-\\d{6})?-.{3}\\d{4}-)(.{5})\\.[^.]*$")
 
-    for filename, percentage in filelist.Filelist(args):
+    for filename, percentage in filelist.Filelist(options.args):
         mymatch = filename_re.match(os.path.basename(filename))
         if mymatch:
             logger.info("%3s%% %s", percentage, filename)
