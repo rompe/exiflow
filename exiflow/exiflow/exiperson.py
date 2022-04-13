@@ -2,8 +2,10 @@
 # -*- coding: utf-8 -*-
 # vim: tabstop=4 expandtab shiftwidth=4
 """
-Personalize images by setting EXIF fields to values spezified in exif.cfg or
-on command line. Any arbitrary field name may be configured or given.
+Personalize images by setting EXIF fields.
+
+Values are spezified in exif.cfg or on command line.
+Any arbitrary field name may be configured or given.
 
 This is normally used for artist and copyright information.
 
@@ -15,16 +17,19 @@ __revision__ = "$Id$"
 
 import sys
 import logging
-import optparse
+import argparse
+from typing import Callable, Dict, List, Optional, Sequence, Tuple
 from . import exif
 from . import filelist
 from . import configfile
 
 
-def personalize_file(filename, personals, options_section_personals,
-                     forced_personals):
+def personalize_file(filename: str, personals: List[Tuple[str, str]],
+                     options_section_personals: List[Tuple[str, str]],
+                     forced_personals: Dict[str, str]) -> int:
     """
     Personalize an image using data from the dictionary "personals".
+
     The optional "forced_personals" override all other personals.
     """
     logger = logging.getLogger("exiperson.personalize_file")
@@ -43,8 +48,8 @@ def personalize_file(filename, personals, options_section_personals,
             configfile.append("exif", exif_file.fields["Model"],
                               ("artist", "contact"))
             sys.stderr.write("Get rid of this message by defining at least"
-                             " an empty [%s] section.\n" %
-                             exif_file.fields["Model"])
+                             f" an empty [{exif_file.fields['Model']}] "
+                             "section.\n")
 
     if len(options_section_personals) > 0:
         personals += options_section_personals
@@ -70,28 +75,32 @@ def personalize_file(filename, personals, options_section_personals,
     return 0
 
 
-def run(argv, callback=None):
+def run(argv: Sequence[str],
+        callback: Optional[Callable[[str, str, float, bool], bool]]
+        = None) -> None:
     """
     Take an equivalent of sys.argv[1:] and optionally a callable.
+
     Parse options, personalize files and optionally call the callable
     on every processed file with 3 arguments: filename, newname, percentage.
     If the callable returns True, stop the processing.
     """
-    parser = optparse.OptionParser(usage="usage: %prog [options] "
-                                         "[-- -TAGNAME=VALUE [...]] "
-                                         "<files or dirs>")
+    parser = argparse.ArgumentParser(usage="usage: %prog [options] "
+                                           "[-- -TAGNAME=VALUE [...]] "
+                                           "<files or dirs>")
     parser.description = ("Hint: %prog is able to set or unset any tags "
                           "supported in ExifTool with -TAGNAME=[VALUE] "
                           "syntax.")
-    parser.add_option("--section", "-s", dest="section",
-                      help="Name of a config file section to be read. This is"
-                           " useful if different people are using the same"
-                           " camera model. By default, the section name is"
-                           " guessed from the camera model. Section 'all' is"
-                           " the default.")
-    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
-                      help="Be verbose.")
-    options, args = parser.parse_args(argv)
+    parser.add_argument("--section", "-s", dest="section",
+                        help="Name of a config file section to be read. This "
+                        "is useful if different people are using the same "
+                        "camera model. By default, the section name is "
+                        "guessed from the camera model. Section 'all' is "
+                        "the default.")
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose",
+                        help="Be verbose.")
+    parser.add_argument("args", nargs="+", metavar="tag_or_file_or_dir")
+    options = parser.parse_args(argv)
 
     logging.basicConfig(format="%(module)s: %(message)s")
     if options.verbose:
@@ -100,8 +109,8 @@ def run(argv, callback=None):
 
     exifconfig = configfile.parse("exif")
 
-    defaultpersonals = []
-    options_section_personals = []
+    defaultpersonals: List[Tuple[str, str]] = []
+    options_section_personals: List[Tuple[str, str]] = []
     if exifconfig.has_section("all"):
         defaultpersonals += exifconfig.items("all")
 
@@ -114,9 +123,9 @@ def run(argv, callback=None):
             sys.exit(1)
 
     # collect EXIF data supplied on command line
-    forced_personals = {}
-    remaining_args = []
-    for arg in args:
+    forced_personals: Dict[str, str] = {}
+    remaining_args: List[str] = []
+    for arg in options.args:
         if arg.startswith("-") and "=" in arg:
             forced_personals.update(dict((arg.lstrip("-").split("="),)))
         else:
@@ -125,7 +134,7 @@ def run(argv, callback=None):
     for filename, percentage in filelist.Filelist(remaining_args):
         logger.info("%3s%% %s", percentage, filename)
         if callable(callback):
-            if callback(filename, filename, percentage):
+            if callback(filename, filename, percentage, False):
                 break
         # Note to programmer:
         # The [:] is needed to get a slice copy instead of a reference.
