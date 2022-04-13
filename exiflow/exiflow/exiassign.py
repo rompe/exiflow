@@ -84,7 +84,8 @@ def assign_file(filename: str, prefix: str, force: bool = False) -> int:
 
 
 def run(argv: Sequence[str],
-        callback: Optional[Callable[[str, str, float], bool]] = None) -> None:
+        callback: Optional[Callable[[str, str, float, bool], bool]]
+        = None) -> None:
     """
     Take an equivalent of sys.argv[1:] and optionally a callable.
 
@@ -94,8 +95,7 @@ def run(argv: Sequence[str],
     filename, newname, percentage.
     If the callable returns True, stop the processing.
     """
-    parser = argparse.ArgumentParser(usage="usage: %prog [options] "
-                                     "<files or dirs>")
+    parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--force", action="store_true", dest="force",
                         help="Force update even if EXIF is already present. "
                              "The fields handled by these scripts are kept "
@@ -119,7 +119,7 @@ def run(argv: Sequence[str],
             prefix = mymatch.groups()[0]
             assign_file(filename, prefix, options.force)
             if callable(callback):
-                if callback(filename, filename, percentage):
+                if callback(filename, filename, percentage, False):
                     break
 
 

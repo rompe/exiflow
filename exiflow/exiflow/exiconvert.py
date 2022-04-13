@@ -31,17 +31,16 @@ import os
 import re
 import sys
 import logging
-import optparse
+import argparse
 import subprocess
+from typing import Callable, Optional, Sequence
 from . import exif
 from . import filelist
 from . import configfile
 
 
-def convert_file(filename):
-    """
-    Convert filename and return the newly generated name without dir.
-    """
+def convert_file(filename: str) -> str:
+    """Convert filename and return the newly generated name without dir."""
     logger = logging.getLogger("exiconvert.convert_file")
     basename = os.path.basename(filename)
     # Sanity check - no sense in trying to convert jpeg to jpeg
@@ -54,6 +53,7 @@ def convert_file(filename):
     exif_file.read_exif()
     model = exif_file.fields.get("Model", "all")
 
+    # pylint: disable=unbalanced-tuple-unpacking
     raw_extension, raw_converter = \
         configfile.get_options("cameras", model,
                                ("raw_extension", "raw_converter"))
@@ -75,13 +75,17 @@ def convert_file(filename):
         logger.info("%s already exists, skipping %s.", newname, basename)
     else:
         command = raw_converter + " " + filename
-        process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
-        for line in process.stderr:
+        with subprocess.Popen(command, shell=True,
+                              universal_newlines=True,
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE) as process:
+            stdout, stderr = process.communicate()
+            result = process.wait()
+        for line in stderr.splitlines():
             logger.warning(line)
-        for line in process.stdout:
+        for line in stdout.splitlines():
             logger.info(line)
-        if process.wait() > 0:
+        if result > 0:
             logger.error("Converter invocation returned an error:\n%s",
                          command)
         else:
@@ -93,23 +97,26 @@ def convert_file(filename):
     return basename
 
 
-def run(argv, callback=None):
+def run(argv: Sequence[str],
+        callback: Optional[Callable[[str, str, float, bool], bool]]
+        = None) -> None:
     """
     Take an equivalent of sys.argv[1:] and optionally a callable.
+
     Parse options, convert convertible files and optionally call the callable
     on every processed file with 4 arguments: filename, newname, percentage,
     keep_original=true. The latter option means "The new file is an addition,
     not a replacement". If the callable returns True, stop the processing.
     """
-    parser = optparse.OptionParser(usage="usage: %prog [options] "
-                                         "<files or dirs>")
-    parser.add_option("-r", "--remove-lqjpeg", action="store_true",
-                      dest="remove_lqjpeg",
-                      help="removes the low quality jpeg (...00l.jpg) "
-                            "example yyyymmdd-a00000-xy00l.jpg")
-    parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
-                      help="Be verbose.")
-    options, args = parser.parse_args(args=argv)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-r", "--remove-lqjpeg", action="store_true",
+                        dest="remove_lqjpeg",
+                        help="removes the low quality jpeg (...00l.jpg) "
+                        "example yyyymmdd-a00000-xy00l.jpg")
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose",
+                        help="Be verbose.")
+    parser.add_argument("args", nargs="+", metavar="file_or_dir")
+    options = parser.parse_args(args=argv)
 
     logging.basicConfig(format="%(module)s: %(message)s")
     if options.verbose:
@@ -117,11 +124,11 @@ def run(argv, callback=None):
     logger = logging.getLogger("exiconvert")
 
     filename_re = re.compile("^(\\d{8}(-\\d{6})?-.{3}\\d{4}-.{2})000\\.jpg$")
-    for filename, percentage in filelist.Filelist(args):
+    for filename, percentage in filelist.Filelist(options.args):
         callback_filename = None
         logger.info("%3s%% %s", percentage, filename)
         if callable(callback):
-            if callback(filename, filename, percentage):
+            if callback(filename, filename, percentage, False):
                 break
         try:
             newname = convert_file(filename)
@@ -148,7 +155,7 @@ def run(argv, callback=None):
         if callback_filename is not None and callable(callback):
             if callback(callback_filename,
                         os.path.join(os.path.dirname(filename), newname),
-                        percentage, keep_original=keep_original):
+                        percentage, keep_original):
                 break
 
 
